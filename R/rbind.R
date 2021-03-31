@@ -95,13 +95,11 @@ rbind_csr <- function(...) {
 
 #' @name rbind2-method
 #' @title Concatenate CSR matrices by rows
-#' @description `rbind2` method for the `dgRMatrix`, `ngRMatrix`, and `sparseVector` classes
-#' from the `Matrix` package. This method will concatenate CSR (a.k.a. RsparseMatrix)
-#' matrix objects without converting them to triplets/COO in the process, and will also
-#' concatenate sparse vectors assuming they are row vectors.
+#' @description `rbind2` method for the sparse matrix and sparse vector classes from `Matrix`,
+#' taking the most efficient route for the concatenation according to the input types.
 #' @param x First matrix to concatenate.
 #' @param y Second matrix to concatenate.
-#' @return A CSR matrix (`dgRMatrix` or `ndRMatrix` depending on the inputs).
+#' @return Either a CSR matrix or a COO matrix depending on the input types.
 #' @examples
 #' library(Matrix)
 #' library(MatrixExtra)
@@ -110,6 +108,7 @@ rbind_csr <- function(...) {
 #' X <- as(X, "RsparseMatrix")
 #' inherits(rbind2(X, X), "dgRMatrix")
 #' inherits(rbind(X, X, as.csc.matrix(X), X), "dgRMatrix")
+#' inherits(rbind2(as.coo.matrix(X), as.coo.matrix(X)), "dgTMatrix")
 NULL
 
 concat_dimname <- function(nm1, nm2, nrow1, nrow2) {
@@ -229,6 +228,11 @@ rbind2_generic <- function(x, y) {
     y_is_binary <- inherits(y, binary_types)
     y_is_logical <- inherits(y, logical_types)
 
+    if (inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
+        x <- as.csr.matrix(x, logical=x_is_logical, binary=x_is_binary)
+    if (inherits(x, "symmetricMatrix") || (.hasSlot(y, "diag") && y@diag != "N"))
+        y <- as.csr.matrix(y, logical=y_is_logical, binary=y_is_binary)
+
     if (x_is_binary && y_is_binary) {
         return(rbind2_ngr(as.csr.matrix(x, binary=TRUE), as.csr.matrix(y, binary=TRUE)))
     } else if ((x_is_binary || x_is_logical) && (y_is_binary || y_is_logical)) {
@@ -285,3 +289,108 @@ setMethod("rbind2", signature(x="RsparseMatrix", y="TsparseMatrix"), rbind2_gene
 #' @rdname rbind2-method
 #' @export
 setMethod("rbind2", signature(x="TsparseMatrix", y="RsparseMatrix"), rbind2_generic)
+
+### TODO: add tests for the ones below
+
+rbind2_tri <- function(x, y) {
+    x_is_binary <- inherits(x, "nsparseMatrix")
+    x_is_logical <- inherits(x, "lsparseMatrix")
+    y_is_binary <- inherits(y, "nsparseMatrix")
+    y_is_logical <- inherits(y, "lsparseMatrix")
+
+    if (inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
+        x <- as.coo.matrix(x, logical=x_is_logical, binary=x_is_binary)
+    if (inherits(x, "symmetricMatrix") || (.hasSlot(y, "diag") && y@diag != "N"))
+        y <- as.coo.matrix(y, logical=y_is_logical, binary=y_is_binary)
+
+    if (x_is_binary && y_is_binary) {
+        out <- new("ngTMatrix")
+    } else if ((x_is_binary || x_is_logical) && (y_is_binary || y_is_logical)) {
+        out <- new("lgTMatrix")
+    } else {
+        out <- new("dgTMatrix")
+    }
+
+    out@Dim <- as.integer(c(nrow(x) + nrow(y), max(ncol(x), ncol(y))))
+    out@Dimnames <- concat_dimnames(x, y)
+    out@i <- c(x@i, y@i)
+    out@j <- c(x@j, i@j)
+
+    if (inherits(out, "dsparseMatrix")) {
+        if (.hasSlot(x, "x") && .hasSlot(y, "x")) {
+            out@x <- concat_as_numeric(x@x, y@x)
+        } else if (.hasSlot(x, "x")) {
+            out@x <- concat_as_numeric(x@x, rep(1, length(y@i)))
+        } else {
+            out@x <- concat_as_numeric(rep(1, length(x@i)), y@x)
+        }
+    } else if (inherits(out, "lsparseMatrix")) {
+        if (.hasSlot(x, "x") && .hasSlot(y, "x")) {
+            out@x <- concat_as_logical(x@x, y@x)
+        } else if (.hasSlot(x, "x")) {
+            out@x <- concat_as_logical(x@x, rep(TRUE, length(y@i)))
+        } else {
+            out@x <- concat_as_logical(rep(TRUE, length(x@i)), y@x)
+        }
+    }
+
+    return(out)
+}
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="TsparseMatrix", y="TsparseMatrix"), rbind2_tri)
+
+rbind2_tri_vec <- function(x, v, x_is_first) {
+    x_is_binary <- inherits(x, "nsparseMatrix")
+    x_is_logical <- inherits(x, "lsparseMatrix")
+    v_is_binary <- inherits(v, "nsparseVector")
+    v_is_logical <- inherits(v, "lsparseVector")
+
+    if (inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
+        x <- as.coo.matrix(x, logical=x_is_logical, binary=x_is_binary)
+
+    if (x_is_binary && v_is_binary) {
+        out <- new("ngTMatrix")
+    } else if ((x_is_binary || x_is_logical) && (v_is_binary || v_is_logical)) {
+        out <- new("lgTMatrix")
+    } else {
+        out <- new("dgTMatrix")
+    }
+
+    out@Dim <- as.integer(c(nrow(x) + 1L, max(ncol(x), v@length)))
+    if (x_is_first)
+        out@Dimnames <- concat_dimnames(x, v)
+    else
+        out@Dimnames <- concat_dimnames(v, x)
+    out@i <- c(x@i, v@i - 1L)
+    out@j <- c(x@j, i@j)
+
+    if (inherits(out, "dsparseMatrix")) {
+        if (.hasSlot(x, "x") && .hasSlot(v, "x")) {
+            out@x <- concat_as_numeric(x@x, v@x)
+        } else if (.hasSlot(x, "x")) {
+            out@x <- concat_as_numeric(x@x, rep(1, length(v@i)))
+        } else {
+            out@x <- concat_as_numeric(rep(1, length(x@i)), v@x)
+        }
+    } else if (inherits(out, "lsparseMatrix")) {
+        if (.hasSlot(x, "x") && .hasSlot(v, "x")) {
+            out@x <- concat_as_logical(x@x, v@x)
+        } else if (.hasSlot(x, "x")) {
+            out@x <- concat_as_logical(x@x, rep(TRUE, length(v@i)))
+        } else {
+            out@x <- concat_as_logical(rep(TRUE, length(x@i)), v@x)
+        }
+    }
+
+    return(out)
+}
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="TsparseMatrix", y="sparseVector"), function(x, y) rbind2_tri_vec(x, y))
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="sparseVector", y="TsparseMatrix"), function(x, y) rbind2_tri_vec(y, x, FALSE))

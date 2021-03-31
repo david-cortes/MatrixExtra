@@ -5,3 +5,4 @@ src/*.dll
 old/*
 deleteme/*
 .Rproj.user/*
+.Rproj.user
