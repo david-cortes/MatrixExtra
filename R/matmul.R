@@ -1,6 +1,34 @@
 #' @importClassesFrom float float32
 #' @importFrom RhpcBLASctl blas_get_num_procs blas_set_num_threads
 
+### Peculiarities about R's matrix-by-vector multiplications (as of v4.0.4)
+### 
+### matmul(Mat, vec)
+###     -> If 'Mat' has more than one column, 'vec' is a column vector [n,1]
+###     -> If 'Mat' has only one column, 'vec' is a row vector [1,n]
+### matmul(vec, Mat)
+###     -> If 'Mat' has more than one row, 'vec' is a row vector [1,n]
+###     -> If 'Mat' has only one row, 'vec' is a column vector [n,1]
+### matmul(vec, vec) -> LHS is a row vector [1,n], RHS is a column vector [n,1]
+### 
+### crossprod(Mat, vec)
+###     -> If 'Mat' has more than one row, 'vec' is a column vector [n,1]
+###     -> If 'Mat' has one column, 'vec' is a row vector [1,n]
+### crossprod(vec, Mat) -> 'vec' is a column vector [n,1]
+### crossprod(vec, vec) -> 'vec' is a column vector [n,1]
+### 
+### tcrossprod(Mat, vec)
+###    -> If 'Mat' has more than one row and more than one column, will fail
+###    -> If 'Mat' has only one row, 'vec' is a row vector [1,n]
+###    -> If 'Mat' has only one column, 'vec' is a column vector [n,1]
+### tcrossprod(vec, Mat)
+###    -> If 'Mat' has more than one column, 'vec' is a row vector [1,n]
+###    -> If 'Mat' has only one column, 'vec' is a column vector [n,1]
+### tcrossprod(vec, vec): 'vec' is a column vector [n,1]
+
+
+### TODO: try to make the multiplications preserve the names
+
 check_dimensions_match <- function(x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=FALSE) {
     if (matmult) {
         inner_x <- ncol(x)
@@ -48,7 +76,11 @@ set_dimnames <- function(res, x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=F
 #' (See signatures for supported combinations).
 #'
 #' Objects from the `float` package are also supported for some combinations.
-#' @details Be aware that sparse-dense matrix multiplications might suffer from reduced
+#' @details When dealing with small or medium-sized inputs, using multi-threaded operations can
+#' add some very noticeable overhead and end up making the operation much slower. If that
+#' is the case, it's recommended to set the number of threads to 1.
+#' 
+#' Be aware that sparse-dense matrix multiplications might suffer from reduced
 #' numerical precision, especially when using objects of type `float32`
 #' (from the `float` package).
 #'
@@ -86,8 +118,6 @@ NULL
 
 #### Matrices ----
 
-### TODO: one of these float32-by-csr can be simplified to the matrix-vector product version
-
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
@@ -95,10 +125,11 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
 
     # restore on exit
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
     on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
 
     # set num threads to 1 in order to avoid thread contention between BLAS and openmp threads
-    RhpcBLASctl::blas_set_num_threads(1L)
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(x) != "double") mode(x) <- "double"
     y <- as.csc.matrix(y)
@@ -118,10 +149,60 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
-    if (is.vector(x@Data))
-        x@Data <- matrix(x@Data, ncol=1L)
+    
+    if (is.vector(x@Data)) {
+
+        if (inherits(y, "symmetricMatrix") ||
+            (.hasSlot(y, "diag") && y@diag != "N") ||
+            (.hasSlot(y, "x") && !inherits(y, "dsparseMatrix"))
+        ) {
+            y <- as.csc.matrix(y)
+        }
+
+        ### To match base R, if 'y' has more than one row, 'x' is [1,n], otherwise [n,1]
+        if (nrow(y) == 1L) {
+            if (.hasSlot(y, "x")) {
+                res <- matmul_colvec_by_srowvecascsc(
+                    x@Data,
+                    y@p,
+                    y@i,
+                    y@x
+                )
+            } else {
+                res <- matmul_colvec_by_srowvecascsc_binary(
+                    x@Data,
+                    y@p,
+                    y@i
+                )
+            }
+            return(new("float32", Data=res))
+        } else {
+            if (nrow(y) != length(x@Data))
+                stop("(row) vector-Matrix multiplication dimensions do not match.")
+
+            if (.hasSlot(y, "x")) {
+                res <- matmul_rowvec_by_csc(
+                    x@Data,
+                    y@p,
+                    y@i,
+                    y@x
+                )
+            } else {
+                res <- matmul_rowvec_by_cscbin(
+                    x@Data,
+                    y@p,
+                    y@i
+                )
+            }
+            return(new("float32", Data=res))
+        }
+    }
+
     check_dimensions_match(x, y, matmult=TRUE)
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     y <- as.csc.matrix(y)
 
@@ -142,8 +223,9 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
 setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
     on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
-    RhpcBLASctl::blas_set_num_threads(1L)
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(x) != "double") mode(x) <- "double"
     y <- as.csr.matrix(y)
@@ -162,10 +244,57 @@ setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y)
 #' @rdname matmult
 #' @export
 setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y) {
-    if (is.vector(x@Data))
-        x@Data <- matrix(x@Data, ncol=1L)
+    
+    if (is.vector(x@Data)) {
+        
+        if (inherits(y, "symmetricMatrix") ||
+            (.hasSlot(y, "diag") && y@diag != "N") ||
+            (.hasSlot(y, "x") && !inherits(y, "dsparseMatrix"))
+        ) {
+            y <- as.csr.matrix(y)
+        }
+
+        ### To match with base R, if 'y' has only one column, x is [n,1], otherwise [1,n]
+        if (ncol(y) == 1L) {
+            if (.hasSlot(y, "x")) {
+                res <- matmul_colvec_by_srowvecascsc(
+                    x@Data,
+                    y@p,
+                    y@j,
+                    y@x
+                )
+            } else {
+                res <- matmul_colvec_by_srowvecascsc_binary(
+                    x@Data,
+                    y@p,
+                    y@j
+                )
+            }
+            return(new("float32", Data=res))
+        } else {
+            if (.hasSlot(y, "x")) {
+                res <- matmul_rowvec_by_csc(
+                    x@Data,
+                    y@p,
+                    y@j,
+                    y@x
+                )
+            } else {
+                res <- matmul_rowvec_by_cscbin(
+                    x@Data,
+                    y@p,
+                    y@j
+                )
+            }
+            return(new("float32", Data=res))
+        }
+    }
+
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     y <- as.csr.matrix(y)
 
@@ -184,90 +313,72 @@ setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y
 #' @rdname matmult
 #' @export
 setMethod("crossprod", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
-    check_dimensions_match(x, y, crossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
-    RhpcBLASctl::blas_set_num_threads(1L)
-
-    if (typeof(x) != "double") mode(x) <- "double"
-    y <- as.csc.matrix(y)
-
-    res <- crossprod_dense_csc_numeric(
-        x,
-        y@p,
-        y@i,
-        y@x,
-        nthreads
-    )
-    res <- set_dimnames(res, x, y, crossprod=TRUE)
-    return(res)
+    return(t(x) %*% y)
 })
 
 #' @rdname matmult
 #' @export
 setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), function(x, y) {
-    if (is.vector(x@Data))
-        x@Data <- matrix(x@Data, ncol=1L)
-    check_dimensions_match(x, y, crossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
+    
+    if (is.vector(x@Data)) {
+        if (length(x@Data) != nrow(y))
+            stop("(column) vector-Matrix crossprod dimensions do not match.")
+        if (inherits(y, "symmetricMatrix") ||
+            (.hasSlot(y, "diag") && y@diag != "N") ||
+            (.hasSlot(y, "x") && !inherits(y, "dsparseMatrix"))
+        ) {
+            y <- as.csc.matrix(y)
+        }
+        if (.hasSlot(y, "x")) {
+            res <- matmul_rowvec_by_csc(
+                x@Data,
+                y@p,
+                y@i,
+                y@x
+            )
+        } else {
+            res <- matmul_rowvec_by_cscbin(
+                x@Data,
+                y@p,
+                y@i
+            )
+        }
+        return(new("float32", Data=res))
+    }
 
-    y <- as.csc.matrix(y)
-
-    res <- crossprod_dense_csc_float32(
-        x@Data,
-        y@p,
-        y@i,
-        y@x,
-        nthreads
-    )
-    res <- set_dimnames(res, x, y, crossprod=TRUE)
-    return(new("float32", Data=res))
+    return(t(x) %*% y)
 })
 
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
-    check_dimensions_match(x, y, matmult=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
-    RhpcBLASctl::blas_set_num_threads(1L)
-
-    if (typeof(y) != "double") mode(y) <- "double"
-    x <- as.csr.matrix(x)
-
-    res <- matmul_csr_dense_numeric(
-        x@p,
-        x@j,
-        x@x,
-        y,
-        nthreads
-    )
-
-    res <- set_dimnames(res, x, y, matmult=TRUE)
-    return(res)
+    return(tcrossprod(x, t(y)))
 })
 
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
-    if (is.vector(y@Data))
-        return(gemv_csr_vec(x, y))
+    
+    if (is.vector(y@Data)) {
+        if (ncol(x) == 1L) {
+            if (!inherits(x, "dsparseMatrix") ||
+                inherits(x, "symmetricMatrix") ||
+                (.hasSlot(x, "diag") && x@diag != "N")) {
+                x <- as.csr.matrix(x)
+            }
+            res <- matmul_colvec_by_scolvecascsr_f32(
+                y@Data,
+                x@p,
+                x@j,
+                x@x
+            )
+            return(new("float32", Data=res))
+        } else {
+            return(gemv_csr_vec(x, y))
+        }
+    }
 
-    check_dimensions_match(x, y, matmult=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-
-    x <- as.csr.matrix(x)
-
-    res <- matmul_csr_dense_float32(
-        x@p,
-        x@j,
-        x@x,
-        y@Data,
-        nthreads
-    )
-
-    res <- set_dimnames(res, x, y, matmult=TRUE)
-    return(new("float32", Data=res))
+    return(tcrossprod(x, t(y)))
 })
 
 #' @rdname matmult
@@ -275,8 +386,9 @@ setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
 setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
     on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
-    RhpcBLASctl::blas_set_num_threads(1L)
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(y) != "double") mode(y) <- "double"
     x <- as.csr.matrix(x)
@@ -298,6 +410,9 @@ setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), function(x, y)
 setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- RhpcBLASctl::blas_get_num_procs()
+    nthreads <- max(nthreads, 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     x <- as.csr.matrix(x)
 
@@ -348,7 +463,7 @@ gemv_csr_vec <- function(x, y) {
                 y,
                 nthreads
             )
-        } else if (typeof(y) == "float32") {
+        } else if (inherits(y, "float32")) {
             res <- matmul_csr_dvec_float32(
                 x@p,
                 x@j,
@@ -412,23 +527,116 @@ gemv_csr_vec <- function(x, y) {
         }
     }
 
-    if (!is.null(rownames(x))) rownames(res) <- rownames(x)
-    if (typeof(y) == 'float32') res <- new("float32", Data=res)
-    return(matrix(res, ncol=1))
+    if (!is.null(rownames(x)))
+        names(res) <- rownames(x)
+    
+    if (!inherits(y, "float32")) {
+        return(matrix(res, ncol=1))
+    } else {
+        res <- new("float32", Data=matrix(res, ncol=1))
+        return(res)
+    }
+}
+
+outerprod_csrsinglecol_by_dvec <- function(x, y) {
+    if (ncol(x) != 1L)
+        stop("Internal error. Please create a bug report in GitHub.")
+
+    if (!inherits(x, "dsparseMatrix") ||
+        inherits(x, "symmetricMatrix") ||
+        (.hasSlot(x, "diag") && x@diag != "N")
+    ) {
+        x <- as.csr.matrix(x)
+    }
+
+    if (inherits(y, "sparseVector")) {
+        y <- sort_sparse_indices(y)
+
+        if (inherits(y, "dsparseVector")) {
+            res <- matmul_spcolvec_by_scolvecascsr_numeric(
+                x@p,
+                x@j,
+                x@x,
+                y@i,
+                y@x,
+                y@length
+            )
+        } else if (inherits(y, "isparseVector")) {
+            res <- matmul_spcolvec_by_scolvecascsr_integer(
+                x@p,
+                x@j,
+                x@x,
+                y@i,
+                y@x,
+                y@length
+            )
+        } else if (inherits(y, "lsparseVector")) {
+            res <- matmul_spcolvec_by_scolvecascsr_logical(
+                x@p,
+                x@j,
+                x@x,
+                y@i,
+                y@x,
+                y@length
+            )
+        } else if (inherits(y, "nsparseVector")) {
+            res <- matmul_spcolvec_by_scolvecascsr_binary(
+                x@p,
+                x@j,
+                x@x,
+                y@i,
+                y@length
+            )
+        } else {
+            y <- as(y, "dsparseVector")
+            return(outerprod_csrsinglecol_by_dvec(x, y))
+        }
+        out <- new("dgCMatrix")
+        out@p <- res$indptr
+        out@i <- res$indices
+        out@x <- res$values
+        out@Dim <- as.integer(c(nrow(x), y@length))
+        out@Dimnames <- list(rownames(x), NULL)
+        return(out)
+    } else {
+
+        if (typeof(y) != "double")
+            mode(y) <- "double"
+
+        res <- matmul_colvec_by_scolvecascsr(
+            y,
+            x@p,
+            x@j,
+            x@x
+        )
+        if (!is.null(rownames(x)))
+            rownames(res) <- rownames(x)
+        if ("names" %in% names(attributes(y)))
+            colnames(x) <- names(y)
+        return(res)
+    }
+
+}
+
+matmul_csr_vec <- function(x, y) {
+    if (ncol(x) == 1L)
+        return(outerprod_csrsinglecol_by_dvec(x, y))
+    else
+        return(gemv_csr_vec(x, y))
 }
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="numeric"), gemv_csr_vec)
+setMethod("%*%", signature(x="RsparseMatrix", y="numeric"), matmul_csr_vec)
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="logical"), gemv_csr_vec)
+setMethod("%*%", signature(x="RsparseMatrix", y="logical"), matmul_csr_vec)
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="integer"), gemv_csr_vec)
+setMethod("%*%", signature(x="RsparseMatrix", y="integer"), matmul_csr_vec)
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="sparseVector"), gemv_csr_vec)
+setMethod("%*%", signature(x="RsparseMatrix", y="sparseVector"), matmul_csr_vec)

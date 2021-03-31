@@ -4,6 +4,8 @@ library("MatrixExtra")
 library("float")
 context("Matrix multiplications")
 
+### TODO: add tests about the names of objects
+
 test_that("matmult dense-CSC", {
     set.seed(1)
     A <- rsparsematrix(100, 50, .4)
@@ -144,11 +146,72 @@ test_that("matmult CSR-vector", {
         num, int, bool
     )
     for (inp in lst_inputs) {
-        expect_equal(as.csr.matrix(A) %*% inp, as.matrix(A) %*% as.numeric(inp))
+        expect_equal(as.csr.matrix(A) %*% inp,
+                     as.matrix(A) %*% as.numeric(inp))
+        expect_equal(unname(as.matrix(as.csr.matrix(A[,1,drop=FALSE]) %*% inp)),
+                     unname(as.matrix(A[,1,drop=FALSE]) %*% as.numeric(inp)))
+        expect_equal(unname(as.matrix(as.csr.matrix(A[1:10,1,drop=FALSE]) %*% inp)),
+                     unname(as.matrix(A[1:10,1,drop=FALSE]) %*% as.numeric(inp)))
     }
 
     v[4] <- NA_real_
     A <- as.csr.matrix(A)
     A@x[10] <- NA_real_
     expect_equal(A %*% v, unname(as.matrix(as.csc.matrix(A) %*% v)))
+})
+
+test_that("float32 vectors", {
+    set.seed(1)
+    A <- rsparsematrix(100, 50, .4)
+    v <- float::fl(rnorm(100))
+    v2 <- float::fl(rnorm(50))
+
+    expect_equal(float::dbl(v %*% A),
+                 float::dbl(v) %*% as.matrix(A),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(v2 %*% as.csc.matrix(A[1,,drop=FALSE])),
+                 float::dbl(v2) %*% as.matrix(A)[1,,drop=FALSE],
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(v2 %*% as.csc.matrix(A[1,1:10,drop=FALSE])),
+                 float::dbl(v2) %*% as.matrix(A)[1,1:10,drop=FALSE],
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(tcrossprod(v2, as.csr.matrix(A))),
+                 tcrossprod(float::dbl(v2), as.matrix(A)),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(tcrossprod(v2, as.csr.matrix(A[1:10,]))),
+                 tcrossprod(float::dbl(v2), as.matrix(A)[1:10,]),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(tcrossprod(v, as.csr.matrix(A[,1,drop=FALSE]))),
+                 tcrossprod(float::dbl(v), as.matrix(A[,1,drop=FALSE])),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(tcrossprod(v, as.csr.matrix(A[1:10,1,drop=FALSE]))),
+                 tcrossprod(float::dbl(v), as.matrix(A[1:10,1,drop=FALSE])),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(crossprod(v, as.csc.matrix(A))),
+                 crossprod(float::dbl(v), as.matrix(A)),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(crossprod(v, as.csc.matrix(A[,1:10,drop=FALSE]))),
+                 crossprod(float::dbl(v), as.matrix(A)[,1:10,drop=FALSE]),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(as.csr.matrix(A) %*% v2),
+                 as.matrix(A) %*% float::dbl(v2),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(as.csr.matrix(A[,1,drop=FALSE]) %*% v2),
+                 as.matrix(A[,1,drop=FALSE]) %*% float::dbl(v2),
+                 tolerance=1e-5)
+
+    expect_equal(float::dbl(as.csr.matrix(A[1:10,1,drop=FALSE]) %*% v2),
+                 as.matrix(A[1:10,1,drop=FALSE]) %*% float::dbl(v2),
+                 tolerance=1e-5)
+
 })

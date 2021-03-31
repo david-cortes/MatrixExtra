@@ -2,12 +2,17 @@
 #include <stddef.h>
 #include <limits.h>
 #include <math.h>
+#include <string.h>
 #include <type_traits>
 #include <numeric>
 #include <algorithm>
 #include <unordered_set>
 #include <unordered_map>
-#include <omp.h>
+#ifdef _OPENMP
+#   include <omp.h>
+#else
+#   define omp_get_thread_num() (0)
+#endif
 
 /* Aliasing for compiler optimizations */
 #if defined(__GNUG__) || defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)

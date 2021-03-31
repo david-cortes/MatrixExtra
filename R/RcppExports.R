@@ -17,22 +17,6 @@ tcrossprod_dense_csr_float32 <- function(X_colmajor, Y_csr_indptr, Y_csr_indices
     .Call(`_MatrixExtra_tcrossprod_dense_csr_float32`, X_colmajor, Y_csr_indptr, Y_csr_indices, Y_csr_values, nthreads, ncols_Y)
 }
 
-crossprod_dense_csc_numeric <- function(X_colmajor, Y_csc_indptr, Y_csc_indices, Y_csc_values, nthreads) {
-    .Call(`_MatrixExtra_crossprod_dense_csc_numeric`, X_colmajor, Y_csc_indptr, Y_csc_indices, Y_csc_values, nthreads)
-}
-
-crossprod_dense_csc_float32 <- function(X_colmajor, Y_csc_indptr, Y_csc_indices, Y_csc_values, nthreads) {
-    .Call(`_MatrixExtra_crossprod_dense_csc_float32`, X_colmajor, Y_csc_indptr, Y_csc_indices, Y_csc_values, nthreads)
-}
-
-matmul_csr_dense_numeric <- function(X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads) {
-    .Call(`_MatrixExtra_matmul_csr_dense_numeric`, X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads)
-}
-
-matmul_csr_dense_float32 <- function(X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads) {
-    .Call(`_MatrixExtra_matmul_csr_dense_float32`, X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads)
-}
-
 tcrossprod_csr_dense_numeric <- function(X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads) {
     .Call(`_MatrixExtra_tcrossprod_csr_dense_numeric`, X_csr_indptr, X_csr_indices, X_csr_values, Y_colmajor, nthreads)
 }
@@ -75,6 +59,50 @@ matmul_csr_svec_binary <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_
 
 matmul_csr_svec_float32 <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, nthreads) {
     .Call(`_MatrixExtra_matmul_csr_svec_float32`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, nthreads)
+}
+
+matmul_colvec_by_srowvecascsc <- function(colvec_, indptr, indices, values) {
+    .Call(`_MatrixExtra_matmul_colvec_by_srowvecascsc`, colvec_, indptr, indices, values)
+}
+
+matmul_colvec_by_srowvecascsc_binary <- function(colvec_, indptr, indices) {
+    .Call(`_MatrixExtra_matmul_colvec_by_srowvecascsc_binary`, colvec_, indptr, indices)
+}
+
+matmul_rowvec_by_csc <- function(rowvec_, indptr, indices, values) {
+    .Call(`_MatrixExtra_matmul_rowvec_by_csc`, rowvec_, indptr, indices, values)
+}
+
+matmul_rowvec_by_cscbin <- function(rowvec_, indptr, indices) {
+    .Call(`_MatrixExtra_matmul_rowvec_by_cscbin`, rowvec_, indptr, indices)
+}
+
+matmul_colvec_by_drowvecascsc <- function(colvec_, indptr, indices, values_) {
+    .Call(`_MatrixExtra_matmul_colvec_by_drowvecascsc`, colvec_, indptr, indices, values_)
+}
+
+matmul_colvec_by_scolvecascsr_f32 <- function(colvec_, indptr, indices, values) {
+    .Call(`_MatrixExtra_matmul_colvec_by_scolvecascsr_f32`, colvec_, indptr, indices, values)
+}
+
+matmul_colvec_by_scolvecascsr <- function(colvec_, indptr, indices, values_) {
+    .Call(`_MatrixExtra_matmul_colvec_by_scolvecascsr`, colvec_, indptr, indices, values_)
+}
+
+matmul_spcolvec_by_scolvecascsr_numeric <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length) {
+    .Call(`_MatrixExtra_matmul_spcolvec_by_scolvecascsr_numeric`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length)
+}
+
+matmul_spcolvec_by_scolvecascsr_integer <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length) {
+    .Call(`_MatrixExtra_matmul_spcolvec_by_scolvecascsr_integer`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length)
+}
+
+matmul_spcolvec_by_scolvecascsr_logical <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length) {
+    .Call(`_MatrixExtra_matmul_spcolvec_by_scolvecascsr_logical`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, y_length)
+}
+
+matmul_spcolvec_by_scolvecascsr_binary <- function(X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_length) {
+    .Call(`_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_length)
 }
 
 is_same_ngRMatrix <- function(indptr1, indptr2, indices1, indices2) {

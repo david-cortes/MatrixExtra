@@ -63,6 +63,10 @@ for <sparse, dense> matrix combinations and <sparse, vector> combinations
 Objects from the `float` package are also supported for some combinations.
 }
 \details{
+When dealing with small or medium-sized inputs, using multi-threaded operations can
+add some very noticeable overhead and end up making the operation much slower. If that
+is the case, it's recommended to set the number of threads to 1.
+
 Be aware that sparse-dense matrix multiplications might suffer from reduced
 numerical precision, especially when using objects of type `float32`
 (from the `float` package).
