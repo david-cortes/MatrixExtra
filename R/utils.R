@@ -1,8 +1,3 @@
-#' @useDynLib MatrixExtra, .registration=TRUE
-#' @importFrom Rcpp evalCpp
-#' @import Matrix
-#' @import methods
-
 #' @title Sort the indices of a sparse matrix or sparse vector
 #' @details Will sort the indices of a sparse matrix or sparse vector.
 #'

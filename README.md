@@ -109,7 +109,7 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 
 # TODO
 
-* Function to set number of threads.
+* Function to set number of threads and to set `t_shallow` as the default.
 * Function to remove zeros.
 * Assignment operator (`[<-`).
 * `diag` and `diag<-`.

@@ -48,10 +48,12 @@
 }
 \arguments{
 \item{x, y}{dense (\code{matrix} / \code{float32})
-and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices.}
+and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices or vectors
+(\code{sparseVector}, \code{numeric}, \code{integer}, \code{logical}).}
 }
 \value{
-A dense \code{matrix} object.
+A dense \code{matrix} object in most cases, except for `<RsparseMatrix, sparseVector>`,
+which will return a CSC matrix (`dgCMatrix`).
 }
 \description{
 Multithreaded <matrix, matrix> multiplications
@@ -63,16 +65,35 @@ for <sparse, dense> matrix combinations and <sparse, vector> combinations
 Objects from the `float` package are also supported for some combinations.
 }
 \details{
-When dealing with small or medium-sized inputs, using multi-threaded operations can
-add some very noticeable overhead and end up making the operation much slower. If that
-is the case, it's recommended to set the number of threads to 1.
+Will try to use the same number of threads that are configured for BLAS.
+These can be set through the `RhpcBLASctl` package (see
+\link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
 
 Be aware that sparse-dense matrix multiplications might suffer from reduced
 numerical precision, especially when using objects of type `float32`
 (from the `float` package).
 
+Internally, these functions use BLAS level-1 routines, so their speed might depend on
+the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
+on a default install of R for Windows.
+
 When multiplying a sparse matrix by a sparse vector, their indices
 will be sorted in-place (see \link{sort_sparse_indices}).
+
+In order to match exactly with base R's behaviors, when passing vectors to these
+operators, will assume their shape as follows:\itemize{
+\item MatMult(Matrix, vector): column vector if the matrix has more than one column
+or is empty, row vector if the matrix has only one column.
+\item MatMult(vector, Matrix): row vector if the matrix has more than one row,
+column vector if the matrix has only one row
+\item crossprod(Matrix, vector): column vector if the matrix has more than one row,
+row vector if the matrix has only one row.
+\item crossprod(vector, Matrix): column vector.
+\item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
+column vector if the matrix has only one column, and will throw an error otherwise.
+\item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
+column vector if the matrix has only one column.
+}
 }
 \examples{
 library(Matrix)

@@ -2,7 +2,7 @@
 #' @importFrom RhpcBLASctl blas_get_num_procs blas_set_num_threads
 
 ### Peculiarities about R's matrix-by-vector multiplications (as of v4.0.4)
-### 
+###
 ### matmul(Mat, vec)
 ###     -> If 'Mat' has more than one column, 'vec' is a column vector [n,1]
 ###     -> If 'Mat' has only one column, 'vec' is a row vector [1,n]
@@ -10,13 +10,13 @@
 ###     -> If 'Mat' has more than one row, 'vec' is a row vector [1,n]
 ###     -> If 'Mat' has only one row, 'vec' is a column vector [n,1]
 ### matmul(vec, vec) -> LHS is a row vector [1,n], RHS is a column vector [n,1]
-### 
+###
 ### crossprod(Mat, vec)
 ###     -> If 'Mat' has more than one row, 'vec' is a column vector [n,1]
 ###     -> If 'Mat' has one column, 'vec' is a row vector [1,n]
 ### crossprod(vec, Mat) -> 'vec' is a column vector [n,1]
 ### crossprod(vec, vec) -> 'vec' is a column vector [n,1]
-### 
+###
 ### tcrossprod(Mat, vec)
 ###    -> If 'Mat' has more than one row and more than one column, will fail
 ###    -> If 'Mat' has only one row, 'vec' is a row vector [1,n]
@@ -76,20 +76,41 @@ set_dimnames <- function(res, x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=F
 #' (See signatures for supported combinations).
 #'
 #' Objects from the `float` package are also supported for some combinations.
-#' @details When dealing with small or medium-sized inputs, using multi-threaded operations can
-#' add some very noticeable overhead and end up making the operation much slower. If that
-#' is the case, it's recommended to set the number of threads to 1.
-#' 
+#' @details Will try to use the same number of threads that are configured for BLAS.
+#' These can be set through the `RhpcBLASctl` package (see
+#' \link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
+#'
 #' Be aware that sparse-dense matrix multiplications might suffer from reduced
 #' numerical precision, especially when using objects of type `float32`
 #' (from the `float` package).
 #'
+#' Internally, these functions use BLAS level-1 routines, so their speed might depend on
+#' the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
+#' on a default install of R for Windows.
+#'
 #' When multiplying a sparse matrix by a sparse vector, their indices
 #' will be sorted in-place (see \link{sort_sparse_indices}).
+#'
+#' In order to match exactly with base R's behaviors, when passing vectors to these
+#' operators, will assume their shape as follows:\itemize{
+#' \item MatMult(Matrix, vector): column vector if the matrix has more than one column
+#' or is empty, row vector if the matrix has only one column.
+#' \item MatMult(vector, Matrix): row vector if the matrix has more than one row,
+#' column vector if the matrix has only one row
+#' \item crossprod(Matrix, vector): column vector if the matrix has more than one row,
+#' row vector if the matrix has only one row.
+#' \item crossprod(vector, Matrix): column vector.
+#' \item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
+#' column vector if the matrix has only one column, and will throw an error otherwise.
+#' \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
+#' column vector if the matrix has only one column.
+#' }
 #' @param x,y dense (\code{matrix} / \code{float32})
-#' and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices.
+#' and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices or vectors
+#' (\code{sparseVector}, \code{numeric}, \code{integer}, \code{logical}).
 #' @return
-#' A dense \code{matrix} object.
+#' A dense \code{matrix} object in most cases, except for `<RsparseMatrix, sparseVector>`,
+#' which will return a CSC matrix (`dgCMatrix`).
 #'
 #' @name matmult
 #' @rdname matmult
@@ -149,7 +170,7 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
-    
+
     if (is.vector(x@Data)) {
 
         if (inherits(y, "symmetricMatrix") ||
@@ -244,9 +265,9 @@ setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y)
 #' @rdname matmult
 #' @export
 setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y) {
-    
+
     if (is.vector(x@Data)) {
-        
+
         if (inherits(y, "symmetricMatrix") ||
             (.hasSlot(y, "diag") && y@diag != "N") ||
             (.hasSlot(y, "x") && !inherits(y, "dsparseMatrix"))
@@ -319,7 +340,7 @@ setMethod("crossprod", signature(x="matrix", y="CsparseMatrix"), function(x, y) 
 #' @rdname matmult
 #' @export
 setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), function(x, y) {
-    
+
     if (is.vector(x@Data)) {
         if (length(x@Data) != nrow(y))
             stop("(column) vector-Matrix crossprod dimensions do not match.")
@@ -358,7 +379,7 @@ setMethod("%*%", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
-    
+
     if (is.vector(y@Data)) {
         if (ncol(x) == 1L) {
             if (!inherits(x, "dsparseMatrix") ||
@@ -529,7 +550,7 @@ gemv_csr_vec <- function(x, y) {
 
     if (!is.null(rownames(x)))
         names(res) <- rownames(x)
-    
+
     if (!inherits(y, "float32")) {
         return(matrix(res, ncol=1))
     } else {
