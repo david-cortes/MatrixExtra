@@ -1,0 +1,7 @@
+.directory
+src/*.o
+src/*.so
+src/*.dll
+old/*
+deleteme/*
+.Rproj.user/*

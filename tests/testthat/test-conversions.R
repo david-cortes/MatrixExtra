@@ -1,0 +1,325 @@
+library("testthat")
+library("Matrix")
+library("MatrixExtra")
+library("data.table")
+context("Conversion functions")
+
+m.base <- matrix(1:10, nrow=5)
+m.coo <- as(m.base, "TsparseMatrix")
+m.coo.b <- as(m.coo, "nsparseMatrix")
+m.csr <- as(m.base, "RsparseMatrix")
+m.csr.b <- as(m.csr, "nsparseMatrix")
+m.csc <- as(m.base, "CsparseMatrix")
+m.csc.b <- as(m.csc, "nsparseMatrix")
+m.f32 <- float::fl(m.base)
+df <- as.data.frame(m.base)
+dt <- data.table::as.data.table(df)
+v.num <- as.numeric(1:3)
+v.int <- as.integer(v.num)
+v.f32 <- float::fl(v.num)
+v.sp <- as(v.num, "dsparseVector")
+
+test_that("Conversion to CSR", {
+    expect_s4_class(as.csr.matrix(m.base), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.coo), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.coo.b), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.csr), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.csr.b), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.csc), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.csc.b), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(m.f32), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(df), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(dt), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(v.num), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(v.int), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(v.f32), "dgRMatrix")
+    expect_s4_class(as.csr.matrix(v.sp), "dgRMatrix")
+
+    expect_s4_class(as.csr.matrix(m.base, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.coo, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.coo.b, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.csr, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.csr.b, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.csc, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.csc.b, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(m.f32, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(df, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(dt, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(v.num, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(v.int, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(v.f32, binary=TRUE), "ngRMatrix")
+    expect_s4_class(as.csr.matrix(v.sp, binary=TRUE), "ngRMatrix")
+
+    expect_equal(nrow(as.csr.matrix(v.num)), 1L)
+    expect_equal(nrow(as.csr.matrix(v.int)), 1L)
+    expect_equal(nrow(as.csr.matrix(v.f32)), 1L)
+    expect_equal(nrow(as.csr.matrix(v.sp)), 1L)
+
+    expect_equal(dim(as.csr.matrix(m.base)), dim(m.base))
+    expect_equal(dim(as.csr.matrix(m.coo)), dim(m.coo))
+    expect_equal(dim(as.csr.matrix(m.coo.b)), dim(m.coo.b))
+    expect_equal(dim(as.csr.matrix(m.csr)), dim(m.csr))
+    expect_equal(dim(as.csr.matrix(m.csr.b)), dim(m.csr.b))
+    expect_equal(dim(as.csr.matrix(m.csc)), dim(m.csc))
+    expect_equal(dim(as.csr.matrix(m.csc.b)), dim(m.csc.b))
+    expect_equal(dim(as.csr.matrix(m.f32)), dim(m.f32))
+    expect_equal(dim(as.csr.matrix(df)), dim(df))
+    expect_equal(dim(as.csr.matrix(dt)), dim(dt))
+})
+
+test_that("Conversion to CSC", {
+    expect_s4_class(as.csc.matrix(m.base), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.coo), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.coo.b), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.csr), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.csr.b), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.csc), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.csc.b), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(m.f32), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(df), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(dt), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(v.num), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(v.int), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(v.f32), "dgCMatrix")
+    expect_s4_class(as.csc.matrix(v.sp), "dgCMatrix")
+
+    expect_s4_class(as.csc.matrix(m.base, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.coo, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.coo.b, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.csr, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.csr.b, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.csc, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.csc.b, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(m.f32, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(df, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(dt, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(v.num, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(v.int, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(v.f32, binary=TRUE), "ngCMatrix")
+    expect_s4_class(as.csc.matrix(v.sp, binary=TRUE), "ngCMatrix")
+
+    expect_equal(ncol(as.csc.matrix(v.num)), 1L)
+    expect_equal(ncol(as.csc.matrix(v.int)), 1L)
+    expect_equal(ncol(as.csc.matrix(v.f32)), 1L)
+    expect_equal(ncol(as.csc.matrix(v.sp)), 1L)
+
+    expect_equal(dim(as.csc.matrix(m.base)), dim(m.base))
+    expect_equal(dim(as.csc.matrix(m.coo)), dim(m.coo))
+    expect_equal(dim(as.csc.matrix(m.coo.b)), dim(m.coo.b))
+    expect_equal(dim(as.csc.matrix(m.csr)), dim(m.csr))
+    expect_equal(dim(as.csc.matrix(m.csr.b)), dim(m.csr.b))
+    expect_equal(dim(as.csc.matrix(m.csc)), dim(m.csc))
+    expect_equal(dim(as.csc.matrix(m.csc.b)), dim(m.csc.b))
+    expect_equal(dim(as.csc.matrix(m.f32)), dim(m.f32))
+    expect_equal(dim(as.csc.matrix(df)), dim(df))
+    expect_equal(dim(as.csc.matrix(dt)), dim(dt))
+})
+
+test_that("Conversion to COO", {
+    expect_s4_class(as.coo.matrix(m.base), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.coo), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.coo.b), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.csr), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.csr.b), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.csc), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.csc.b), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(m.f32), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(df), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(dt), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(v.num), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(v.int), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(v.f32), "dgTMatrix")
+    expect_s4_class(as.coo.matrix(v.sp), "dgTMatrix")
+
+    expect_s4_class(as.coo.matrix(m.base, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.coo, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.coo.b, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.csr, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.csr.b, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.csc, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.csc.b, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(m.f32, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(df, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(dt, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(v.num, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(v.int, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(v.f32, binary=TRUE), "ngTMatrix")
+    expect_s4_class(as.coo.matrix(v.sp, binary=TRUE), "ngTMatrix")
+
+    expect_equal(nrow(as.coo.matrix(v.num)), 1L)
+    expect_equal(nrow(as.coo.matrix(v.int)), 1L)
+    expect_equal(nrow(as.coo.matrix(v.f32)), 1L)
+    expect_equal(nrow(as.coo.matrix(v.sp)), 1L)
+
+    expect_equal(dim(as.coo.matrix(m.base)), dim(m.base))
+    expect_equal(dim(as.coo.matrix(m.coo)), dim(m.coo))
+    expect_equal(dim(as.coo.matrix(m.coo.b)), dim(m.coo.b))
+    expect_equal(dim(as.coo.matrix(m.csr)), dim(m.csr))
+    expect_equal(dim(as.coo.matrix(m.csr.b)), dim(m.csr.b))
+    expect_equal(dim(as.coo.matrix(m.csc)), dim(m.csc))
+    expect_equal(dim(as.coo.matrix(m.csc.b)), dim(m.csc.b))
+    expect_equal(dim(as.coo.matrix(m.f32)), dim(m.f32))
+    expect_equal(dim(as.coo.matrix(df)), dim(df))
+    expect_equal(dim(as.coo.matrix(dt)), dim(dt))
+})
+
+test_that("Conversion through 'as'", {
+    classes_to <- c("dgRMatrix", "lgRMatrix", "ngRMatrix")
+    for (cl in classes_to) {
+        expect_s4_class(as(m.base, cl), cl)
+        expect_s4_class(as(m.coo, cl), cl)
+        expect_s4_class(as(m.coo.b, cl), cl)
+        expect_s4_class(as(m.csc, cl), cl)
+        expect_s4_class(as(m.csc.b, cl), cl)
+    }
+    expect_s4_class(as(m.csr, "lgRMatrix"), "lgRMatrix")
+    expect_s4_class(as(m.csr, "ngRMatrix"), "ngRMatrix")
+    expect_s4_class(as(m.csr.b, "lgRMatrix"), "lgRMatrix")
+    expect_s4_class(as(m.csr.b, "ngRMatrix"), "ngRMatrix")
+})
+
+test_that("Uncommon types", {
+    sy <- sparseMatrix(i= c(2,4,3:5), j= c(4,7:5,5), x = 1:5, dims = c(7,7),
+                       symmetric=TRUE, dimnames = list(NULL, letters[1:7]))
+    ex_dsCMatrix <- sy
+    ex_lsCMatrix <- as(sy, "lsparseMatrix")
+    ex_nsCMatrix <- as(sy, "nsparseMatrix")
+
+    ex_dsRMatrix <- as(sy, "RsparseMatrix")
+    ex_lsRMatrix <- as(ex_lsCMatrix, "RsparseMatrix")
+    ex_nsRMatrix <- as(ex_nsCMatrix, "RsparseMatrix")
+
+    ex_dsTMatrix <- as(sy, "TsparseMatrix")
+    ex_lsTMatrix <- as(ex_lsCMatrix, "TsparseMatrix")
+    ex_nsTMatrix <- as(ex_nsCMatrix, "TsparseMatrix")
+
+    tri <- matrix(c(1,2,0,4, 0,0,6,7, 0,0,8,9, 0,0,0,0), byrow=TRUE, nrow=4)
+    tri <- as(tri, "triangularMatrix")
+
+    ex_dtCMatrix <- as(tri, "CsparseMatrix")
+    ex_ltCMatrix <- as(ex_dtCMatrix, "lsparseMatrix")
+    ex_ntCMatrix <- as(ex_dtCMatrix, "nsparseMatrix")
+
+    ex_dtRMatrix <- as(ex_dtCMatrix, "RsparseMatrix")
+    ex_ltRMatrix <- as(ex_ltCMatrix, "RsparseMatrix")
+    ex_ntRMatrix <- as(ex_ntCMatrix, "RsparseMatrix")
+
+    ex_dtTMatrix <- as(ex_dtCMatrix, "TsparseMatrix")
+    ex_ltTMatrix <- as(ex_ltCMatrix, "TsparseMatrix")
+    ex_ntTMatrix <- as(ex_ntCMatrix, "TsparseMatrix")
+
+    ### Check just in case
+    expect_s4_class(ex_dsCMatrix, "dsCMatrix")
+    expect_s4_class(ex_lsCMatrix, "lsCMatrix")
+    expect_s4_class(ex_nsCMatrix, "nsCMatrix")
+    expect_s4_class(ex_dsRMatrix, "dsRMatrix")
+    expect_s4_class(ex_lsRMatrix, "lsRMatrix")
+    expect_s4_class(ex_nsRMatrix, "nsRMatrix")
+    expect_s4_class(ex_dsTMatrix, "dsTMatrix")
+    expect_s4_class(ex_lsTMatrix, "lsTMatrix")
+    expect_s4_class(ex_nsTMatrix, "nsTMatrix")
+    expect_s4_class(ex_dtCMatrix, "dtCMatrix")
+    expect_s4_class(ex_ltCMatrix, "ltCMatrix")
+    expect_s4_class(ex_ntCMatrix, "ntCMatrix")
+    expect_s4_class(ex_dtRMatrix, "dtRMatrix")
+    expect_s4_class(ex_ltRMatrix, "ltRMatrix")
+    expect_s4_class(ex_ntRMatrix, "ntRMatrix")
+    expect_s4_class(ex_dtTMatrix, "dtTMatrix")
+    expect_s4_class(ex_ltTMatrix, "ltTMatrix")
+    expect_s4_class(ex_ntTMatrix, "ntTMatrix")
+
+    lst_inputs <- list(
+        ex_dsCMatrix, ex_lsCMatrix, ex_nsCMatrix,
+        ex_dsRMatrix, ex_lsRMatrix, ex_nsRMatrix,
+        ex_dsTMatrix, ex_lsTMatrix, ex_nsTMatrix,
+        ex_dtCMatrix, ex_ltCMatrix, ex_ntCMatrix,
+        ex_dtRMatrix, ex_ltRMatrix, ex_ntRMatrix,
+        ex_dtTMatrix, ex_ltTMatrix, ex_ntTMatrix
+    )
+    for (inp in lst_inputs) {
+        mat_conv <- as.matrix(inp)
+        mode(mat_conv) <- "double"
+        mat_conv <- unname(as.matrix(mat_conv))
+
+        expect_s4_class(as.csr.matrix(inp), "dgRMatrix")
+        expect_s4_class(as.csr.matrix(inp, logical=TRUE), "lgRMatrix")
+        expect_s4_class(as.csr.matrix(inp, binary=TRUE), "ngRMatrix")
+        expect_equal(mat_conv, unname(as.matrix(as.csr.matrix(inp))))
+
+        expect_s4_class(as.csc.matrix(inp), "dgCMatrix")
+        expect_s4_class(as.csc.matrix(inp, logical=TRUE), "lgCMatrix")
+        expect_s4_class(as.csc.matrix(inp, binary=TRUE), "ngCMatrix")
+        expect_equal(mat_conv, unname(as.matrix(as.csc.matrix(inp))))
+
+        expect_s4_class(as.coo.matrix(inp), "dgTMatrix")
+        expect_s4_class(as.coo.matrix(inp, logical=TRUE), "lgTMatrix")
+        expect_s4_class(as.coo.matrix(inp, binary=TRUE), "ngTMatrix")
+        expect_equal(mat_conv, unname(as.matrix(as.coo.matrix(inp))))
+
+        expect_s4_class(as(inp, "dgRMatrix"), "dgRMatrix")
+        expect_s4_class(as(inp, "lgRMatrix"), "lgRMatrix")
+        expect_s4_class(as(inp, "ngRMatrix"), "ngRMatrix")
+
+        expect_s4_class(as(inp, "dgCMatrix"), "dgCMatrix")
+        expect_s4_class(as(inp, "lgCMatrix"), "lgCMatrix")
+        expect_s4_class(as(inp, "ngCMatrix"), "ngCMatrix")
+
+        expect_s4_class(as(inp, "dgTMatrix"), "dgTMatrix")
+        expect_s4_class(as(inp, "lgTMatrix"), "lgTMatrix")
+        expect_s4_class(as(inp, "ngTMatrix"), "ngTMatrix")
+    }
+})
+
+test_that("Sparse and dense vectors", {
+    v <- as(1:10, "sparseVector")
+    dvec <- as(v, "dsparseVector")
+    ivec <- as(v, "isparseVector")
+    lvec <- as(v, "lsparseVector")
+    nvec <- as(v, "nsparseVector")
+
+    num <- as.numeric(v)
+    int <- as.integer(num)
+    bool <- as.logical(num)
+
+    ### Logical check
+    expect_s4_class(dvec, "dsparseVector")
+    expect_s4_class(ivec, "isparseVector")
+    expect_s4_class(lvec, "lsparseVector")
+    expect_s4_class(nvec, "nsparseVector")
+
+    lst_inputs <- list(
+        dvec, ivec, lvec, nvec,
+        num, int, bool
+    )
+    for (inp in lst_inputs) {
+        expect_s4_class(as.csr.matrix(inp), "dgRMatrix")
+        expect_s4_class(as.csr.matrix(inp, logical=TRUE), "lgRMatrix")
+        expect_s4_class(as.csr.matrix(inp, binary=TRUE), "ngRMatrix")
+        expect_equal(nrow(as.csr.matrix(inp)), 1L)
+        expect_equal(ncol(as.csr.matrix(inp)), length(num))
+
+        expect_s4_class(as.csc.matrix(inp), "dgCMatrix")
+        expect_s4_class(as.csc.matrix(inp, logical=TRUE), "lgCMatrix")
+        expect_s4_class(as.csc.matrix(inp, binary=TRUE), "ngCMatrix")
+        expect_equal(ncol(as.csc.matrix(inp)), 1L)
+        expect_equal(nrow(as.csc.matrix(inp)), length(num))
+
+        expect_s4_class(as.coo.matrix(inp), "dgTMatrix")
+        expect_s4_class(as.coo.matrix(inp, logical=TRUE), "lgTMatrix")
+        expect_s4_class(as.coo.matrix(inp, binary=TRUE), "ngTMatrix")
+        expect_equal(nrow(as.coo.matrix(inp)), 1L)
+        expect_equal(ncol(as.coo.matrix(inp)), length(num))
+
+        expect_s4_class(as(inp, "dgRMatrix"), "dgRMatrix")
+        expect_s4_class(as(inp, "lgRMatrix"), "lgRMatrix")
+        expect_s4_class(as(inp, "ngRMatrix"), "ngRMatrix")
+
+        expect_s4_class(as(inp, "dgCMatrix"), "dgCMatrix")
+        expect_s4_class(as(inp, "lgCMatrix"), "lgCMatrix")
+        expect_s4_class(as(inp, "ngCMatrix"), "ngCMatrix")
+
+        expect_s4_class(as(inp, "dgTMatrix"), "dgTMatrix")
+        expect_s4_class(as(inp, "lgTMatrix"), "lgTMatrix")
+        expect_s4_class(as(inp, "ngTMatrix"), "ngTMatrix")
+    }
+})
