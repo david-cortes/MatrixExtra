@@ -119,10 +119,12 @@ concat_dimname <- function(nm1, nm2, nrow1, nrow2) {
     }
 
     if (is.null(nm1)) {
-        nm1 <- as.character(seq(1, nrow1))
+        nm1 <- rep("", nrow1)
+        # nm1 <- as.character(seq(1, nrow1))
     }
     if (is.null(nm2)) {
-        nm2 <- as.character(seq(nrow1 + 1L, nrow1 + nrow2))
+        nm2 <- rep("", nrow2)
+        # nm2 <- as.character(seq(nrow1 + 1L, nrow1 + nrow2))
     }
     return(concat_dimname(nm1, nm2, nrow1, nrow2))
 }
@@ -291,6 +293,7 @@ setMethod("rbind2", signature(x="RsparseMatrix", y="TsparseMatrix"), rbind2_gene
 setMethod("rbind2", signature(x="TsparseMatrix", y="RsparseMatrix"), rbind2_generic)
 
 ### TODO: add tests for the ones below
+### TODO: add tests with named vectors
 
 rbind2_tri <- function(x, y) {
     x_is_binary <- inherits(x, "nsparseMatrix")
@@ -313,8 +316,8 @@ rbind2_tri <- function(x, y) {
 
     out@Dim <- as.integer(c(nrow(x) + nrow(y), max(ncol(x), ncol(y))))
     out@Dimnames <- concat_dimnames(x, y)
-    out@i <- c(x@i, y@i)
-    out@j <- c(x@j, i@j)
+    out@i <- c(x@i, y@i + nrow(x))
+    out@j <- c(x@j, y@j)
 
     if (inherits(out, "dsparseMatrix")) {
         if (.hasSlot(x, "x") && .hasSlot(y, "x")) {
@@ -359,12 +362,13 @@ rbind2_tri_vec <- function(x, v, x_is_first) {
     }
 
     out@Dim <- as.integer(c(nrow(x) + 1L, max(ncol(x), v@length)))
-    if (x_is_first)
-        out@Dimnames <- concat_dimnames(x, v)
-    else
-        out@Dimnames <- concat_dimnames(v, x)
-    out@i <- c(x@i, v@i - 1L)
-    out@j <- c(x@j, i@j)
+    if (x_is_first) {
+        out@i <- c(x@i, rep(nrow(x), length(v@i)))
+        out@j <- c(x@j, v@i - 1L)
+    } else {
+        out@i <- c(rep(0L, length(v@i)), x@i+1L)
+        out@j <- c(x@j, v@i - 1L)
+    }
 
     if (inherits(out, "dsparseMatrix")) {
         if (.hasSlot(x, "x") && .hasSlot(v, "x")) {
@@ -389,7 +393,7 @@ rbind2_tri_vec <- function(x, v, x_is_first) {
 
 #' @rdname rbind2-method
 #' @export
-setMethod("rbind2", signature(x="TsparseMatrix", y="sparseVector"), function(x, y) rbind2_tri_vec(x, y))
+setMethod("rbind2", signature(x="TsparseMatrix", y="sparseVector"), function(x, y) rbind2_tri_vec(x, y, TRUE))
 
 #' @rdname rbind2-method
 #' @export
