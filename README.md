@@ -1,6 +1,6 @@
 # MatrixExtra
 
-`MatrixExtra` is an R package which extends the sparse matrix types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as selecting rows, concatenating by rows, or elementwise multiplication of CSR matrices.
+`MatrixExtra` is an R package which extends the sparse matrix types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as selecting rows, concatenating by rows, or multi-threaded `<sparse, dense>` matrix multiplications.
 
 Right now the package is in alpha status, with many methods yet to be implemented.
 
@@ -123,6 +123,7 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 
 ```r
 library(Matrix)
+library(MatrixExtra)
 X = matrix(c(0,0,2,1, 0,3,0,0, 0,0,0,0), nrow=3, ncol=4, byrow=TRUE)
 X = as(X, "RsparseMatrix")
 
@@ -134,7 +135,7 @@ v = as(X[1,,drop=FALSE], "sparseVector")
 rbind(v, v)
 sqrt(X)
 t_shallow(X)
-X %*% matrix(c(1,2,3,4), nrow=1)
+X %*% matrix(c(1,2,3,4), ncol=1)
 as(as.matrix(X), "dgRMatrix")
 as.csc.matrix(X, binary=TRUE)
 ```
