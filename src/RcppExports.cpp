@@ -221,31 +221,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// matmul_colvec_by_srowvecascsc
-Rcpp::IntegerMatrix matmul_colvec_by_srowvecascsc(Rcpp::IntegerVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values);
-RcppExport SEXP _MatrixExtra_matmul_colvec_by_srowvecascsc(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type colvec_(colvec_SEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
-    rcpp_result_gen = Rcpp::wrap(matmul_colvec_by_srowvecascsc(colvec_, indptr, indices, values));
-    return rcpp_result_gen;
-END_RCPP
-}
-// matmul_colvec_by_srowvecascsc_binary
-Rcpp::IntegerMatrix matmul_colvec_by_srowvecascsc_binary(Rcpp::IntegerVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices);
-RcppExport SEXP _MatrixExtra_matmul_colvec_by_srowvecascsc_binary(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type colvec_(colvec_SEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
-    rcpp_result_gen = Rcpp::wrap(matmul_colvec_by_srowvecascsc_binary(colvec_, indptr, indices));
-    return rcpp_result_gen;
-END_RCPP
-}
 // matmul_rowvec_by_csc
 Rcpp::IntegerMatrix matmul_rowvec_by_csc(Rcpp::IntegerVector rowvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values);
 RcppExport SEXP _MatrixExtra_matmul_rowvec_by_csc(SEXP rowvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
@@ -285,20 +260,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // matmul_colvec_by_scolvecascsr_f32
-Rcpp::IntegerMatrix matmul_colvec_by_scolvecascsr_f32(Rcpp::IntegerVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values);
-RcppExport SEXP _MatrixExtra_matmul_colvec_by_scolvecascsr_f32(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
+Rcpp::List matmul_colvec_by_scolvecascsr_f32(Rcpp::IntegerVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values_);
+RcppExport SEXP _MatrixExtra_matmul_colvec_by_scolvecascsr_f32(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP values_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type colvec_(colvec_SEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
-    rcpp_result_gen = Rcpp::wrap(matmul_colvec_by_scolvecascsr_f32(colvec_, indptr, indices, values));
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_(values_SEXP);
+    rcpp_result_gen = Rcpp::wrap(matmul_colvec_by_scolvecascsr_f32(colvec_, indptr, indices, values_));
     return rcpp_result_gen;
 END_RCPP
 }
 // matmul_colvec_by_scolvecascsr
-Rcpp::NumericMatrix matmul_colvec_by_scolvecascsr(Rcpp::NumericVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values_);
+Rcpp::List matmul_colvec_by_scolvecascsr(Rcpp::NumericVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values_);
 RcppExport SEXP _MatrixExtra_matmul_colvec_by_scolvecascsr(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP values_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -658,8 +633,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_matmul_csr_svec_logical", (DL_FUNC) &_MatrixExtra_matmul_csr_svec_logical, 6},
     {"_MatrixExtra_matmul_csr_svec_binary", (DL_FUNC) &_MatrixExtra_matmul_csr_svec_binary, 5},
     {"_MatrixExtra_matmul_csr_svec_float32", (DL_FUNC) &_MatrixExtra_matmul_csr_svec_float32, 6},
-    {"_MatrixExtra_matmul_colvec_by_srowvecascsc", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_srowvecascsc, 4},
-    {"_MatrixExtra_matmul_colvec_by_srowvecascsc_binary", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_srowvecascsc_binary, 3},
     {"_MatrixExtra_matmul_rowvec_by_csc", (DL_FUNC) &_MatrixExtra_matmul_rowvec_by_csc, 4},
     {"_MatrixExtra_matmul_rowvec_by_cscbin", (DL_FUNC) &_MatrixExtra_matmul_rowvec_by_cscbin, 3},
     {"_MatrixExtra_matmul_colvec_by_drowvecascsc", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_drowvecascsc, 4},

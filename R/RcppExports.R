@@ -61,14 +61,6 @@ matmul_csr_svec_float32 <- function(X_csr_indptr, X_csr_indices, X_csr_values, y
     .Call(`_MatrixExtra_matmul_csr_svec_float32`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_values, nthreads)
 }
 
-matmul_colvec_by_srowvecascsc <- function(colvec_, indptr, indices, values) {
-    .Call(`_MatrixExtra_matmul_colvec_by_srowvecascsc`, colvec_, indptr, indices, values)
-}
-
-matmul_colvec_by_srowvecascsc_binary <- function(colvec_, indptr, indices) {
-    .Call(`_MatrixExtra_matmul_colvec_by_srowvecascsc_binary`, colvec_, indptr, indices)
-}
-
 matmul_rowvec_by_csc <- function(rowvec_, indptr, indices, values) {
     .Call(`_MatrixExtra_matmul_rowvec_by_csc`, rowvec_, indptr, indices, values)
 }
@@ -81,8 +73,8 @@ matmul_colvec_by_drowvecascsc <- function(colvec_, indptr, indices, values_) {
     .Call(`_MatrixExtra_matmul_colvec_by_drowvecascsc`, colvec_, indptr, indices, values_)
 }
 
-matmul_colvec_by_scolvecascsr_f32 <- function(colvec_, indptr, indices, values) {
-    .Call(`_MatrixExtra_matmul_colvec_by_scolvecascsr_f32`, colvec_, indptr, indices, values)
+matmul_colvec_by_scolvecascsr_f32 <- function(colvec_, indptr, indices, values_) {
+    .Call(`_MatrixExtra_matmul_colvec_by_scolvecascsr_f32`, colvec_, indptr, indices, values_)
 }
 
 matmul_colvec_by_scolvecascsr <- function(colvec_, indptr, indices, values_) {

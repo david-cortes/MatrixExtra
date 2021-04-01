@@ -1,4 +1,5 @@
 #' @importClassesFrom float float32
+#' @importFrom float dbl
 #' @importFrom RhpcBLASctl blas_get_num_procs blas_set_num_threads
 
 ### Peculiarities about R's matrix-by-vector multiplications (as of v4.0.4)
@@ -28,6 +29,82 @@
 
 
 ### TODO: try to make the multiplications preserve the names
+
+#' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
+#' @description Multithreaded <matrix, matrix> multiplications
+#' (`\%*\%`, `crossprod`, and `tcrossprod`)
+#' and <matrix, vector> multiplications (`\%*\%`),
+#' for <sparse, dense> matrix combinations and <sparse, vector> combinations
+#' (See signatures for supported combinations).
+#'
+#' Objects from the `float` package are also supported for some combinations.
+#' @details Will try to use the same number of threads that are configured for BLAS.
+#' These can be set through the `RhpcBLASctl` package (see
+#' \link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
+#'
+#' Be aware that sparse-dense matrix multiplications might suffer from reduced
+#' numerical precision, especially when using objects of type `float32`
+#' (from the `float` package).
+#'
+#' Internally, these functions use BLAS level-1 routines, so their speed might depend on
+#' the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
+#' on a default install of R for Windows.
+#'
+#' When multiplying a sparse matrix by a sparse vector, their indices
+#' will be sorted in-place (see \link{sort_sparse_indices}).
+#'
+#' In order to match exactly with base R's behaviors, when passing vectors to these
+#' operators, will assume their shape as follows:\itemize{
+#' \item MatMult(Matrix, vector): column vector if the matrix has more than one column
+#' or is empty, row vector if the matrix has only one column.
+#' \item MatMult(vector, Matrix): row vector if the matrix has more than one row,
+#' column vector if the matrix has only one row
+#' \item crossprod(Matrix, vector): column vector if the matrix has more than one row,
+#' row vector if the matrix has only one row.
+#' \item crossprod(vector, Matrix): column vector.
+#' \item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
+#' column vector if the matrix has only one column, and will throw an error otherwise.
+#' \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
+#' column vector if the matrix has only one column.
+#' }
+#'
+#' In general, the output returned by these functions will be a dense matrix from base R,
+#' or a dense matrix from `float` when one of the inputs is also from the `float` package,
+#' with the following exceptions:\itemize{
+#' \item MatMult(RsparseMatrix[n,1], vector) -> `dgRMatrix`.
+#' \item MatMult(RsparseMatrix[n,1], sparseVector) -> `dgCMatrix`.
+#' \item MatMult(float32[n], CsparseMatrix[1,m]) -> `dgCMatrix`.
+#' \item tcrossprod(float32[n], RsparseMatrix[m,1]) -> `dgCMatrix`.
+#' }
+#' @param x,y dense (\code{matrix} / \code{float32})
+#' and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices or vectors
+#' (\code{sparseVector}, \code{numeric}, \code{integer}, \code{logical}).
+#' @return A dense \code{matrix} object in most cases, with some exceptions which might
+#' come in sparse format (see the 'Details' section).
+#' @name matmult
+#' @rdname matmult
+#' @examples
+#' library(Matrix)
+#' library(MatrixExtra)
+#' ## Will use the same number of threads as for BLAS
+#' curr_nthreads <- RhpcBLASctl::blas_get_num_procs()
+#' ## Set the number of threads here (will restore later)
+#' RhpcBLASctl::blas_set_num_threads(1L)
+#'
+#' ## Generate random matrices
+#' set.seed(1)
+#' A <- rsparsematrix(5,4,.5)
+#' B <- rsparsematrix(4,3,.5)
+#'
+#' ## Now multiply in some supported combinations
+#' as.matrix(A) %*% as.csc.matrix(B)
+#' as.csr.matrix(A) %*% as.matrix(B)
+#' crossprod(as.matrix(B), as.csc.matrix(B))
+#' tcrossprod(as.csr.matrix(A), as.matrix(A))
+#'
+#' ## Restore the number of threads for BLAS
+#' RhpcBLASctl::blas_set_num_threads(curr_nthreads)
+NULL
 
 check_dimensions_match <- function(x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=FALSE) {
     if (matmult) {
@@ -67,75 +144,6 @@ set_dimnames <- function(res, x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=F
         colnames(res) <- cnames
     return(res)
 }
-
-#' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
-#' @description Multithreaded <matrix, matrix> multiplications
-#' (`\%*\%`, `crossprod`, and `tcrossprod`)
-#' and <matrix, vector> multiplications (`\%*\%`),
-#' for <sparse, dense> matrix combinations and <sparse, vector> combinations
-#' (See signatures for supported combinations).
-#'
-#' Objects from the `float` package are also supported for some combinations.
-#' @details Will try to use the same number of threads that are configured for BLAS.
-#' These can be set through the `RhpcBLASctl` package (see
-#' \link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
-#'
-#' Be aware that sparse-dense matrix multiplications might suffer from reduced
-#' numerical precision, especially when using objects of type `float32`
-#' (from the `float` package).
-#'
-#' Internally, these functions use BLAS level-1 routines, so their speed might depend on
-#' the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
-#' on a default install of R for Windows.
-#'
-#' When multiplying a sparse matrix by a sparse vector, their indices
-#' will be sorted in-place (see \link{sort_sparse_indices}).
-#'
-#' In order to match exactly with base R's behaviors, when passing vectors to these
-#' operators, will assume their shape as follows:\itemize{
-#' \item MatMult(Matrix, vector): column vector if the matrix has more than one column
-#' or is empty, row vector if the matrix has only one column.
-#' \item MatMult(vector, Matrix): row vector if the matrix has more than one row,
-#' column vector if the matrix has only one row
-#' \item crossprod(Matrix, vector): column vector if the matrix has more than one row,
-#' row vector if the matrix has only one row.
-#' \item crossprod(vector, Matrix): column vector.
-#' \item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
-#' column vector if the matrix has only one column, and will throw an error otherwise.
-#' \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
-#' column vector if the matrix has only one column.
-#' }
-#' @param x,y dense (\code{matrix} / \code{float32})
-#' and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices or vectors
-#' (\code{sparseVector}, \code{numeric}, \code{integer}, \code{logical}).
-#' @return
-#' A dense \code{matrix} object in most cases, except for `<RsparseMatrix, sparseVector>`,
-#' which will return a CSC matrix (`dgCMatrix`).
-#'
-#' @name matmult
-#' @rdname matmult
-#' @examples
-#' library(Matrix)
-#' library(MatrixExtra)
-#' ## Will use the same number of threads as for BLAS
-#' curr_nthreads <- RhpcBLASctl::blas_get_num_procs()
-#' ## Set the number of threads here (will restore later)
-#' RhpcBLASctl::blas_set_num_threads(1L)
-#'
-#' ## Generate random matrices
-#' set.seed(1)
-#' A <- rsparsematrix(5,4,.5)
-#' B <- rsparsematrix(4,3,.5)
-#'
-#' ## Now multiply in some supported combinations
-#' as.matrix(A) %*% as.csc.matrix(B)
-#' as.csr.matrix(A) %*% as.matrix(B)
-#' crossprod(as.matrix(B), as.csc.matrix(B))
-#' tcrossprod(as.csr.matrix(A), as.matrix(A))
-#'
-#' ## Restore the number of threads for BLAS
-#' RhpcBLASctl::blas_set_num_threads(curr_nthreads)
-NULL
 
 #### Matrices ----
 
@@ -182,21 +190,26 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
 
         ### To match base R, if 'y' has more than one row, 'x' is [1,n], otherwise [n,1]
         if (nrow(y) == 1L) {
-            if (.hasSlot(y, "x")) {
-                res <- matmul_colvec_by_srowvecascsc(
-                    x@Data,
-                    y@p,
-                    y@i,
-                    y@x
-                )
-            } else {
-                res <- matmul_colvec_by_srowvecascsc_binary(
-                    x@Data,
-                    y@p,
-                    y@i
-                )
-            }
-            return(new("float32", Data=res))
+
+            if (!inherits(y, "dsparseMatrix"))
+                y <- as.csr.matrix(y)
+
+            res <- matmul_colvec_by_scolvecascsr_f32(
+                x@Data,
+                y@p,
+                y@i,
+                y@x
+            )
+            out <- new("dgCMatrix")
+            out@p <- res$indptr
+            out@i <- res$indices
+            out@x <- res$values
+            out@Dim <- as.integer(c(length(x@Data), ncol(y)))
+            if (!is.null(y@Dimnames[[2L]]))
+                out@Dimnames[[2L]] <- y@Dimnames[[2L]]
+            if ("names" %in% names(attributes(x@Data)))
+                colnames(out) <- names(x@Data)
+            return(out)
         } else {
             if (nrow(y) != length(x@Data))
                 stop("(row) vector-Matrix multiplication dimensions do not match.")
@@ -277,21 +290,27 @@ setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y
 
         ### To match with base R, if 'y' has only one column, x is [n,1], otherwise [1,n]
         if (ncol(y) == 1L) {
-            if (.hasSlot(y, "x")) {
-                res <- matmul_colvec_by_srowvecascsc(
-                    x@Data,
-                    y@p,
-                    y@j,
-                    y@x
-                )
-            } else {
-                res <- matmul_colvec_by_srowvecascsc_binary(
-                    x@Data,
-                    y@p,
-                    y@j
-                )
-            }
-            return(new("float32", Data=res))
+
+            if (!inherits(y, "dsparseMatrix"))
+                y <- as.csr.matrix(y)
+
+            res <- matmul_colvec_by_scolvecascsr_f32(
+                x@Data,
+                y@p,
+                y@j,
+                y@x
+            )
+            out <- new("dgCMatrix")
+            out@p <- res$indptr
+            out@i <- res$indices
+            out@x <- res$values
+            out@Dim <- as.integer(c(length(x@Data), nrow(y)))
+            if (!is.null(y@Dimnames[[2L]]))
+                out@Dimnames[[2L]] <- y@Dimnames[[2L]]
+            if ("names" %in% names(attributes(x@Data)))
+                colnames(out) <- names(x@Data)
+            return(out)
+
         } else {
             if (.hasSlot(y, "x")) {
                 res <- matmul_rowvec_by_csc(
@@ -393,7 +412,16 @@ setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
                 x@j,
                 x@x
             )
-            return(new("float32", Data=res))
+            out <- new("dgRMatrix")
+            out@p <- res$indptr
+            out@j <- res$indices
+            out@x <- res$values
+            out@Dim <- as.integer(c(nrow(x), length(y)))
+            if (!is.null(rownames(x)))
+                out@Dimnames[[1L]] <- rownames(x)
+            if ("names" %in% names(attributes(y)))
+                colnames(out) <- names(y)
+            return(out)
         } else {
             return(gemv_csr_vec(x, y))
         }
@@ -630,11 +658,16 @@ outerprod_csrsinglecol_by_dvec <- function(x, y) {
             x@j,
             x@x
         )
+        out <- new("dgRMatrix")
+        out@p <- res$indptr
+        out@j <- res$indices
+        out@x <- res$values
+        out@Dim <- as.integer(c(nrow(x), length(y)))
         if (!is.null(rownames(x)))
-            rownames(res) <- rownames(x)
+            rownames(out) <- rownames(x)
         if ("names" %in% names(attributes(y)))
-            colnames(x) <- names(y)
-        return(res)
+            colnames(out) <- names(y)
+        return(out)
     }
 
 }

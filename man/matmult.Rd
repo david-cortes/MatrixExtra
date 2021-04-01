@@ -52,8 +52,8 @@ and sparse (\code{RsparseMatrix} / \code{CsparseMatrix}) matrices or vectors
 (\code{sparseVector}, \code{numeric}, \code{integer}, \code{logical}).}
 }
 \value{
-A dense \code{matrix} object in most cases, except for `<RsparseMatrix, sparseVector>`,
-which will return a CSC matrix (`dgCMatrix`).
+A dense \code{matrix} object in most cases, with some exceptions which might
+come in sparse format (see the 'Details' section).
 }
 \description{
 Multithreaded <matrix, matrix> multiplications
@@ -93,6 +93,15 @@ row vector if the matrix has only one row.
 column vector if the matrix has only one column, and will throw an error otherwise.
 \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
 column vector if the matrix has only one column.
+}
+
+In general, the output returned by these functions will be a dense matrix from base R,
+or a dense matrix from `float` when one of the inputs is also from the `float` package,
+with the following exceptions:\itemize{
+\item MatMult(RsparseMatrix[n,1], vector) -> `dgRMatrix`.
+\item MatMult(RsparseMatrix[n,1], sparseVector) -> `dgCMatrix`.
+\item MatMult(float32[n], CsparseMatrix[1,m]) -> `dgCMatrix`.
+\item tcrossprod(float32[n], RsparseMatrix[m,1]) -> `dgCMatrix`.
 }
 }
 \examples{

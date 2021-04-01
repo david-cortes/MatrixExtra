@@ -170,11 +170,13 @@ test_that("float32 vectors", {
                  float::dbl(v) %*% as.matrix(A),
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(v2 %*% as.csc.matrix(A[1,,drop=FALSE])),
+    ### sparse CSC
+    expect_equal(unname(as.matrix(v2 %*% as.csc.matrix(A[1,,drop=FALSE]))),
                  float::dbl(v2) %*% as.matrix(A)[1,,drop=FALSE],
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(v2 %*% as.csc.matrix(A[1,1:10,drop=FALSE])),
+    ### sparse CSC
+    expect_equal(unname(as.matrix(v2 %*% as.csc.matrix(A[1,1:10,drop=FALSE]))),
                  float::dbl(v2) %*% as.matrix(A)[1,1:10,drop=FALSE],
                  tolerance=1e-5)
 
@@ -186,11 +188,13 @@ test_that("float32 vectors", {
                  tcrossprod(float::dbl(v2), as.matrix(A)[1:10,]),
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(tcrossprod(v, as.csr.matrix(A[,1,drop=FALSE]))),
+    ### sparse CSC
+    expect_equal(unname(as.matrix(tcrossprod(v, as.csr.matrix(A[,1,drop=FALSE])))),
                  tcrossprod(float::dbl(v), as.matrix(A[,1,drop=FALSE])),
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(tcrossprod(v, as.csr.matrix(A[1:10,1,drop=FALSE]))),
+    ### sparse CSC
+    expect_equal(unname(as.matrix(tcrossprod(v, as.csr.matrix(A[1:10,1,drop=FALSE])))),
                  tcrossprod(float::dbl(v), as.matrix(A[1:10,1,drop=FALSE])),
                  tolerance=1e-5)
 
@@ -206,12 +210,13 @@ test_that("float32 vectors", {
                  as.matrix(A) %*% float::dbl(v2),
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(as.csr.matrix(A[,1,drop=FALSE]) %*% v2),
+    # sparse CSR
+    expect_equal(unname(as.matrix(as.csr.matrix(A[,1,drop=FALSE]) %*% v2)),
                  as.matrix(A[,1,drop=FALSE]) %*% float::dbl(v2),
                  tolerance=1e-5)
 
-    expect_equal(float::dbl(as.csr.matrix(A[1:10,1,drop=FALSE]) %*% v2),
+    # sparse CSR
+    expect_equal(unname(as.matrix(as.csr.matrix(A[1:10,1,drop=FALSE]) %*% v2)),
                  as.matrix(A[1:10,1,drop=FALSE]) %*% float::dbl(v2),
                  tolerance=1e-5)
-
 })

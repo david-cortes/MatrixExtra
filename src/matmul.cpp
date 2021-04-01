@@ -617,55 +617,6 @@ Rcpp::NumericVector matmul_csr_svec_float32(Rcpp::IntegerVector X_csr_indptr,
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::IntegerMatrix matmul_colvec_by_srowvecascsc
-(
-    Rcpp::IntegerVector colvec_,
-    Rcpp::IntegerVector indptr,
-    Rcpp::IntegerVector indices,
-    Rcpp::NumericVector values
-)
-{
-    const int dim = colvec_.size();
-    const size_t dim2 = indptr.size()-1;
-    Rcpp::IntegerMatrix out_(dim, dim2);
-    float *restrict colvec = (float*)INTEGER(colvec_);
-    float *out = (float*)INTEGER(out_);
-    float *restrict ptr_write;
-
-    for (size_t ix = 0; ix < dim2; ix++)
-    {
-        ptr_write = out + (size_t)dim*ix;
-        if (indptr[ix] < indptr[ix+1])
-            saxpy1(dim, values[indptr[ix]], colvec, ptr_write);
-    }
-    return out_;
-}
-
-// [[Rcpp::export(rng = false)]]
-Rcpp::IntegerMatrix matmul_colvec_by_srowvecascsc_binary
-(
-    Rcpp::IntegerVector colvec_,
-    Rcpp::IntegerVector indptr,
-    Rcpp::IntegerVector indices
-)
-{
-    const size_t dim = colvec_.size();
-    const size_t dim2 = indptr.size()-1;
-    Rcpp::IntegerMatrix out_(dim, dim2);
-    float *restrict colvec = (float*)INTEGER(colvec_);
-    float *out = (float*)INTEGER(out_);
-    float *restrict ptr_write;
-
-    for (size_t ix = 0; ix < dim2; ix++)
-    {
-        ptr_write = out + (size_t)dim*ix;
-        if (indptr[ix] < indptr[ix+1])
-            memcpy(ptr_write, colvec, dim*sizeof(float));
-    }
-    return out_;
-}
-
-// [[Rcpp::export(rng = false)]]
 Rcpp::IntegerMatrix matmul_rowvec_by_csc
 (
     Rcpp::IntegerVector rowvec_,
@@ -734,36 +685,57 @@ Rcpp::NumericVector matmul_colvec_by_drowvecascsc
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::IntegerMatrix matmul_colvec_by_scolvecascsr_f32
+Rcpp::List matmul_colvec_by_scolvecascsr_f32
 (
     Rcpp::IntegerVector colvec_,
     Rcpp::IntegerVector indptr,
     Rcpp::IntegerVector indices,
-    Rcpp::NumericVector values
+    Rcpp::NumericVector values_
 )
 {
     const int dim = colvec_.size();
     const size_t dim2 = indptr.size()-1;
-    Rcpp::IntegerMatrix out_(dim2, dim);
+    const size_t nnz = indices.size();
+    const size_t nnz_out = nnz * (size_t)dim;
+    Rcpp::IntegerVector out_csr_indptr(dim2+1);
+    Rcpp::IntegerVector out_csr_indices_(nnz_out);
+    Rcpp::NumericVector out_csr_values_(nnz_out);
+    std::unique_ptr<float[]> out_csr_values__(new float[nnz_out]());
+
+    float *restrict out_csr_values = out_csr_values__.get();
+    int *restrict out_csr_indices = INTEGER(out_csr_indices_);
+    double *restrict values = REAL(values_);
     float *restrict colvec = (float*)INTEGER(colvec_);
-    float *restrict out = (float*)INTEGER(out_);
-    std::unique_ptr<float[]> temp_arr(new float[dim]);
-    float *restrict ptr_write = temp_arr.get();
+    size_t ncurr = 0;
 
     for (size_t ix = 0; ix < dim2; ix++)
     {
-        memset(ptr_write, 0, (size_t)dim*sizeof(float));
         if (indptr[ix] < indptr[ix+1])
-            saxpy1(dim, values[indptr[ix]], colvec, ptr_write);
-        scopy_1toN(dim, ptr_write, out + ix, dim2);
+        {
+            out_csr_indptr[ix+1] = dim;
+            saxpy1(dim, values[indptr[ix]], colvec, out_csr_values + ncurr);
+            std::iota(out_csr_indices + ncurr, out_csr_indices + ncurr + dim, 0);
+            ncurr += dim;
+        }
     }
-    return out_;
+
+    for (size_t ix = 0; ix < dim2; ix++)
+        out_csr_indptr[ix+1] += out_csr_indptr[ix];
+
+    for (size_t ix = 0; ix < nnz_out; ix++)
+        out_csr_values_[ix] = (double)out_csr_values[ix];
+
+    return Rcpp::List::create(
+        Rcpp::_["indptr"] = out_csr_indptr,
+        Rcpp::_["indices"] = out_csr_indices_,
+        Rcpp::_["values"] = out_csr_values_
+    );
 }
 
 /* TODO: some the functions above should output sparse matrices */
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::NumericMatrix matmul_colvec_by_scolvecascsr
+Rcpp::List matmul_colvec_by_scolvecascsr
 (
     Rcpp::NumericVector colvec_,
     Rcpp::IntegerVector indptr,
@@ -772,23 +744,38 @@ Rcpp::NumericMatrix matmul_colvec_by_scolvecascsr
 )
 {
     const int dim = colvec_.size();
-    const int dim2 = indptr.size()-1;
-    Rcpp::NumericMatrix out_(dim2, dim);
-    double *restrict colvec = REAL(colvec_);
-    double *restrict out = REAL(out_);
-    std::unique_ptr<double[]> temp_arr(new double[dim]);
-    double *restrict ptr_write = temp_arr.get();
-    const double *restrict values = REAL(values_);
-    const int one = 1;
+    const size_t dim2 = indptr.size()-1;
+    const size_t nnz = indices.size();
+    Rcpp::IntegerVector out_csr_indptr(dim2+1);
+    Rcpp::IntegerVector out_csr_indices_(nnz * (size_t)dim);
+    Rcpp::NumericVector out_csr_values_(nnz * (size_t)dim);
 
-    for (int ix = 0; ix < dim2; ix++)
+    double *restrict out_csr_values = REAL(out_csr_values_);
+    int *restrict out_csr_indices = INTEGER(out_csr_indices_);
+    double *restrict values = REAL(values_);
+    double *restrict colvec = REAL(colvec_);
+    const int one = 1;
+    size_t ncurr = 0;
+
+    for (size_t ix = 0; ix < dim2; ix++)
     {
-        memset(ptr_write, 0, (size_t)dim*sizeof(double));
         if (indptr[ix] < indptr[ix+1])
-            daxpy_(&dim, values + indptr[ix], colvec, &one, ptr_write, &one);
-        dcopy_(&dim, ptr_write, &one, out + ix, &dim2);
+        {
+            out_csr_indptr[ix+1] = dim;
+            daxpy_(&dim, values + indptr[ix], colvec, &one, out_csr_values + ncurr, &one);
+            std::iota(out_csr_indices + ncurr, out_csr_indices + ncurr + dim, 0);
+            ncurr += dim;
+        }
     }
-    return out_;
+
+    for (size_t ix = 0; ix < dim2; ix++)
+        out_csr_indptr[ix+1] += out_csr_indptr[ix];
+
+    return Rcpp::List::create(
+        Rcpp::_["indptr"] = out_csr_indptr,
+        Rcpp::_["indices"] = out_csr_indices_,
+        Rcpp::_["values"] = out_csr_values_
+    );
 }
 
 template <class InputDType>
