@@ -3,68 +3,118 @@
 \name{mathematical-functions}
 \alias{mathematical-functions}
 \alias{sqrt,RsparseMatrix-method}
+\alias{sqrt,TsparseMatrix-method}
 \alias{abs,RsparseMatrix-method}
+\alias{abs,TsparseMatrix-method}
 \alias{log1p,RsparseMatrix-method}
+\alias{log1p,TsparseMatrix-method}
 \alias{sin,RsparseMatrix-method}
+\alias{sin,TsparseMatrix-method}
 \alias{tan,RsparseMatrix-method}
+\alias{tan,TsparseMatrix-method}
 \alias{tanh,RsparseMatrix-method}
+\alias{tanh,TsparseMatrix-method}
 \alias{tanpi,RsparseMatrix-method}
+\alias{tanpi,TsparseMatrix-method}
 \alias{sinh,RsparseMatrix-method}
+\alias{sinh,TsparseMatrix-method}
 \alias{atanh,RsparseMatrix-method}
+\alias{atanh,TsparseMatrix-method}
 \alias{expm1,RsparseMatrix-method}
+\alias{expm1,TsparseMatrix-method}
 \alias{sign,RsparseMatrix-method}
+\alias{sign,TsparseMatrix-method}
 \alias{ceiling,RsparseMatrix-method}
+\alias{ceiling,TsparseMatrix-method}
 \alias{floor,RsparseMatrix-method}
+\alias{floor,TsparseMatrix-method}
 \alias{trunc,RsparseMatrix-method}
+\alias{trunc,TsparseMatrix-method}
 \alias{round,RsparseMatrix-method}
+\alias{round,TsparseMatrix-method}
 \alias{signif,RsparseMatrix-method}
-\title{Mathematical functions for CSR matrices}
+\alias{signif,TsparseMatrix-method}
+\title{Mathematical functions for CSR and COO matrices}
 \usage{
 \S4method{sqrt}{RsparseMatrix}(x)
 
+\S4method{sqrt}{TsparseMatrix}(x)
+
 \S4method{abs}{RsparseMatrix}(x)
+
+\S4method{abs}{TsparseMatrix}(x)
 
 \S4method{log1p}{RsparseMatrix}(x)
 
+\S4method{log1p}{TsparseMatrix}(x)
+
 \S4method{sin}{RsparseMatrix}(x)
+
+\S4method{sin}{TsparseMatrix}(x)
 
 \S4method{tan}{RsparseMatrix}(x)
 
+\S4method{tan}{TsparseMatrix}(x)
+
 \S4method{tanh}{RsparseMatrix}(x)
+
+\S4method{tanh}{TsparseMatrix}(x)
 
 \S4method{tanpi}{RsparseMatrix}(x)
 
+\S4method{tanpi}{TsparseMatrix}(x)
+
 \S4method{sinh}{RsparseMatrix}(x)
+
+\S4method{sinh}{TsparseMatrix}(x)
 
 \S4method{atanh}{RsparseMatrix}(x)
 
+\S4method{atanh}{TsparseMatrix}(x)
+
 \S4method{expm1}{RsparseMatrix}(x)
+
+\S4method{expm1}{TsparseMatrix}(x)
 
 \S4method{sign}{RsparseMatrix}(x)
 
+\S4method{sign}{TsparseMatrix}(x)
+
 \S4method{ceiling}{RsparseMatrix}(x)
+
+\S4method{ceiling}{TsparseMatrix}(x)
 
 \S4method{floor}{RsparseMatrix}(x)
 
+\S4method{floor}{TsparseMatrix}(x)
+
 \S4method{trunc}{RsparseMatrix}(x)
+
+\S4method{trunc}{TsparseMatrix}(x)
 
 \S4method{round}{RsparseMatrix}(x, digits = 0)
 
+\S4method{round}{TsparseMatrix}(x, digits = 0)
+
 \S4method{signif}{RsparseMatrix}(x, digits = 6)
+
+\S4method{signif}{TsparseMatrix}(x, digits = 6)
 }
 \arguments{
-\item{x}{A CSR matrix.}
+\item{x}{A CSR or COO matrix.}
 
 \item{digits}{See \link{round} and \link{signif}. If passing more than one value,
 will call the corresponding function from the `Matrix` package, which implies first
 converting `x` to CSC format.}
 }
 \value{
-A CSR matrix in `dgRMatrix` format.
+A CSR or COO matrix depending on the input. They will be of the `dg` type
+(`dgRMatrix` or `dgTMatrix`).
 }
 \description{
-Implements some mathematical functions for CSR matrices
-(a.k.a. "RsparseMatrix") without converting them to CSC matrices in the process.
+Implements some mathematical functions for CSR
+(a.k.a. "RsparseMatrix") and COO (a.k.a. "TsparseMatrix") matrix types
+without converting them to CSC matrices in the process.
 
 The functions here reduce to applying the same operation over the non-zero elements only,
 and as such do not benefit from any storage format conversion as done implicitly

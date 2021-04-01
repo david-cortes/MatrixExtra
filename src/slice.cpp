@@ -244,3 +244,85 @@ Rcpp::IntegerVector repeat_indices_n_times(Rcpp::IntegerVector indices,
         out[ix + n_indices*full_repeats] = remainder[ix] + ix_length*full_repeats;
     return out;
 }
+
+double extract_single_val_csr
+(
+    int *restrict indptr,
+    int *restrict indices,
+    double *restrict values,
+    int row, int col,
+    bool check_sorted
+)
+{
+    if (indptr[row] == indptr[row+1])
+        return 0;
+    else {
+        int st_this = indptr[row];
+        size_t n_this = indptr[row+1] - st_this;
+        if (check_sorted && !check_is_sorted(indices + st_this, n_this))
+        {
+            std::vector<size_t> argsorted(n_this);
+            std::vector<int> indices_sorted(n_this);
+            std::vector<double> values_sorted(n_this);
+            int *restrict indices_ = indices + st_this;
+            double *restrict values_ = values? (values + st_this) : nullptr;
+            std::iota(argsorted.begin(), argsorted.end(), (size_t)0);
+            std::sort(argsorted.begin(), argsorted.end(),
+                      [&indices_](const size_t a, const size_t b)
+                      {return indices_[a] < indices_[b];});
+            for (size_t ix = 0; ix < n_this; ix++)
+                indices_sorted[ix] = indices_[argsorted[ix]];
+            if (values != nullptr)
+            for (size_t ix = 0; ix < n_this; ix++)
+                values_sorted[ix] = values_[argsorted[ix]];
+            std::copy(indices_sorted.begin(), indices_sorted.end(), indices_);
+            if (values != nullptr)
+            std::copy(values_sorted.begin(), values_sorted.end(), values_);
+        }
+
+        int *res = std::lower_bound(indices + st_this, indices + indptr[row+1], col);
+        if (res >= indices + indptr[row+1]) {
+            return 0;
+        }
+        else {
+            if (values != nullptr)
+                return values[res - (indices + st_this)];
+            else
+                return 1;
+        }
+    }
+
+}
+
+// [[Rcpp::export(rng = false)]]
+double extract_single_val_csr_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    int row, int col
+)
+{
+    return extract_single_val_csr(
+        INTEGER(indptr),
+        INTEGER(indices),
+        REAL(values),
+        row, col, true
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+double extract_single_val_csr_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    int row, int col
+)
+{
+    return extract_single_val_csr(
+        INTEGER(indptr),
+        INTEGER(indices),
+        (double*)nullptr,
+        row, col, true
+    );
+}

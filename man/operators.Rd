@@ -5,33 +5,72 @@
 \alias{*,RsparseMatrix,sparseMatrix-method}
 \alias{*,ngRMatrix,sparseMatrix-method}
 \alias{*,lgRMatrix,sparseMatrix-method}
+\alias{*,sparseMatrix,RsparseMatrix-method}
+\alias{*,sparseMatrix,ngRMatrix-method}
+\alias{*,sparseMatrix,lgRMatrix-method}
+\alias{*,CsparseMatrix,TsparseMatrix-method}
+\alias{*,TsparseMatrix,CsparseMatrix-method}
 \alias{*,RsparseMatrix,matrix-method}
 \alias{*,ngRMatrix,matrix-method}
 \alias{*,lgRMatrix,matrix-method}
+\alias{*,matrix,RsparseMatrix-method}
+\alias{*,matrix,ngRMatrix-method}
+\alias{*,matrix,lgRMatrix-method}
+\alias{*,TsparseMatrix,matrix-method}
+\alias{*,TsparseMatrix,float32-method}
+\alias{*,ngTMatrix,matrix-method}
+\alias{*,lgTMatrix,matrix-method}
+\alias{*,matrix,TsparseMatrix-method}
+\alias{*,float32,TsparseMatrix-method}
+\alias{*,matrix,ngTMatrix-method}
+\alias{*,matrix,lgTMatrix-method}
 \alias{+,RsparseMatrix,sparseMatrix-method}
 \alias{+,ngRMatrix,sparseMatrix-method}
 \alias{+,lgRMatrix,sparseMatrix-method}
+\alias{+,sparseMatrix,RsparseMatrix-method}
+\alias{+,sparseMatrix,ngRMatrix-method}
+\alias{+,sparseMatrix,lgRMatrix-method}
 \alias{-,RsparseMatrix,sparseMatrix-method}
 \alias{-,ngRMatrix,sparseMatrix-method}
 \alias{-,lgRMatrix,sparseMatrix-method}
+\alias{-,sparseMatrix,RsparseMatrix-method}
+\alias{-,sparseMatrix,ngRMatrix-method}
+\alias{-,sparseMatrix,lgRMatrix-method}
 \alias{*,RsparseMatrix,integer-method}
 \alias{*,RsparseMatrix,numeric-method}
 \alias{*,RsparseMatrix,logical-method}
+\alias{*,integer,RsparseMatrix-method}
+\alias{*,numeric,RsparseMatrix-method}
+\alias{*,logical,RsparseMatrix-method}
 \alias{/,RsparseMatrix,integer-method}
+\alias{/,TsparseMatrix,integer-method}
 \alias{/,RsparseMatrix,numeric-method}
+\alias{/,TsparseMatrix,numeric-method}
 \alias{/,RsparseMatrix,logical-method}
+\alias{/,TsparseMatrix,logical-method}
 \alias{\%/\%,RsparseMatrix,integer-method}
+\alias{\%/\%,TsparseMatrix,integer-method}
 \alias{\%/\%,RsparseMatrix,numeric-method}
+\alias{\%/\%,TsparseMatrix,numeric-method}
 \alias{\%/\%,RsparseMatrix,logical-method}
+\alias{\%/\%,TsparseMatrix,logical-method}
 \alias{\%\%,RsparseMatrix,integer-method}
+\alias{\%\%,TsparseMatrix,integer-method}
 \alias{\%\%,RsparseMatrix,numeric-method}
+\alias{\%\%,TsparseMatrix,numeric-method}
 \alias{\%\%,RsparseMatrix,logical-method}
+\alias{\%\%,TsparseMatrix,logical-method}
 \alias{^,RsparseMatrix,integer-method}
+\alias{^,TsparseMatrix,integer-method}
 \alias{^,RsparseMatrix,numeric-method}
+\alias{^,TsparseMatrix,numeric-method}
 \alias{^,RsparseMatrix,logical-method}
+\alias{^,TsparseMatrix,logical-method}
 \alias{&,RsparseMatrix,logical-method}
+\alias{&,TsparseMatrix,logical-method}
 \alias{|,RsparseMatrix,logical-method}
-\title{Mathematical operators on CSR matrices}
+\alias{|,TsparseMatrix,logical-method}
+\title{Mathematical operators on CSR and COO matrices}
 \usage{
 \S4method{*}{RsparseMatrix,sparseMatrix}(e1, e2)
 
@@ -39,11 +78,43 @@
 
 \S4method{*}{lgRMatrix,sparseMatrix}(e1, e2)
 
+\S4method{*}{sparseMatrix,RsparseMatrix}(e1, e2)
+
+\S4method{*}{sparseMatrix,ngRMatrix}(e1, e2)
+
+\S4method{*}{sparseMatrix,lgRMatrix}(e1, e2)
+
+\S4method{*}{CsparseMatrix,TsparseMatrix}(e1, e2)
+
+\S4method{*}{TsparseMatrix,CsparseMatrix}(e1, e2)
+
 \S4method{*}{RsparseMatrix,matrix}(e1, e2)
 
 \S4method{*}{ngRMatrix,matrix}(e1, e2)
 
 \S4method{*}{lgRMatrix,matrix}(e1, e2)
+
+\S4method{*}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{*}{matrix,ngRMatrix}(e1, e2)
+
+\S4method{*}{matrix,lgRMatrix}(e1, e2)
+
+\S4method{*}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{*}{TsparseMatrix,float32}(e1, e2)
+
+\S4method{*}{ngTMatrix,matrix}(e1, e2)
+
+\S4method{*}{lgTMatrix,matrix}(e1, e2)
+
+\S4method{*}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{*}{float32,TsparseMatrix}(e1, e2)
+
+\S4method{*}{matrix,ngTMatrix}(e1, e2)
+
+\S4method{*}{matrix,lgTMatrix}(e1, e2)
 
 \S4method{+}{RsparseMatrix,sparseMatrix}(e1, e2)
 
@@ -51,11 +122,23 @@
 
 \S4method{+}{lgRMatrix,sparseMatrix}(e1, e2)
 
+\S4method{+}{sparseMatrix,RsparseMatrix}(e1, e2)
+
+\S4method{+}{sparseMatrix,ngRMatrix}(e1, e2)
+
+\S4method{+}{sparseMatrix,lgRMatrix}(e1, e2)
+
 \S4method{-}{RsparseMatrix,sparseMatrix}(e1, e2)
 
 \S4method{-}{ngRMatrix,sparseMatrix}(e1, e2)
 
 \S4method{-}{lgRMatrix,sparseMatrix}(e1, e2)
+
+\S4method{-}{sparseMatrix,RsparseMatrix}(e1, e2)
+
+\S4method{-}{sparseMatrix,ngRMatrix}(e1, e2)
+
+\S4method{-}{sparseMatrix,lgRMatrix}(e1, e2)
 
 \S4method{*}{RsparseMatrix,integer}(e1, e2)
 
@@ -63,50 +146,80 @@
 
 \S4method{*}{RsparseMatrix,logical}(e1, e2)
 
+\S4method{*}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{*}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{*}{logical,RsparseMatrix}(e1, e2)
+
 \S4method{/}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{/}{TsparseMatrix,integer}(e1, e2)
 
 \S4method{/}{RsparseMatrix,numeric}(e1, e2)
 
+\S4method{/}{TsparseMatrix,numeric}(e1, e2)
+
 \S4method{/}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{/}{TsparseMatrix,logical}(e1, e2)
 
 \S4method{\%/\%}{RsparseMatrix,integer}(e1, e2)
 
+\S4method{\%/\%}{TsparseMatrix,integer}(e1, e2)
+
 \S4method{\%/\%}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{\%/\%}{TsparseMatrix,numeric}(e1, e2)
 
 \S4method{\%/\%}{RsparseMatrix,logical}(e1, e2)
 
+\S4method{\%/\%}{TsparseMatrix,logical}(e1, e2)
+
 \S4method{\%\%}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,integer}(e1, e2)
 
 \S4method{\%\%}{RsparseMatrix,numeric}(e1, e2)
 
+\S4method{\%\%}{TsparseMatrix,numeric}(e1, e2)
+
 \S4method{\%\%}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,logical}(e1, e2)
 
 \S4method{^}{RsparseMatrix,integer}(e1, e2)
 
+\S4method{^}{TsparseMatrix,integer}(e1, e2)
+
 \S4method{^}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{^}{TsparseMatrix,numeric}(e1, e2)
 
 \S4method{^}{RsparseMatrix,logical}(e1, e2)
 
+\S4method{^}{TsparseMatrix,logical}(e1, e2)
+
 \S4method{&}{RsparseMatrix,logical}(e1, e2)
 
+\S4method{&}{TsparseMatrix,logical}(e1, e2)
+
 \S4method{|}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{|}{TsparseMatrix,logical}(e1, e2)
 }
 \arguments{
-\item{e1}{A CSR matrix.}
+\item{e1}{A sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.}
 
-\item{e2}{Right-hand side of the operation. Either a CSR matrix or a scalar
-depending on the specific operation. If the RHS is not covered by the functions
-in this package, will default to the operators from `Matrix` (e.g. when the
-RHS is a vector)}
+\item{e2}{Another sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.}
 }
 \value{
-A CSR matrix of class `dgRMatrix` (`lgRMatrix` for some of the logical
-operators).
+A CSR or COO matrix depending on the input type and operation.
 }
 \description{
-Implements some mathematical operators between CSR matrices
-(a.k.a. RsparseMatrix) such as addition and multiplication,
- and between CSR matrices and numeric constants, such as division and multiplication.
+Implements some mathematical operators between CSR
+(a.k.a. RsparseMatrix) / COO (a.k.a. TsparseMatrix) matrices such as addition and multiplication,
+ and between CSR/COO matrices and numeric constants, such as division and multiplication.
 }
 \details{
 The indices of the matrices might be sorted in-place for some operations
@@ -120,6 +233,4 @@ X <- as.csr.matrix(rsparsematrix(4, 3, .5))
 X + X
 X * 2
 X ^ 2
-### here the result will be CSC
-X ^ c(1,2)
 }

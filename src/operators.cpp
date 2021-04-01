@@ -281,3 +281,169 @@ Rcpp::List add_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector ind
     out["values"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     return out;
 }
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_csr_by_coo_internal
+(
+    Rcpp::IntegerVector X_csr_indptr_,
+    Rcpp::IntegerVector X_csr_indices_,
+    Rcpp::NumericVector X_csr_values_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    size_t nnz_y = Y_coo_row.size();
+    std::vector<int> out_coo_row;
+    std::vector<int> out_coo_col;
+    std::vector<double> out_coo_val;
+    out_coo_row.reserve(nnz_y);
+    out_coo_col.reserve(nnz_y);
+    out_coo_val.reserve(nnz_y);
+    double val;
+
+    int *restrict X_csr_indptr = INTEGER(X_csr_indptr_);
+    int *restrict X_csr_indices = INTEGER(X_csr_indices_);
+    double *restrict X_csr_values = REAL(X_csr_values_);
+
+    for (size_t ix = 0; ix < nnz_y; ix++)
+    {
+        val = extract_single_val_csr(
+            X_csr_indptr,
+            X_csr_indices,
+            X_csr_values,
+            Y_coo_row[ix], Y_coo_col[ix],
+            false
+        );
+        if (ISNAN(val) || val != 0)
+        {
+            out_coo_row.push_back(Y_coo_row[ix]);
+            out_coo_val.push_back(Y_coo_col[ix]);
+            out_coo_val.push_back(val * Y_coo_val[ix]);
+        }
+    }
+
+
+    Rcpp::List out;
+    VectorConstructorArgs args;
+    args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &out_coo_row;
+    out["row"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    out_coo_row.clear(); out_coo_row.shrink_to_fit();
+    args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &out_coo_col;
+    out["col"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    out_coo_col.clear(); out_coo_col.shrink_to_fit();
+    args.as_integer = false; args.from_cpp_vec = true; args.num_vec_from = &out_coo_val;
+    out["val"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    return out;
+}
+
+template <class RcppMatrix, class InputDType>
+Rcpp::List multiply_coo_by_dense
+(
+    RcppMatrix X_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    InputDType *restrict X;
+    if (std::is_same<InputDType, float>::value)
+        X = (InputDType*)INTEGER(X_);
+    else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value)
+        X = (InputDType*)LOGICAL(X_);
+    else if (std::is_same<RcppMatrix, Rcpp::IntegerMatrix>::value)
+        X = (InputDType*)INTEGER(X_);
+    else
+        X = (InputDType*)REAL(X_);
+
+    size_t nrows = X_.nrow();
+    size_t nnz_y = Y_coo_row.size();
+    Rcpp::NumericVector out_coo_val(nnz_y);
+
+    for (size_t ix = 0; ix < nnz_y; ix++)
+    {
+        if (std::is_same<InputDType, int>::value)
+            out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows] == NA_INTEGER)?
+                               (NA_REAL) : (Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows]);
+        else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value)
+            out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows] == NA_LOGICAL)?
+                               (NA_REAL) : (Y_coo_val[ix] * (bool)X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows]);
+        else
+            out_coo_val[ix] = Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows];
+    }
+
+    /* Note: avoid shallow copies as the indices might get sorted in some situations */
+    return Rcpp::List::create(
+        Rcpp::_["row"] = Rcpp::IntegerVector(Y_coo_row.begin(), Y_coo_row.end()),
+        Rcpp::_["col"] = Rcpp::IntegerVector(Y_coo_col.begin(), Y_coo_col.end()),
+        Rcpp::_["val"] = out_coo_val
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_coo_by_dense_numeric
+(
+    Rcpp::NumericMatrix X_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    return multiply_coo_by_dense<Rcpp::NumericMatrix, double>(
+        X_,
+        Y_coo_row,
+        Y_coo_col,
+        Y_coo_val
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_coo_by_dense_integer
+(
+    Rcpp::IntegerMatrix X_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    return multiply_coo_by_dense<Rcpp::IntegerMatrix, int>(
+        X_,
+        Y_coo_row,
+        Y_coo_col,
+        Y_coo_val
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_coo_by_dense_logical
+(
+    Rcpp::LogicalMatrix X_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    return multiply_coo_by_dense<Rcpp::LogicalMatrix, int>(
+        X_,
+        Y_coo_row,
+        Y_coo_col,
+        Y_coo_val
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_coo_by_dense_float32
+(
+    Rcpp::IntegerMatrix X_,
+    Rcpp::IntegerVector Y_coo_row,
+    Rcpp::IntegerVector Y_coo_col,
+    Rcpp::NumericVector Y_coo_val
+)
+{
+    return multiply_coo_by_dense<Rcpp::IntegerMatrix, float>(
+        X_,
+        Y_coo_row,
+        Y_coo_col,
+        Y_coo_val
+    );
+}

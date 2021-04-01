@@ -43,6 +43,7 @@ struct VectorConstructorArgs {
     std::vector<double> *num_vec_from = NULL;
 };
 
+bool check_is_sorted(int* vec, size_t n);
 bool check_is_seq(Rcpp::IntegerVector indices);
 SEXP SafeRcppVector(void *args_);
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
@@ -51,3 +52,12 @@ bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
 /* rbind.cpp */
 enum RbindedType {dgRMatrix, lgRMatrix, ngRMatrix};
 
+/* slice.cpp */
+double extract_single_val_csr
+(
+    int *restrict indptr,
+    int *restrict indices,
+    double *restrict values,
+    int row, int col,
+    bool check_sorted
+);

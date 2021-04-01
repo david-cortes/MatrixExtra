@@ -161,6 +161,26 @@ add_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, valu
     .Call(`_MatrixExtra_add_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2, substract)
 }
 
+multiply_csr_by_coo_internal <- function(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_multiply_csr_by_coo_internal`, X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
+multiply_coo_by_dense_numeric <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_numeric`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
+multiply_coo_by_dense_integer <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_integer`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
+multiply_coo_by_dense_logical <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_logical`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
+multiply_coo_by_dense_float32 <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_float32`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
 concat_indptr2 <- function(ptr1, ptr2) {
     .Call(`_MatrixExtra_concat_indptr2`, ptr1, ptr2)
 }
@@ -187,5 +207,13 @@ copy_csr_arbitrary <- function(indptr, indices, values, rows_take, cols_take) {
 
 repeat_indices_n_times <- function(indices, remainder, ix_length, desired_length) {
     .Call(`_MatrixExtra_repeat_indices_n_times`, indices, remainder, ix_length, desired_length)
+}
+
+extract_single_val_csr_numeric <- function(indptr, indices, values, row, col) {
+    .Call(`_MatrixExtra_extract_single_val_csr_numeric`, indptr, indices, values, row, col)
+}
+
+extract_single_val_csr_binary <- function(indptr, indices, row, col) {
+    .Call(`_MatrixExtra_extract_single_val_csr_binary`, indptr, indices, row, col)
 }
 

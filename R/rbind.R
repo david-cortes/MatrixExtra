@@ -366,7 +366,7 @@ rbind2_tri_vec <- function(x, v, x_is_first) {
         out@i <- c(x@i, rep(nrow(x), length(v@i)))
         out@j <- c(x@j, v@i - 1L)
     } else {
-        out@i <- c(rep(0L, length(v@i)), x@i+1L)
+        out@i <- c(x@i+1L, rep(0L, length(v@i)))
         out@j <- c(x@j, v@i - 1L)
     }
 

@@ -7,7 +7,7 @@ Maintainer: David Cortes <david.cortes.rivera@gmail.com>
 Description: Extends sparse matrix and vector classes from the 'Matrix' package by providing: 
   (a) Methods and operators that work natively on CSR formats (compressed sparse row, 
   a.k.a. 'RsparseMatrix') such as slicing/sub-setting, assignment, rbind, 
-  mathematical operators such as addition ("+") or "sqrt", and methods such as "diag"; 
+  mathematical operators for CSR and COO such as addition ("+") or "sqrt", and methods such as "diag"; 
   (b) Multi-threaded matrix multiplication and cross-product for many <sparse, dense> types, 
   including the 'float32' type from 'float'; 
   (c) Coercion methods between pairs of classes which are not present in 'Matrix', 

@@ -530,6 +530,73 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// multiply_csr_by_coo_internal
+Rcpp::List multiply_csr_by_coo_internal(Rcpp::IntegerVector X_csr_indptr_, Rcpp::IntegerVector X_csr_indices_, Rcpp::NumericVector X_csr_values_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_coo_internal(SEXP X_csr_indptr_SEXP, SEXP X_csr_indices_SEXP, SEXP X_csr_values_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr_(X_csr_indptr_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indices_(X_csr_indices_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type X_csr_values_(X_csr_values_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_coo_internal(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_numeric
+Rcpp::List multiply_coo_by_dense_numeric(Rcpp::NumericMatrix X_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_numeric(SEXP X_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_numeric(X_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_integer
+Rcpp::List multiply_coo_by_dense_integer(Rcpp::IntegerMatrix X_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_integer(SEXP X_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_integer(X_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_logical
+Rcpp::List multiply_coo_by_dense_logical(Rcpp::LogicalMatrix X_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_logical(SEXP X_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_logical(X_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_float32
+Rcpp::List multiply_coo_by_dense_float32(Rcpp::IntegerMatrix X_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_float32(SEXP X_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_float32(X_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concat_indptr2
 Rcpp::IntegerVector concat_indptr2(Rcpp::IntegerVector ptr1, Rcpp::IntegerVector ptr2);
 RcppExport SEXP _MatrixExtra_concat_indptr2(SEXP ptr1SEXP, SEXP ptr2SEXP) {
@@ -616,6 +683,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// extract_single_val_csr_numeric
+double extract_single_val_csr_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, int row, int col);
+RcppExport SEXP _MatrixExtra_extract_single_val_csr_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rowSEXP, SEXP colSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< int >::type row(rowSEXP);
+    Rcpp::traits::input_parameter< int >::type col(colSEXP);
+    rcpp_result_gen = Rcpp::wrap(extract_single_val_csr_numeric(indptr, indices, values, row, col));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extract_single_val_csr_binary
+double extract_single_val_csr_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, int row, int col);
+RcppExport SEXP _MatrixExtra_extract_single_val_csr_binary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP rowSEXP, SEXP colSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< int >::type row(rowSEXP);
+    Rcpp::traits::input_parameter< int >::type col(colSEXP);
+    rcpp_result_gen = Rcpp::wrap(extract_single_val_csr_binary(indptr, indices, row, col));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_matmul_dense_csc_numeric", (DL_FUNC) &_MatrixExtra_matmul_dense_csc_numeric, 5},
@@ -658,6 +752,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_int", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_int, 4},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_bool", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_bool, 4},
     {"_MatrixExtra_add_csr_elemwise", (DL_FUNC) &_MatrixExtra_add_csr_elemwise, 7},
+    {"_MatrixExtra_multiply_csr_by_coo_internal", (DL_FUNC) &_MatrixExtra_multiply_csr_by_coo_internal, 6},
+    {"_MatrixExtra_multiply_coo_by_dense_numeric", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_numeric, 4},
+    {"_MatrixExtra_multiply_coo_by_dense_integer", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_integer, 4},
+    {"_MatrixExtra_multiply_coo_by_dense_logical", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_logical, 4},
+    {"_MatrixExtra_multiply_coo_by_dense_float32", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_float32, 4},
     {"_MatrixExtra_concat_indptr2", (DL_FUNC) &_MatrixExtra_concat_indptr2, 2},
     {"_MatrixExtra_concat_csr_batch", (DL_FUNC) &_MatrixExtra_concat_csr_batch, 2},
     {"_MatrixExtra_check_is_seq", (DL_FUNC) &_MatrixExtra_check_is_seq, 1},
@@ -665,6 +764,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_copy_csr_rows_col_seq", (DL_FUNC) &_MatrixExtra_copy_csr_rows_col_seq, 5},
     {"_MatrixExtra_copy_csr_arbitrary", (DL_FUNC) &_MatrixExtra_copy_csr_arbitrary, 5},
     {"_MatrixExtra_repeat_indices_n_times", (DL_FUNC) &_MatrixExtra_repeat_indices_n_times, 4},
+    {"_MatrixExtra_extract_single_val_csr_numeric", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_numeric, 5},
+    {"_MatrixExtra_extract_single_val_csr_binary", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_binary, 4},
     {NULL, NULL, 0}
 };
 

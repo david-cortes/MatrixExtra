@@ -65,8 +65,54 @@ subset_csr <- function(x, i, j, drop=TRUE) {
         x <- as.csr.matrix(x)
     has_x <- .hasSlot(x, "x")
 
-    if (missing(i) && missing(j))
+    if (missing(i) && missing(j)) {
+        if (missing(drop) || isTRUE(drop)) {
+            if (nrow(x) == 1L || ncol(x) == 1L)
+                x <- as.vector(x)
+        }
         return(x)
+    }
+
+    if (!missing(i) && !missing(j) &&
+        NROW(i) == 1L && NROW(j) == 1L &&
+        typeof(i) %in% c("integer", "numeric") &&
+        typeof(j) %in% c("integer", "numeric")
+    ) {
+        i <- as.integer(i)
+        j <- as.integer(j)
+        if (is.na(i) || is.na(j)) {
+            res <- NA_real_
+        } else if (i > nrow(x) || j > ncol(x)) {
+            stop("Subscript out of bounds.")
+        } else {
+            if (.hasSlot(x, "x"))
+                res <- extract_single_val_csr_numeric(x@p, x@j, x@x, i-1L, j-1L)
+            else
+                res <- extract_single_val_csr_binary(x@p, x@j, i-1L, j-1L)
+        }
+        if (missing(drop) || isTRUE(drop)) {
+            if (!is.null(colnames(x)))
+                names(res) <- colnames(x)[j]
+            return(res)
+        }
+
+        out <- new("dgRMatrix")
+        out@Dim <- c(1L, 1L)
+        if (!is.null(x@Dimnames[[1L]]))
+            out@Dimnames[[1L]] <- x@Dimnames[[1L]][i]
+        if (!is.null(x@Dimnames[[2L]]))
+            out@Dimnames[[2L]] <- x@Dimnames[[2L]][j]
+        
+        if (res == 0) {
+            out@p <- c(0L, 0L)
+            return(out)
+        } else {
+            out@p <- c(0L, 1L)
+            out@j <- 0L
+            out@x <- res
+            return(out)
+        }
+    }
 
     row_names <- rownames(x)
     col_names <- colnames(x)

@@ -20,6 +20,10 @@ test_that("RsparseMatrix subset cols and rows", {
     expect_equal(m[as.character(1:10), 1:100], as(m_csc[as.character(1:10), 1:100], "RsparseMatrix"))
     expect_equal(m["10", "20", drop=FALSE], as(m_csc["10", "20", drop=FALSE], "RsparseMatrix"))
     expect_equal(m["10", "20", drop=TRUE], m_csc["10", "20", drop=TRUE])
+    expect_equal(m[10, "20", drop=FALSE], as(m_csc[10, "20", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["10", 20, drop=TRUE], m_csc["10", 20, drop=TRUE])
+    expect_equal(m["10", "20", drop=FALSE], as(m_csc["10", "20", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m[10, 20, drop=TRUE], m_csc[10, 20, drop=TRUE])
 })
 
 test_that("RsparseMatrix subset non sequential", {

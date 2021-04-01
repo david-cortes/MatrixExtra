@@ -5,6 +5,7 @@
 \alias{as.csr.matrix}
 \alias{as.csc.matrix}
 \alias{as.coo.matrix}
+\alias{as.sparse.vector}
 \title{Conversions between matrix types}
 \usage{
 as.csr.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
@@ -12,6 +13,8 @@ as.csr.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
 as.csc.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
 
 as.coo.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
+
+as.sparse.vector(x)
 }
 \arguments{
 \item{x}{A matrix which is to be converted to a different format.
@@ -37,13 +40,14 @@ Can only pass one of `binary` or `logical`.}
 cases it might also end up sorting the indices of the input matrix.}
 }
 \value{
-A sparse matrix, with format:\itemize{
+A sparse matrix/vector, with format:\itemize{
 \item CSR (a.k.a. `RsparseMatrix`) when calling `as.csr.matrix`
 (class `dgRMatrix`, `ngRMatrix`, or `lgRMatrix`, depending on parameters `binary` and `logical`).
 \item CSC (a.k.a. `CsparseMatrix`) when calling `as.csc.matrix`
 (class `dgCMatrix`, `ngCMatrix`, or `lgCMatrix`, depending on parameters `binary` and `logical`).
 \item COO (a.k.a. `TsparseMatrix`) when calling `as.coo.matrix`
 (class `dgTMatrix`, `ngTMatrix`, or `lgTMatrix`, depending on parameters `binary` and `logical`).
+\item sparse vector (class dependant on input) when calling `as.sparse.vector`.
 }
 }
 \description{
