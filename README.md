@@ -109,6 +109,7 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 
 # TODO
 
+* Matrix multiplications between `float32` and `sparseVector`.
 * Function to set number of threads and to set `t_shallow` as the default.
 * Function to remove zeros.
 * Assignment operator (`[<-`).

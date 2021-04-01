@@ -110,7 +110,7 @@ void dgemm_csr_drm_as_drm
     }
 }
 
-/* X <- A*B + X | A(m,k) is sparse CSR, B(k,n) is dense row-major, X(m,n) is dense column-major
+/* X <- A*B | A(m,k) is sparse CSR, B(k,n) is dense row-major, X(m,n) is dense column-major
 
    When X is zeroed-out:
    X <- A*t(B) | A(m,k) CSR, B(n,k) column-major, X(m,n) column-major
@@ -135,11 +135,14 @@ void dgemm_csr_drm_as_dcm
             private(write_ptr)
     for (int row = 0; row < m; row++)
     {
-        write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
-        memset(write_ptr, 0, ldb*sizeof(double));
-        for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-            daxpy_(&n, values + ix, DenseMat + (size_t)indices[ix]*ldb, &one, write_ptr, &one);
-        dcopy_(&n, write_ptr, &one, OutputMat + row, &ldc);
+        if (indptr[row] < indptr[row+1])
+        {
+            write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
+            memset(write_ptr, 0, ldb*sizeof(double));
+            for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+                daxpy_(&n, values + ix, DenseMat + (size_t)indices[ix]*ldb, &one, write_ptr, &one);
+            dcopy_(&n, write_ptr, &one, OutputMat + row, &ldc);
+        }
     }
 }
 
@@ -162,11 +165,14 @@ void dgemm_csr_drm_as_dcm
             private(write_ptr)
     for (int row = 0; row < m; row++)
     {
-        write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
-        memset(write_ptr, 0, ldb*sizeof(float));
-        for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-            saxpy1(n, values[ix], DenseMat + (size_t)indices[ix]*ldb, write_ptr);
-        scopy_1toN(n, write_ptr, OutputMat + row, ldc);
+        if (indptr[row] < indptr[row+1])
+        {
+            write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
+            memset(write_ptr, 0, ldb*sizeof(float));
+            for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+                saxpy1(n, values[ix], DenseMat + (size_t)indices[ix]*ldb, write_ptr);
+            scopy_1toN(n, write_ptr, OutputMat + row, ldc);
+        }
     }
 }
 
