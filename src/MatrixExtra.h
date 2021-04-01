@@ -58,6 +58,6 @@ double extract_single_val_csr
     int *restrict indptr,
     int *restrict indices,
     double *restrict values,
-    int row, int col,
-    bool check_sorted
+    const int row, const int col,
+    const bool check_sorted
 );

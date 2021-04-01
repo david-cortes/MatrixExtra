@@ -161,8 +161,8 @@ add_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, valu
     .Call(`_MatrixExtra_add_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2, substract)
 }
 
-multiply_csr_by_coo_internal <- function(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val) {
-    .Call(`_MatrixExtra_multiply_csr_by_coo_internal`, X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val)
+multiply_csr_by_coo_elemwise <- function(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X) {
+    .Call(`_MatrixExtra_multiply_csr_by_coo_elemwise`, X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X)
 }
 
 multiply_coo_by_dense_numeric <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {

@@ -283,14 +283,15 @@ Rcpp::List add_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector ind
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::List multiply_csr_by_coo_internal
+Rcpp::List multiply_csr_by_coo_elemwise
 (
     Rcpp::IntegerVector X_csr_indptr_,
     Rcpp::IntegerVector X_csr_indices_,
     Rcpp::NumericVector X_csr_values_,
     Rcpp::IntegerVector Y_coo_row,
     Rcpp::IntegerVector Y_coo_col,
-    Rcpp::NumericVector Y_coo_val
+    Rcpp::NumericVector Y_coo_val,
+    int max_row_X, int max_col_X
 )
 {
     size_t nnz_y = Y_coo_row.size();
@@ -308,18 +309,23 @@ Rcpp::List multiply_csr_by_coo_internal
 
     for (size_t ix = 0; ix < nnz_y; ix++)
     {
-        val = extract_single_val_csr(
-            X_csr_indptr,
-            X_csr_indices,
-            X_csr_values,
-            Y_coo_row[ix], Y_coo_col[ix],
-            false
-        );
-        if (ISNAN(val) || val != 0)
+        if ((ISNAN(Y_coo_val[ix]) || Y_coo_val[ix] != 0) &&
+            Y_coo_row[ix] < max_row_X &&
+            Y_coo_col[ix] < max_col_X)
         {
-            out_coo_row.push_back(Y_coo_row[ix]);
-            out_coo_val.push_back(Y_coo_col[ix]);
-            out_coo_val.push_back(val * Y_coo_val[ix]);
+            val = extract_single_val_csr(
+                X_csr_indptr,
+                X_csr_indices,
+                X_csr_values,
+                Y_coo_row[ix], Y_coo_col[ix],
+                false
+            );
+            if (ISNAN(val) || val != 0)
+            {
+                out_coo_row.push_back(Y_coo_row[ix]);
+                out_coo_col.push_back(Y_coo_col[ix]);
+                out_coo_val.push_back(val * Y_coo_val[ix]);
+            }
         }
     }
 

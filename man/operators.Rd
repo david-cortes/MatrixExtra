@@ -224,6 +224,10 @@ Implements some mathematical operators between CSR
 \details{
 The indices of the matrices might be sorted in-place for some operations
 (see \link{sort_sparse_indices}).
+
+\bold{Important:}: Multiplying NAs by zero here will be treated differently from base R,
+as it will assume 0*NA = 0 (no entry in the matrix) vs. base R's 0*NA=NA. In order to get the
+same behavior as in base R, the operations should be done in CSC format.
 }
 \examples{
 library(Matrix)

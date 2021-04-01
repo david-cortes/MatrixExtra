@@ -530,9 +530,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// multiply_csr_by_coo_internal
-Rcpp::List multiply_csr_by_coo_internal(Rcpp::IntegerVector X_csr_indptr_, Rcpp::IntegerVector X_csr_indices_, Rcpp::NumericVector X_csr_values_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val);
-RcppExport SEXP _MatrixExtra_multiply_csr_by_coo_internal(SEXP X_csr_indptr_SEXP, SEXP X_csr_indices_SEXP, SEXP X_csr_values_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+// multiply_csr_by_coo_elemwise
+Rcpp::List multiply_csr_by_coo_elemwise(Rcpp::IntegerVector X_csr_indptr_, Rcpp::IntegerVector X_csr_indices_, Rcpp::NumericVector X_csr_values_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::NumericVector Y_coo_val, int max_row_X, int max_col_X);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_coo_elemwise(SEXP X_csr_indptr_SEXP, SEXP X_csr_indices_SEXP, SEXP X_csr_values_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP, SEXP max_row_XSEXP, SEXP max_col_XSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr_(X_csr_indptr_SEXP);
@@ -541,7 +541,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
-    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_coo_internal(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val));
+    Rcpp::traits::input_parameter< int >::type max_row_X(max_row_XSEXP);
+    Rcpp::traits::input_parameter< int >::type max_col_X(max_col_XSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_coo_elemwise(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -752,7 +754,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_int", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_int, 4},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_bool", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_bool, 4},
     {"_MatrixExtra_add_csr_elemwise", (DL_FUNC) &_MatrixExtra_add_csr_elemwise, 7},
-    {"_MatrixExtra_multiply_csr_by_coo_internal", (DL_FUNC) &_MatrixExtra_multiply_csr_by_coo_internal, 6},
+    {"_MatrixExtra_multiply_csr_by_coo_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_by_coo_elemwise, 8},
     {"_MatrixExtra_multiply_coo_by_dense_numeric", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_numeric, 4},
     {"_MatrixExtra_multiply_coo_by_dense_integer", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_integer, 4},
     {"_MatrixExtra_multiply_coo_by_dense_logical", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_logical, 4},

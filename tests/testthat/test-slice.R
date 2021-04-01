@@ -24,6 +24,21 @@ test_that("RsparseMatrix subset cols and rows", {
     expect_equal(m["10", 20, drop=TRUE], m_csc["10", 20, drop=TRUE])
     expect_equal(m["10", "20", drop=FALSE], as(m_csc["10", "20", drop=FALSE], "RsparseMatrix"))
     expect_equal(m[10, 20, drop=TRUE], m_csc[10, 20, drop=TRUE])
+
+
+    expect_equal(m["1000", "2", drop=FALSE], as(m_csc["1000", "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["1000", "2", drop=TRUE], m_csc["1000", "2", drop=TRUE])
+    expect_equal(m[1000, "2", drop=FALSE], as(m_csc[1000, "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["1000", 2, drop=TRUE], m_csc["1000", 2, drop=TRUE])
+    expect_equal(m["1000", "2", drop=FALSE], as(m_csc["1000", "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m[1000, 2, drop=TRUE], m_csc[1000, 2, drop=TRUE])
+
+    v1 <- m[,1,drop=FALSE]
+    v2 <- m[1,,drop=FALSE]
+    expect_s4_class(v1, "dgRMatrix")
+    expect_s4_class(v2, "dgRMatrix")
+    expect_true(typeof(v1[,,drop=TRUE]) == "double")
+    expect_true(typeof(v2[,,drop=TRUE]) == "double")
 })
 
 test_that("RsparseMatrix subset non sequential", {

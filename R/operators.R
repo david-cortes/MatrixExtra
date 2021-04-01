@@ -5,6 +5,10 @@
 #'  and between CSR/COO matrices and numeric constants, such as division and multiplication.
 #' @details The indices of the matrices might be sorted in-place for some operations
 #' (see \link{sort_sparse_indices}).
+#' 
+#' \bold{Important:}: Multiplying NAs by zero here will be treated differently from base R,
+#' as it will assume 0*NA = 0 (no entry in the matrix) vs. base R's 0*NA=NA. In order to get the
+#' same behavior as in base R, the operations should be done in CSC format.
 #' @param e1 A sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.
 #' @param e2 Another sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.
 #' @return A CSR or COO matrix depending on the input type and operation.
@@ -42,20 +46,21 @@ multiply_csr_by_csr <- function(e1, e2) {
 
 multiply_csr_by_coo <- function(e1, e2) {
     if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
-        stop("Matrices must have the same dimensions in order to multiply them.")
+        warning("Matrices to multiply have different dimensions.")
 
     e1 <- as.csr.matrix(e1)
     e2 <- as.coo.matrix(e2)
     e1 <- sort_sparse_indices(e1)
-    res <- multiply_csr_by_coo_internal(
-        e1@p,  e1@j, e1@x,
-        e2@i, e2@j, e2@x
+    res <- multiply_csr_by_coo_elemwise(
+        e1@p, e1@j, e1@x,
+        e2@i, e2@j, e2@x,
+        nrow(e1), ncol(e1)
     )
     out <- new("dgTMatrix")
     out@i <- res$row
     out@j <- res$col
     out@x <- res$val
-    out@Dim <- dim(e1)
+    out@Dim <- as.integer(c(max(nrow(e1), nrow(e2)), max(ncol(e1), ncol(e2))))
     return(out)
 }
 
