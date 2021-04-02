@@ -229,36 +229,36 @@ subset_csr <- function(x, i, j, drop=TRUE) {
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "index", j <- "index", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="index", j="index", drop="logical"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "missing", j <- "index", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="missing", j="index", drop="logical"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "index", j <- "missing", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="index", j="missing", drop="logical"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "missing", j <- "missing", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="missing", j="missing", drop="logical"), subset_csr)
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "nsparseVector", j <- "nsparseVector", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="nsparseVector", j="nsparseVector", drop="logical"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "missing", j <- "nsparseVector", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="missing", j="nsparseVector", drop="logical"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "nsparseVector", j <- "missing", drop="logical"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="nsparseVector", j="missing", drop="logical"), subset_csr)
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "nsparseVector", j <- "nsparseVector", drop="missing"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="nsparseVector", j="nsparseVector", drop="missing"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "missing", j <- "nsparseVector", drop="missing"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="missing", j="nsparseVector", drop="missing"), subset_csr)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "RsparseMatrix", i <- "nsparseVector", j <- "missing", drop="missing"), subset_csr)
+setMethod(`[`, signature(x="RsparseMatrix", i="nsparseVector", j="missing", drop="missing"), subset_csr)
 
 subset_generic_with_vector <- function(x, i, j, drop) {
     if (missing(i) && missing(j))
@@ -279,42 +279,42 @@ subset_generic_with_vector <- function(x, i, j, drop) {
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "nsparseVector", j <- "nsparseVector", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="nsparseVector", j="nsparseVector", drop="logical"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "missing", j <- "nsparseVector", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="missing", j="nsparseVector", drop="logical"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "nsparseVector", j <- "missing", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="nsparseVector", j="missing", drop="logical"), subset_generic_with_vector)
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "nsparseVector", j <- "nsparseVector", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="nsparseVector", j="nsparseVector", drop="missing"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "missing", j <- "nsparseVector", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="missing", j="nsparseVector", drop="missing"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "sparseMatrix", i <- "nsparseVector", j <- "missing", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="sparseMatrix", i="nsparseVector", j="missing", drop="missing"), subset_generic_with_vector)
 
 
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "nsparseVector", j <- "nsparseVector", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="nsparseVector", j="nsparseVector", drop="logical"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "missing", j <- "nsparseVector", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="missing", j="nsparseVector", drop="logical"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "nsparseVector", j <- "missing", drop="logical"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="nsparseVector", j="missing", drop="logical"), subset_generic_with_vector)
 
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "nsparseVector", j <- "nsparseVector", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="nsparseVector", j="nsparseVector", drop="missing"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "missing", j <- "nsparseVector", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="missing", j="nsparseVector", drop="missing"), subset_generic_with_vector)
 #' @rdname slice
 #' @export
-setMethod(`[`, signature(x <- "matrix", i <- "nsparseVector", j <- "missing", drop="missing"), subset_generic_with_vector)
+setMethod(`[`, signature(x="matrix", i="nsparseVector", j="missing", drop="missing"), subset_generic_with_vector)
