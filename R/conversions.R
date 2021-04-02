@@ -137,6 +137,10 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.numeric(X_attr$x)
         else
             X_attr$x <- rep(1., length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -147,6 +151,10 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.logical(X_attr$x)
         else
             X_attr$x <- rep(TRUE, length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -155,6 +163,10 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
         X_attr$class <- "ngRMatrix"
         if ("x" %in% names(X_attr))
             X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -196,6 +208,10 @@ as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.numeric(X_attr$x)
         else
             X_attr$x <- rep(1., length(X_attr$i))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -206,6 +222,10 @@ as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.logical(X_attr$x)
         else
             X_attr$x <- rep(TRUE, length(X_attr$i))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -214,6 +234,10 @@ as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
         X_attr$class <- "ngCMatrix"
         if ("x" %in% names(X_attr))
             X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -261,6 +285,10 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.numeric(X_attr$x)
         else
             X_attr$x <- rep(1., length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -271,6 +299,10 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
             X_attr$x <- as.logical(X_attr$x)
         else
             X_attr$x <- rep(TRUE, length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
@@ -279,6 +311,10 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
         X_attr$class <- "ngTMatrix"
         if ("x" %in% names(X_attr))
             X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
         attributes(x) <- X_attr
     }
 
