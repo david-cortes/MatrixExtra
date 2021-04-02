@@ -69,10 +69,6 @@ matmul_rowvec_by_cscbin <- function(rowvec_, indptr, indices) {
     .Call(`_MatrixExtra_matmul_rowvec_by_cscbin`, rowvec_, indptr, indices)
 }
 
-matmul_colvec_by_drowvecascsc <- function(colvec_, indptr, indices, values_) {
-    .Call(`_MatrixExtra_matmul_colvec_by_drowvecascsc`, colvec_, indptr, indices, values_)
-}
-
 matmul_colvec_by_scolvecascsr_f32 <- function(colvec_, indptr, indices, values_) {
     .Call(`_MatrixExtra_matmul_colvec_by_scolvecascsr_f32`, colvec_, indptr, indices, values_)
 }

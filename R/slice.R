@@ -261,6 +261,9 @@ setMethod(`[`, signature(x="RsparseMatrix", i="missing", j="nsparseVector", drop
 setMethod(`[`, signature(x="RsparseMatrix", i="nsparseVector", j="missing", drop="missing"), subset_csr)
 
 subset_generic_with_vector <- function(x, i, j, drop) {
+    if (inherits(x, "CsparseMatrix"))
+        return(t_shallow(subset_generic_with_vector(t_shallow(x),j,i,drop)))
+
     if (missing(i) && missing(j))
         return(x)
     if (!missing(i))
@@ -269,11 +272,11 @@ subset_generic_with_vector <- function(x, i, j, drop) {
         j <- get_indices_integer(j, ncol(x), colnames(x))
 
     if (!missing(i) && !missing(j)) {
-        return(x[i, j, drop])
+        return(x[i, j, drop=drop])
     } else if (!missing(i)) {
-        return(x[i, , drop])
+        return(x[i, , drop=drop])
     } else {
-        return(x[, j, drop])
+        return(x[, j, drop=drop])
     }
 }
 

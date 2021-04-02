@@ -666,31 +666,6 @@ Rcpp::IntegerMatrix matmul_rowvec_by_cscbin
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::NumericVector matmul_colvec_by_drowvecascsc
-(
-    Rcpp::NumericVector colvec_,
-    Rcpp::IntegerVector indptr,
-    Rcpp::IntegerVector indices,
-    Rcpp::NumericVector values_
-)
-{
-    const int dim = colvec_.size();
-    const size_t dim2 = indptr.size()-1;
-    Rcpp::NumericMatrix out_(dim, dim2);
-    double *restrict colvec = REAL(colvec_);
-    double *out = REAL(out_);
-    const int one = 1;
-    const double *restrict values = REAL(values_);
-
-    for (size_t ix = 0; ix < dim2; ix++)
-    {
-        if (indptr[ix] < indptr[ix+1])
-            daxpy_(&dim, values + indptr[ix], colvec, &one, out + (size_t)dim*ix, &one);
-    }
-    return out_;
-}
-
-// [[Rcpp::export(rng = false)]]
 Rcpp::List matmul_colvec_by_scolvecascsr_f32
 (
     Rcpp::IntegerVector colvec_,

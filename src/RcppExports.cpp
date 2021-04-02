@@ -246,19 +246,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// matmul_colvec_by_drowvecascsc
-Rcpp::NumericVector matmul_colvec_by_drowvecascsc(Rcpp::NumericVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values_);
-RcppExport SEXP _MatrixExtra_matmul_colvec_by_drowvecascsc(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP values_SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type colvec_(colvec_SEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_(values_SEXP);
-    rcpp_result_gen = Rcpp::wrap(matmul_colvec_by_drowvecascsc(colvec_, indptr, indices, values_));
-    return rcpp_result_gen;
-END_RCPP
-}
 // matmul_colvec_by_scolvecascsr_f32
 Rcpp::List matmul_colvec_by_scolvecascsr_f32(Rcpp::IntegerVector colvec_, Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values_);
 RcppExport SEXP _MatrixExtra_matmul_colvec_by_scolvecascsr_f32(SEXP colvec_SEXP, SEXP indptrSEXP, SEXP indicesSEXP, SEXP values_SEXP) {
@@ -731,7 +718,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_matmul_csr_svec_float32", (DL_FUNC) &_MatrixExtra_matmul_csr_svec_float32, 6},
     {"_MatrixExtra_matmul_rowvec_by_csc", (DL_FUNC) &_MatrixExtra_matmul_rowvec_by_csc, 4},
     {"_MatrixExtra_matmul_rowvec_by_cscbin", (DL_FUNC) &_MatrixExtra_matmul_rowvec_by_cscbin, 3},
-    {"_MatrixExtra_matmul_colvec_by_drowvecascsc", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_drowvecascsc, 4},
     {"_MatrixExtra_matmul_colvec_by_scolvecascsr_f32", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_scolvecascsr_f32, 4},
     {"_MatrixExtra_matmul_colvec_by_scolvecascsr", (DL_FUNC) &_MatrixExtra_matmul_colvec_by_scolvecascsr, 4},
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_numeric", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_numeric, 6},
