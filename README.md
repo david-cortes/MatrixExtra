@@ -116,6 +116,7 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 * `diag` and `diag<-`.
 * `norm`.
 * Some `sweep` routes with sparse vectors.
+* Better handling of dimension names of the output matrices.
 * Create vignette.
 * Try to port some parts to `Matrix`.
 * Submit to CRAN.
@@ -139,5 +140,5 @@ sqrt(X)
 t_shallow(X)
 X %*% matrix(c(1,2,3,4), ncol=1)
 as(as.matrix(X), "dgRMatrix")
-as.csc.matrix(X, binary=TRUE)
+as.csc.matrix(X)
 ```

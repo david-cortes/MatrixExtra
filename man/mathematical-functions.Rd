@@ -127,4 +127,6 @@ set.seed(1)
 X <- as.csr.matrix(rsparsematrix(4, 3, .4))
 abs(X)
 sqrt(X^2)
+### This will output CSC
+round(X, 1:2)
 }

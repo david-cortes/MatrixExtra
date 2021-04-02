@@ -15,8 +15,12 @@ get_indices_integer <- function(i, max_i, index_names) {
             i <- as.integer(i)
     }
 
-    if (is.numeric(i)) i <- as.integer(i)
-    if (is.character(i)) i <- match(i, index_names)
+    if (is.character(i)) {
+        if (!is.null(index_names))
+            i <- match(i, index_names)
+        else
+            i <- as.integer(i)
+    }
     if (is.logical(i)) {
         if (length(i) != max_i) {
             i <- seq(1L, max_i)[i]
@@ -24,9 +28,14 @@ get_indices_integer <- function(i, max_i, index_names) {
             i <- which(i)
         }
     }
+    ### TODO: maybe allow slicing with NAs
+    if (anyNA(i))
+        stop("Cannot slice matrix with NA indices.")
+    if (typeof(i) != "integer")
+        i <- as.integer(i)
     if (any(i < 0))
         i <- seq(1L, max_i)[i]
-    if(anyNA(i) || any(i >    max_i, na.rm=TRUE))
+    if(any(i > max_i, na.rm=TRUE))
         stop("some of row subset indices are not present in matrix")
     return(as.integer(i))
 }

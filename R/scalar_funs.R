@@ -20,6 +20,8 @@
 #' X <- as.csr.matrix(rsparsematrix(4, 3, .4))
 #' abs(X)
 #' sqrt(X^2)
+#' ### This will output CSC
+#' round(X, 1:2)
 NULL
 
 #' @rdname mathematical-functions
@@ -207,6 +209,8 @@ setMethod("expm1", signature(x="TsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("sign", signature(x="RsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!inherits(x, "dsparseMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
         x <- as.csr.matrix(x)
     x@x <- sign(x@x)
@@ -216,6 +220,8 @@ setMethod("sign", signature(x="RsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("sign", signature(x="TsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!inherits(x, "dsparseMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
         x <- as.coo.matrix(x)
     x@x <- sign(x@x)
@@ -225,6 +231,8 @@ setMethod("sign", signature(x="TsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("ceiling", signature(x="RsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.csr.matrix(x)
     x@x <- ceiling(x@x)
@@ -234,6 +242,8 @@ setMethod("ceiling", signature(x="RsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("ceiling", signature(x="TsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.coo.matrix(x)
     x@x <- ceiling(x@x)
@@ -243,6 +253,8 @@ setMethod("ceiling", signature(x="TsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("floor", signature(x="RsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.csr.matrix(x)
     x@x <- floor(x@x)
@@ -252,6 +264,8 @@ setMethod("floor", signature(x="RsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("floor", signature(x="TsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.coo.matrix(x)
     x@x <- floor(x@x)
@@ -261,6 +275,8 @@ setMethod("floor", signature(x="TsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("trunc", signature(x="RsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.csr.matrix(x)
     x@x <- trunc(x@x)
@@ -270,6 +286,8 @@ setMethod("trunc", signature(x="RsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("trunc", signature(x="TsparseMatrix"), function(x) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!inherits(x, "dsparseMatrix"))
         x <- as.coo.matrix(x)
     x@x <- trunc(x@x)
@@ -279,6 +297,8 @@ setMethod("trunc", signature(x="TsparseMatrix"), function(x) {
 #' @rdname mathematical-functions
 #' @export
 setMethod("round", signature(x="RsparseMatrix", digits="ANY"), function(x, digits) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!missing(digits) && NROW(digits) != 1L) {
         x <- as(x, "CsparseMatrix")
         return(round(x, digits))
@@ -292,6 +312,8 @@ setMethod("round", signature(x="RsparseMatrix", digits="ANY"), function(x, digit
 #' @rdname mathematical-functions
 #' @export
 setMethod("round", signature(x="TsparseMatrix", digits="ANY"), function(x, digits) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!missing(digits) && NROW(digits) != 1L) {
         x <- as(x, "CsparseMatrix")
         return(round(x, digits))
@@ -305,6 +327,8 @@ setMethod("round", signature(x="TsparseMatrix", digits="ANY"), function(x, digit
 #' @rdname mathematical-functions
 #' @export
 setMethod("signif", signature(x="RsparseMatrix", digits="ANY"), function(x, digits) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.csr.matrix(x))
     if (!missing(digits) && NROW(digits) != 1L) {
         x <- as(x, "CsparseMatrix")
         return(signif(x, digits))
@@ -318,6 +342,8 @@ setMethod("signif", signature(x="RsparseMatrix", digits="ANY"), function(x, digi
 #' @rdname mathematical-functions
 #' @export
 setMethod("signif", signature(x="TsparseMatrix", digits="ANY"), function(x, digits) {
+    if (inherits(x, "nsparseMatrix"))
+        return(as.coo.matrix(x))
     if (!missing(digits) && NROW(digits) != 1L) {
         x <- as(x, "CsparseMatrix")
         return(signif(x, digits))

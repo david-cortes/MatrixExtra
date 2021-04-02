@@ -179,10 +179,12 @@ rbind2_csr <- function(x, y, out) {
     Dim <- c(x@Dim[1L] + y@Dim[1L], max(x@Dim[2L], y@Dim[2L]))
     if (Dim[2L] >= .Machine$integer.max)
         stop("Resulting matrix has too many rows for R to handle.")
-    out@Dim <- as.integer(Dim)
-    out@Dimnames <- concat_dimnames(x, y)
-    out@p <- concat_indptr2(x@p, y@p)
-    out@j <- c(x@j, y@j)
+    out_attr <- attributes(out)
+    out_attr$Dim <- as.integer(Dim)
+    out_attr$Dimnames <- concat_dimnames(x, y)
+    out_attr$p <- concat_indptr2(x@p, y@p)
+    out_attr$j <- c(x@j, y@j)
+    attributes(out) <- out_attr
     return(out)
 }
 

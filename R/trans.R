@@ -1,31 +1,31 @@
 t_csc_to_csr <- function(X) {
-    out <- new(gsub("CMatrix", "RMatrix", class(X)[1L], ignore.case=FALSE))
-    out@Dim <- rev(X@Dim)
-    out@Dimnames <- rev(X@Dimnames)
-    out@p <- X@p
-    out@j <- X@i
-    if (.hasSlot(X, "x"))
-        out@x <- X@x
-    if (.hasSlot(X, "diag"))
-        out@diag <- X@diag
-    if (.hasSlot(X, "uplo"))
-        out@uplo <- ifelse(X@uplo == "L", "U", "L")
-    return(out)
+    X_attr <- attributes(X)
+    X_attr$class <- gsub("CMatrix", "RMatrix", X_attr$class, ignore.case=FALSE)
+    X_attr$j <- X_attr$i
+    X_attr$i <- NULL
+    X_attr$Dim <- rev(X_attr$Dim)
+    X_attr$Dimnames <- rev(X_attr$Dimnames)
+    if ("factors" %in% names(X_attr))
+        X_attr$factors <- list()
+    if ("uplo" %in% names(X_attr))
+        X_attr$uplo <- ifelse(X_attr$uplo == "L", "U", "L")
+    attributes(X) <- X_attr
+    return(X)
 }
 
 t_csr_to_csc <- function(X) {
-    out <- new(gsub("RMatrix", "CMatrix", class(X)[1L], ignore.case=FALSE))
-    out@Dim <- rev(X@Dim)
-    out@Dimnames <- rev(X@Dimnames)
-    out@p <- X@p
-    out@i <- X@j
-    if (.hasSlot(X, "x"))
-        out@x <- X@x
-    if (.hasSlot(X, "diag"))
-        out@diag <- X@diag
-    if (.hasSlot(X, "uplo"))
-        out@uplo <- ifelse(X@uplo == "L", "U", "L")
-    return(out)
+    X_attr <- attributes(X)
+    X_attr$class <- gsub("RMatrix", "CMatrix", X_attr$class, ignore.case=FALSE)
+    X_attr$i <- X_attr$j
+    X_attr$j <- NULL
+    X_attr$Dim <- rev(X_attr$Dim)
+    X_attr$Dimnames <- rev(X_attr$Dimnames)
+    if ("factors" %in% names(X_attr))
+        X_attr$factors <- list()
+    if ("uplo" %in% names(X_attr))
+        X_attr$uplo <- ifelse(X_attr$uplo == "L", "U", "L")
+    attributes(X) <- X_attr
+    return(X)
 }
 
 #' @title Transpose a sparse matrix by changing its format

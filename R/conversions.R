@@ -131,38 +131,31 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
 
 
     if (!binary && !logical && !inherits(x, "dgRMatrix")) {
-        X.csr <- new("dgRMatrix")
-        X.csr@Dim <- x@Dim
-        X.csr@Dimnames <- x@Dimnames
-        X.csr@p <- x@p
-        X.csr@j <- x@j
+        X_attr <- attributes(x)
+        X_attr$class <- "dgRMatrix"
         if (.hasSlot(x, "x"))
-            X.csr@x <- as.numeric(x@x)
+            X_attr$x <- as.numeric(X_attr$x)
         else
-            X.csr@x <- rep(1., length(x@j))
-        x <- X.csr
+            X_attr$x <- rep(1., length(X_attr$j))
+        attributes(x) <- X_attr
     }
 
     if (logical && !inherits(x, "lgRMatrix")) {
-        X.csr <- new("lgRMatrix")
-        X.csr@Dim <- x@Dim
-        X.csr@Dimnames <- x@Dimnames
-        X.csr@p <- x@p
-        X.csr@j <- x@j
+        X_attr <- attributes(x)
+        X_attr$class <- "lgRMatrix"
         if (.hasSlot(x, "x"))
-            X.csr@x <- as.logical(x@x)
+            X_attr$x <- as.logical(X_attr$x)
         else
-            X.csr@x <- rep(TRUE, length(x@j))
-        x <- X.csr
+            X_attr$x <- rep(TRUE, length(X_attr$j))
+        attributes(x) <- X_attr
     }
 
     if (binary && !inherits(x, "ngRMatrix")) {
-        X.csr <- new("ngRMatrix")
-        X.csr@Dim <- x@Dim
-        X.csr@Dimnames <- x@Dimnames
-        X.csr@p <- x@p
-        X.csr@j <- x@j
-        x <- X.csr
+        X_attr <- attributes(x)
+        X_attr$class <- "ngRMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        attributes(x) <- X_attr
     }
 
     if (sort) X <- sort_sparse_indices(X)
@@ -197,38 +190,31 @@ as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
     }
 
     if (!binary && !logical && !inherits(x, "dgCMatrix")) {
-        X.csc <- new("dgCMatrix")
-        X.csc@Dim <- x@Dim
-        X.csc@Dimnames <- x@Dimnames
-        X.csc@p <- x@p
-        X.csc@i <- x@i
+        X_attr <- attributes(x)
+        X_attr$class <- "dgCMatrix"
         if (.hasSlot(x, "x"))
-            X.csc@x <- as.numeric(x@x)
+            X_attr$x <- as.numeric(X_attr$x)
         else
-            X.csc@x <- rep(1., length(x@i))
-        x <- X.csc
+            X_attr$x <- rep(1., length(X_attr$i))
+        attributes(x) <- X_attr
     }
 
     if (logical && !inherits(x, "lgCMatrix")) {
-        X.csc <- new("lgCMatrix")
-        X.csc@Dim <- x@Dim
-        X.csc@Dimnames <- x@Dimnames
-        X.csc@p <- x@p
-        X.csc@i <- x@i
+        X_attr <- attributes(x)
+        X_attr$class <- "lgCMatrix"
         if (.hasSlot(x, "x"))
-            X.csc@x <- as.logical(x@x)
+            X_attr$x <- as.logical(X_attr$x)
         else
-            X.csc@x <- rep(TRUE, length(x@i))
-        x <- X.csc
+            X_attr$x <- rep(TRUE, length(X_attr$i))
+        attributes(x) <- X_attr
     }
 
     if (binary && !inherits(x, "ngCMatrix")) {
-        X.csc <- new("ngCMatrix")
-        X.csc@Dim <- x@Dim
-        X.csc@Dimnames <- x@Dimnames
-        X.csc@p <- x@p
-        X.csc@i <- x@i
-        x <- X.csc
+        X_attr <- attributes(x)
+        X_attr$class <- "ngCMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        attributes(x) <- X_attr
     }
 
     if (sort) X <- sort_sparse_indices(X)
@@ -269,38 +255,31 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
     }
 
     if (!binary && !logical && !inherits(x, "dgTMatrix")) {
-        X.coo <- new("dgTMatrix")
-        X.coo@Dim <- x@Dim
-        X.coo@Dimnames <- x@Dimnames
-        X.coo@i <- x@i
-        X.coo@j <- x@j
+        X_attr <- attributes(x)
+        X_attr$class <- "dgTMatrix"
         if (.hasSlot(x, "x"))
-            X.coo@x <- as.numeric(x@x)
+            X_attr$x <- as.numeric(X_attr$x)
         else
-            X.coo@x <- rep(1., length(x@j))
-        x <- X.coo
+            X_attr$x <- rep(1., length(X_attr$j))
+        attributes(x) <- X_attr
     }
 
     if (logical && !inherits(x, "lgTMatrix")) {
-        X.coo <- new("lgTMatrix")
-        X.coo@Dim <- x@Dim
-        X.coo@Dimnames <- x@Dimnames
-        X.coo@i <- x@i
-        X.coo@j <- x@j
+        X_attr <- attributes(x)
+        X_attr$class <- "lgTMatrix"
         if (.hasSlot(x, "x"))
-            X.coo@x <- as.logical(x@x)
+            X_attr$x <- as.logical(X_attr$x)
         else
-            X.coo@x <- rep(TRUE, length(x@j))
-        x <- X.coo
+            X_attr$x <- rep(TRUE, length(X_attr$j))
+        attributes(x) <- X_attr
     }
 
     if (binary && !inherits(x, "ngTMatrix")) {
-        X.coo <- new("ngTMatrix")
-        X.coo@Dim <- x@Dim
-        X.coo@Dimnames <- x@Dimnames
-        X.coo@i <- x@i
-        X.coo@j <- x@j
-        x <- X.coo
+        X_attr <- attributes(x)
+        X_attr$class <- "ngTMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        attributes(x) <- X_attr
     }
 
     if (sort) X <- sort_sparse_indices(X)
