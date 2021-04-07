@@ -105,21 +105,18 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 * Overloaded mathematical functions and operators which act only on the non-zero entries for CSR and COO matrices, such as `sqrt(CSR)` or `CSR * scalar`.
 * Convenience conversion functions between different sparse formats, and registered coercion methods between pairs which are not in `Matrix` (e.g. `matrix` -> `ngRMatrix` or `dgRMatrix` -> `lgCMatrix`).
 * Fast transposes which work by outputting in the opposite format (CSR -> CSC and CSC -> CSR).
-* Methods for sparse vectors such as `rbind` and `cbind`.
 * Utility functions for sorting sparse indices and removing zero-valued entries.
 
 # TODO
 
 * Function to remove zeros.
 * Matrix multiplications between `float32` and `sparseVector`.
-* Function to set number of threads and to set `t_shallow` as the default.
 * Assignment operator (`[<-`).
 * `diag` and `diag<-`.
 * `norm`.
 * Some `sweep` routes with sparse vectors.
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
-* Option to override all `Matrix`'es `<dense,sparse` products with methods from here involving deep transposes.
 * Create vignette.
 * Try to port some parts to `Matrix`.
 * Submit to CRAN.
