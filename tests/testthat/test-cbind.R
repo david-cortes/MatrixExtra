@@ -44,3 +44,35 @@ test_that("cbind vectors", {
     expect_equal(unname(as.matrix(cbind(v, X))),
                  unname(cbind(dvec, as.matrix(X))))
 })
+
+test_that("cbind CSR", {
+    set.seed(1)
+    X <- as.csr.matrix(rsparsematrix(100, 50, .3))
+    Y <- as.csr.matrix(rsparsematrix(100, 20, .3))
+    v <- rnorm(100)
+    
+    expect_s4_class(cbind(X, Y), "dgRMatrix")
+    expect_equal(unname(as.matrix(cbind(X, Y))),
+                 unname(cbind(as.matrix(X), as.matrix(Y))))
+    
+    expect_s4_class(cbind(X, v), "dgRMatrix")
+    expect_equal(unname(as.matrix(cbind(X, v))),
+                 unname(cbind(as.matrix(X), v)))
+    expect_equal(unname(as.matrix(cbind(X, as.integer(v)))),
+                 unname(cbind(as.matrix(X), as.integer(v))))
+    expect_equal(unname(as.matrix(cbind(X, as.logical(v)))),
+                 unname(cbind(as.matrix(X), as.logical(v))))
+    expect_equal(unname(as.matrix(cbind(X, as.sparse.vector(v)))),
+                 unname(cbind(as.matrix(X), v)))
+    
+    
+    expect_s4_class(cbind(v, X), "dgRMatrix")
+    expect_equal(unname(as.matrix(cbind(v, X))),
+                 unname(cbind(v, as.matrix(X))))
+    expect_equal(unname(as.matrix(cbind(as.integer(v), X))),
+                 unname(cbind(as.integer(v), as.matrix(X))))
+    expect_equal(unname(as.matrix(cbind(as.logical(v), X))),
+                 unname(cbind(as.logical(v), as.matrix(X))))
+    expect_equal(unname(as.matrix(cbind(as.sparse.vector(v), X))),
+                 unname(cbind(v, as.matrix(X))))
+})

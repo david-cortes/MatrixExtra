@@ -14,7 +14,7 @@ as.csc.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
 
 as.coo.matrix(x, binary = FALSE, logical = FALSE, sort = FALSE)
 
-as.sparse.vector(x)
+as.sparse.vector(x, binary = FALSE, logical = FALSE, integer = FALSE)
 }
 \arguments{
 \item{x}{A matrix which is to be converted to a different format.
@@ -28,16 +28,18 @@ Supported input types are:\itemize{
 \item `data.frame`, `data.table`, and `tibble`.
 }}
 
-\item{binary}{Whether the result should be a binary-only matrix (inheriting from
-class `nsparseMatrix` - these don't have slot `x`).
+\item{binary}{Whether the result should be a binary-only matrix/vector (inheriting from
+class `nsparseMatrix`/`nsparseVector` - these don't have slot `x`).
 Can only pass one of `binary` or `logical`.}
 
-\item{logical}{Whether the result should be a matrix with logical (boolean) type
-(inheriting from `lsparseMatrix`).
+\item{logical}{Whether the result should be a matrix/vector with logical (boolean) type
+(inheriting from `lsparseMatrix`/`lsparseVector`).
 Can only pass one of `binary` or `logical`.}
 
 \item{sort}{Whether to sort the indices in case they are not sorted. Note that in some
 cases it might also end up sorting the indices of the input matrix.}
+
+\item{integer}{Whether the result should be a vector with integer type ('isparseVector').}
 }
 \value{
 A sparse matrix/vector, with format:\itemize{

@@ -3,19 +3,28 @@
 SEXP SafeRcppVector(void *args_)
 {
     VectorConstructorArgs *args = (VectorConstructorArgs*)args_;
+    std::vector<int> *int_vec_from = (std::vector<int>*)args->int_vec_from;
+    std::vector<double> *num_vec_from = (std::vector<double>*)args->num_vec_from;
+    
     if (args->as_integer) {
         if (args->from_cpp_vec) {
-            return Rcpp::IntegerVector(args->int_vec_from->begin(), args->int_vec_from->end());
+            if (!args->as_logical)
+                return Rcpp::IntegerVector(int_vec_from->begin(), int_vec_from->end());
+            else
+                return Rcpp::LogicalVector(int_vec_from->begin(), int_vec_from->end());
         }
 
         else {
-            return Rcpp::IntegerVector(args->size);
+            if (!args->as_logical)
+                return Rcpp::IntegerVector(args->size);
+            else
+                return Rcpp::LogicalVector(args->size);
         }
     }
 
     else {
         if (args->from_cpp_vec) {
-            return Rcpp::NumericVector(args->num_vec_from->begin(), args->num_vec_from->end());
+            return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->end());
         }
 
         else {
@@ -46,25 +55,55 @@ bool check_is_sorted(int* vec, size_t n)
     return true;
 }
 
+bool check_indices_are_unsorted
+(
+    int *restrict indptr,
+    int *restrict indices,
+    int nrows
+)
+{
+    for (int row = 0; row < nrows; row++)
+    {
+        if(!check_is_sorted(indices + indptr[row], indptr[row+1] - indptr[row]))
+            return false;
+    }
+    return true;
+}
+
+// [[Rcpp::export(rng = false)]]
+bool check_indices_are_unsorted
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::NumericVector indices
+)
+{
+    return check_indices_are_unsorted(
+        INTEGER(indptr),
+        INTEGER(indices),
+        indptr.size() - 1
+    );
+}
+
+
 template <class T>
 void sort_sparse_indices
 (
     int *restrict indptr,
     int *restrict indices,
     T values[],
-    size_t nrows
+    int nrows
 )
 {
-    std::vector<size_t> argsorted;
+    std::vector<int> argsorted;
     std::vector<int> temp_indices;
     std::vector<T> temp_values;
-    size_t ix1, ix2;
-    size_t n_this;
+    int ix1, ix2;
+    int n_this;
 
-    for (size_t ix = 1; ix <= nrows; ix++)
+    for (int row = 1; row <= nrows; row++)
     {
-        ix1 = indptr[ix-1];
-        ix2 = indptr[ix];
+        ix1 = indptr[row-1];
+        ix2 = indptr[row];
         n_this = ix2 - ix1;
         if (n_this)
         {
@@ -75,13 +114,13 @@ void sort_sparse_indices
                     temp_indices.resize(n_this);
                     temp_values.resize(n_this);
                 }
-                std::iota(argsorted.begin(), argsorted.begin() + n_this, (size_t)ix1);
+                std::iota(argsorted.begin(), argsorted.begin() + n_this, ix1);
                 std::sort(argsorted.begin(), argsorted.begin() + n_this,
-                          [&indices](const size_t a, const size_t b){return indices[a] < indices[b];});
-                for (size_t ix = 0; ix < n_this; ix++)
+                          [&indices](const int a, const int b){return indices[a] < indices[b];});
+                for (int ix = 0; ix < n_this; ix++)
                     temp_indices[ix] = indices[argsorted[ix]];
                 std::copy(temp_indices.begin(), temp_indices.begin() + n_this, indices + ix1);
-                for (size_t ix = 0; ix < n_this; ix++)
+                for (int ix = 0; ix < n_this; ix++)
                     temp_values[ix] = values[argsorted[ix]];
                 std::copy(temp_values.begin(), temp_values.begin() + n_this, values + ix1);
 
@@ -100,16 +139,55 @@ void sort_sparse_indices
     size_t ix1, ix2;
     size_t n_this;
 
-    for (size_t ix = 1; ix <= nrows; ix++)
+    for (size_t row = 1; row <= nrows; row++)
     {
-        ix1 = indptr[ix-1];
-        ix2 = indptr[ix];
+        ix1 = indptr[row-1];
+        ix2 = indptr[row];
         n_this = ix2 - ix1;
         if (n_this)
         {
             if (!check_is_sorted(indices + ix1, n_this))
             {
                 std::sort(indices + ix1, indices + ix2);
+            }
+        }
+    }
+}
+
+template <class T>
+void sort_sparse_indices_known_ncol
+(
+    int *restrict indptr,
+    int *restrict indices,
+    T values[],
+    int nrows, int ncols
+)
+{
+    std::vector<int> argsorted(ncols);
+    std::vector<int> temp_indices(ncols);
+    std::vector<T> temp_values(ncols);
+    int ix1, ix2;
+    int n_this;
+
+    for (int row = 1; row <= nrows; row++)
+    {
+        ix1 = indptr[row-1];
+        ix2 = indptr[row];
+        n_this = ix2 - ix1;
+        if (n_this)
+        {
+            if (!check_is_sorted(indices + ix1, n_this))
+            {
+                std::iota(argsorted.begin(), argsorted.begin() + n_this, ix1);
+                std::sort(argsorted.begin(), argsorted.begin() + n_this,
+                          [&indices](const int a, const int b){return indices[a] < indices[b];});
+                for (int ix = 0; ix < n_this; ix++)
+                    temp_indices[ix] = indices[argsorted[ix]];
+                std::copy(temp_indices.begin(), temp_indices.begin() + n_this, indices + ix1);
+                for (int ix = 0; ix < n_this; ix++)
+                    temp_values[ix] = values[argsorted[ix]];
+                std::copy(temp_values.begin(), temp_values.begin() + n_this, values + ix1);
+
             }
         }
     }
@@ -144,6 +222,40 @@ void sort_sparse_indices_logical
         INTEGER(indices),
         LOGICAL(values),
         indptr.size()-1
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+void sort_sparse_indices_numeric_known_ncol
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    int ncol
+)
+{
+    sort_sparse_indices_known_ncol(
+        INTEGER(indptr),
+        INTEGER(indices),
+        REAL(values),
+        indptr.size()-1, ncol
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+void sort_sparse_indices_logical_known_ncol
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    int ncol
+)
+{
+    sort_sparse_indices_known_ncol(
+        INTEGER(indptr),
+        INTEGER(indices),
+        LOGICAL(values),
+        indptr.size()-1, ncol
     );
 }
 
@@ -308,4 +420,28 @@ void sort_vector_indices_binary
 )
 {
     std::sort(INTEGER(indices_base1), INTEGER(indices_base1) + indices_base1.size());
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::NumericVector deepcopy_num(Rcpp::NumericVector x)
+{
+    return Rcpp::NumericVector(x.begin(), x.end());
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::IntegerVector deepcopy_int(Rcpp::IntegerVector x)
+{
+    return Rcpp::IntegerVector(x.begin(), x.end());
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::LogicalVector deepcopy_log(Rcpp::LogicalVector x)
+{
+    return Rcpp::LogicalVector(x.begin(), x.end());
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::String deepcopy_str(Rcpp::String x)
+{
+    return Rcpp::String(x);
 }

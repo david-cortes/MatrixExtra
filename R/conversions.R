@@ -23,12 +23,13 @@
 #' \item Dense matrix or vector from package `float` (class `float32`).
 #' \item `data.frame`, `data.table`, and `tibble`.
 #' }
-#' @param binary Whether the result should be a binary-only matrix (inheriting from
-#' class `nsparseMatrix` - these don't have slot `x`).
+#' @param binary Whether the result should be a binary-only matrix/vector (inheriting from
+#' class `nsparseMatrix`/`nsparseVector` - these don't have slot `x`).
 #' Can only pass one of `binary` or `logical`.
-#' @param logical Whether the result should be a matrix with logical (boolean) type
-#' (inheriting from `lsparseMatrix`).
+#' @param logical Whether the result should be a matrix/vector with logical (boolean) type
+#' (inheriting from `lsparseMatrix`/`lsparseVector`).
 #' Can only pass one of `binary` or `logical`.
+#' @param integer Whether the result should be a vector with integer type ('isparseVector').
 #' @param sort Whether to sort the indices in case they are not sorted. Note that in some
 #' cases it might also end up sorting the indices of the input matrix.
 #' @return A sparse matrix/vector, with format:\itemize{
@@ -324,8 +325,30 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
 
 #' @rdname conversions
 #' @export
-as.sparse.vector <- function(x) {
-    return(as(x, "sparseVector"))
+as.sparse.vector <- function(x, binary=FALSE, logical=FALSE, integer=FALSE) {
+    if ((binary && logical) || (logical && integer) || (binary && integer))
+        stop("Can pass at most one of 'binary', 'logical', 'integer'.")
+
+    if (inherits(x, "data.frame"))
+        x <- as.matrix(x)
+    if (inherits(x, "float32"))
+        x <- float::dbl(x)
+
+    if (!binary && !logical && !integer) {
+        if (!inherits(x, "dsparseVector"))
+            x <- as(x, "dsparseVector")
+    } else if (integer) {
+        if (!inherits(x, "isparseVector"))
+            x <- as(x, "isparseVector")
+    } else if (logical) {
+        if (!inherits(x, "lsparseVector"))
+            x <- as(x, "lsparseVector")
+    } else if (binary) {
+        if (!inherits(x, "nsparseVector"))
+            x <- as(x, "nsparseVector")
+    }
+
+    return(x)
 }
 
 #' @export

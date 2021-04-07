@@ -318,7 +318,7 @@ Rcpp::List multiply_csr_by_coo_elemwise
                 X_csr_indices,
                 X_csr_values,
                 Y_coo_row[ix], Y_coo_col[ix],
-                false
+                true
             );
             if (ISNAN(val) || val != 0)
             {
@@ -379,6 +379,7 @@ Rcpp::List multiply_coo_by_dense
     }
 
     /* Note: avoid shallow copies as the indices might get sorted in some situations */
+    /* TODO: revisit this and see if it can be done with shallow copies */
     return Rcpp::List::create(
         Rcpp::_["row"] = Rcpp::IntegerVector(Y_coo_row.begin(), Y_coo_row.end()),
         Rcpp::_["col"] = Rcpp::IntegerVector(Y_coo_col.begin(), Y_coo_col.end()),

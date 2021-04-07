@@ -25,5 +25,8 @@ and `<RsparseMatrix,scalar>` (see \link[MatrixExtra]{operators}).
 \item Utility functions for sparse matrices (see e.g.
 \link[MatrixExtra]{sort_sparse_indices}).
 }
+
+\bold{Important:} `MatrixExtra` changes some important behaviors from the `Matrix` library.
+See \link{MatrixExtra-options}.
 }
 \keyword{package}

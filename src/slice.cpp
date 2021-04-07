@@ -1,5 +1,22 @@
 #include "MatrixExtra.h"
 
+size_t get_size_reserve(size_t nnz, size_t take1, size_t take2)
+{
+    if (sizeof(size_t) < sizeof(uint64_t))
+    {
+        uint64_t larger = std::min((uint64_t)nnz, (uint64_t)take1 * (uint64_t)take2);
+        if (larger >= SIZE_MAX)
+            return nnz;
+        else
+            return larger;
+    }
+
+    else
+    {
+        return std::min(nnz, (size_t)take1 * (size_t)take2);
+    }
+}
+
 // [[Rcpp::export(rng = false)]]
 bool check_is_seq(Rcpp::IntegerVector indices)
 {
@@ -13,29 +30,220 @@ bool check_is_seq(Rcpp::IntegerVector indices)
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::List copy_csr_rows(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices,
-                         Rcpp::NumericVector values, Rcpp::IntegerVector rows_take)
+bool check_is_rev_seq(Rcpp::IntegerVector indices)
+{
+    if (indices.size() < 2) return true;
+    int n_els = indices.size();
+    if ((indices[0] - indices[n_els - 1]) != n_els - 1) return false;
+    for (int ix = 1; ix < n_els; ix++) {
+        if (indices[ix] != indices[ix - 1] - 1) return false;
+    }
+    return true;
+}
+
+template <class RcppVector, class InputDType>
+Rcpp::List reverse_rows_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    RcppVector values_
+)
+{
+    Rcpp::IntegerVector indptr_new(indptr.size());
+    Rcpp::IntegerVector indices_new_(indices_.size());
+    RcppVector values_new_;
+
+    const int *restrict indices = INTEGER(indices_);
+    const InputDType *restrict values = nullptr;
+    int *restrict indices_new = INTEGER(indices_new_);
+    InputDType *restrict values_new = nullptr;
+    if (values_.size()) {
+        values_new_ = RcppVector(values_.size());
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value) {
+            values = (InputDType*)REAL(values_);
+            values_new = (InputDType*)REAL(values_new_);
+        }
+        else if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
+            values = (InputDType*)INTEGER(values_);
+            values_new = (InputDType*)LOGICAL(values_new_);
+        }
+    }
+
+    int nrows = indptr.size() - 1;
+    int rev_row;
+    int n_this;
+    for (int row = 0; row < nrows; row++)
+    {
+        rev_row = nrows - row - 1;
+        n_this = indptr[rev_row+1] - indptr[rev_row];
+        indptr_new[row+1] = indptr_new[row] + n_this;
+        std::copy(indices + indptr[rev_row], indices + indptr[rev_row+1], indices_new + indptr_new[row]);
+        if (values)
+        std::copy(values + indptr[rev_row], values + indptr[rev_row+1], values_new + indptr_new[row]);
+    }
+
+    return Rcpp::List::create(
+        Rcpp::_["indptr"] = indptr_new,
+        Rcpp::_["indices"] = indices_new_,
+        Rcpp::_["values"] = values_new_
+    );
+}
+
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List reverse_rows_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values
+)
+{
+    return reverse_rows_template<Rcpp::NumericVector, double>(
+        indptr,
+        indices,
+        values
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List reverse_rows_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values
+)
+{
+    return reverse_rows_template<Rcpp::LogicalVector, int>(
+        indptr,
+        indices,
+        values
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List reverse_rows_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices
+)
+{
+    return reverse_rows_template<Rcpp::NumericVector, double>(
+        indptr,
+        indices,
+        Rcpp::NumericVector()
+    );
+}
+
+template <class RcppVector>
+void reverse_columns_inplace
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    RcppVector values_,
+    int ncol
+)
+{
+    int *restrict indices = INTEGER(indices_);
+    auto values = values_.begin();
+    const bool has_values = values_.size();
+
+    int nrows = indptr.size() - 1;
+    for (int row = 0; row < nrows; row++)
+    {
+        if (indptr[row] < indptr[row+1])
+        {
+            #pragma omp simd
+            for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+                indices[ix] = ncol - indices[ix] - 1;
+            std::reverse(indices + indptr[row], indices + indptr[row+1]);
+            if (has_values)
+            std::reverse(values + indptr[row], values + indptr[row+1]);
+        }
+    }
+}
+
+// [[Rcpp::export(rng = false)]]
+void reverse_columns_inplace_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values_,
+    int ncol
+)
+{
+    return reverse_columns_inplace(
+        indptr,
+        indices_,
+        values_,
+        ncol
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+void reverse_columns_inplace_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::LogicalVector values_,
+    int ncol
+)
+{
+    return reverse_columns_inplace(
+        indptr,
+        indices_,
+        values_,
+        ncol
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+void reverse_columns_inplace_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values_,
+    int ncol
+)
+{
+    return reverse_columns_inplace(
+        indptr,
+        indices_,
+        Rcpp::NumericVector(),
+        ncol
+    );
+}
+
+/* TODO: make these ones work also for logical vectors */
+
+template <class RcppVector>
+Rcpp::List copy_csr_rows_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppVector values,
+    Rcpp::IntegerVector rows_take
+)
 {
     size_t total_size = 0;
     for (const int row : rows_take) total_size += indptr[row + 1] - indptr[row];
     if (total_size == 0) {
         return Rcpp::List::create(Rcpp::_["indptr"] = Rcpp::IntegerVector(),
                                   Rcpp::_["indices"] = Rcpp::IntegerVector(),
-                                  Rcpp::_["values"] = Rcpp::NumericVector());
+                                  Rcpp::_["values"] = RcppVector());
     }
     
     Rcpp::IntegerVector new_indptr = Rcpp::IntegerVector(rows_take.size() + 1);
     Rcpp::IntegerVector new_indices = Rcpp::IntegerVector(total_size);
-    Rcpp::NumericVector new_values = Rcpp::NumericVector(values.size()? total_size : 0);
+    RcppVector new_values = RcppVector(values.size()? total_size : 0);
 
     size_t n_copy;
     int row;
     int *restrict ptr_indptr = indptr.begin();
     int *restrict ptr_indices = indices.begin();
-    double *restrict prt_values = values.begin();
+    auto *restrict prt_values = values.begin();
     int *restrict ptr_new_indptr = new_indptr.begin();
     int *restrict ptr_new_indices = new_indices.begin();
-    double *restrict ptr_new_values = new_values.begin();
+    auto *restrict ptr_new_values = new_values.begin();
     const bool has_values = values.size() > 0;
 
     size_t curr = 0;
@@ -59,18 +267,73 @@ Rcpp::List copy_csr_rows(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::List copy_csr_rows_col_seq(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices,
-                                 Rcpp::NumericVector values,
-                                 Rcpp::IntegerVector rows_take,
-                                 Rcpp::IntegerVector cols_take)
+Rcpp::List copy_csr_rows_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerVector rows_take
+)
 {
-    int min_col = *std::min_element(cols_take.begin(), cols_take.end());
-    int max_col = *std::max_element(cols_take.begin(), cols_take.end());
+    return copy_csr_rows_template(
+        indptr,
+        indices,
+        values,
+        rows_take
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_rows_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    Rcpp::IntegerVector rows_take
+)
+{
+    return copy_csr_rows_template(
+        indptr,
+        indices,
+        values,
+        rows_take
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_rows_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::IntegerVector rows_take
+)
+{
+    return copy_csr_rows_template(
+        indptr,
+        indices,
+        Rcpp::NumericVector(),
+        rows_take
+    );
+}
+
+template <class RcppVector>
+Rcpp::List copy_csr_rows_col_seq_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take,
+    const bool index1
+)
+{
+    const int min_col = *std::min_element(cols_take.begin(), cols_take.end()) - index1;
+    const int max_col = *std::max_element(cols_take.begin(), cols_take.end()) - index1;
     Rcpp::IntegerVector new_indptr(rows_take.size() + 1);
 
     int *restrict ptr_indptr = indptr.begin();
     int *restrict ptr_indices = indices.begin();
-    double *restrict ptr_values = values.begin();
+    auto *restrict ptr_values = values.begin();
     int *restrict ptr_new_indptr = new_indptr.begin();
     const bool has_values = values.size() > 0;
 
@@ -91,7 +354,7 @@ Rcpp::List copy_csr_rows_col_seq(Rcpp::IntegerVector indptr, Rcpp::IntegerVector
     Rcpp::IntegerVector new_indices = Rcpp::IntegerVector(total_size);
     Rcpp::NumericVector new_values = Rcpp::NumericVector(has_values? total_size : 0);
     int *restrict ptr_new_indices = new_indices.begin();
-    double *restrict ptr_new_values = new_values.begin();
+    auto *restrict ptr_new_values = new_values.begin();
 
     int curr = 0;
     for (int row = 0; row < (int)rows_take.size(); row++)
@@ -113,9 +376,78 @@ Rcpp::List copy_csr_rows_col_seq(Rcpp::IntegerVector indptr, Rcpp::IntegerVector
 }
 
 // [[Rcpp::export(rng = false)]]
-Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices,
-                              Rcpp::NumericVector values, Rcpp::IntegerVector rows_take,
-                              Rcpp::IntegerVector cols_take)
+Rcpp::List copy_csr_rows_col_seq_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take,
+    const bool index1
+)
+{
+    return copy_csr_rows_col_seq_template(
+        indptr,
+        indices,
+        values,
+        rows_take,
+        cols_take,
+        index1
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_rows_col_seq_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take,
+    const bool index1
+)
+{
+    return copy_csr_rows_col_seq_template(
+        indptr,
+        indices,
+        values,
+        rows_take,
+        cols_take,
+        index1
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_rows_col_seq_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take,
+    const bool index1
+)
+{
+    return copy_csr_rows_col_seq_template(
+        indptr,
+        indices,
+        Rcpp::NumericVector(),
+        rows_take,
+        cols_take,
+        index1
+    );
+}
+
+/* TODO: if the indices are sorted, this function could use std::lower_bound instead */
+
+template <class RcppVector, class InputDType, class CompileFlag>
+Rcpp::List copy_csr_arbitrary_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take
+)
 {
     std::unordered_map<int, int> new_mapping;
     for (int col = 0; col < (int)cols_take.size(); col++) new_mapping[cols_take[col]] = col;
@@ -145,41 +477,52 @@ Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector in
         }
     }
 
+    const int min_j = *std::min_element(cols_take.begin(), cols_take.end());
+    const int max_j = *std::max_element(cols_take.begin(), cols_take.end());
+
     Rcpp::IntegerVector new_indptr;
     VectorConstructorArgs args;
     args.as_integer = true; args.from_cpp_vec = false; args.size = rows_take.size() + 1;
     new_indptr = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     std::vector<int> new_indices;
-    std::vector<double> new_values;
+    std::vector<InputDType> new_values;
 
-    std::vector<int> argsort_cols;
-    std::vector<int> temp_int;
-    std::vector<double> temp_double;
+    std::vector<int> argsort_cols(cols_take.size());
+    std::vector<int> temp_int(cols_take.size());
+    std::vector<InputDType> temp_double(values.size()? cols_take.size() : 0);
 
-    const bool has_values = values.size() > 0;
+
+    size_t size_reserve = get_size_reserve(indices.size(), rows_take.size(), cols_take.size());
+    new_indices.reserve(size_reserve);
+    if (std::is_same<CompileFlag, bool>::value) new_values.reserve(size_reserve);
 
     int size_this = 0;
     int row = 0;
+    std::unordered_map<int, int>::iterator match;
+
     for (int row_ix = 0; row_ix < (int)rows_take.size(); row_ix++)
     {
         row = rows_take[row_ix];
         for (int ix = indptr[row]; ix < indptr[row + 1]; ix++)
         {
-            auto match = new_mapping.find(indices[ix]);
+            if (indices[ix] < min_j || indices[ix] > max_j)
+                continue;
+
+            match = new_mapping.find(indices[ix]);
             if (match != new_mapping.end())
             {
                 if (has_duplicates && n_repeats[indices[ix]] > 1)
                 {
-                    for (const auto& el : indices_rep[indices[ix]]) {
+                    for (const auto el : indices_rep[indices[ix]]) {
                         new_indices.push_back(el);
-                        if (has_values)
+                        if (std::is_same<CompileFlag, bool>::value)
                         new_values.push_back(values[ix]);
                     }
                 }
                 else
                 {
                     new_indices.push_back(match->second);
-                    if (has_values)
+                    if (std::is_same<CompileFlag, bool>::value)
                     new_values.push_back(values[ix]);
                 }
             }
@@ -188,11 +531,6 @@ Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector in
         if (!cols_are_sorted && new_indptr[row_ix + 1] > new_indptr[row_ix])
         {
             size_this = new_indptr[row_ix + 1] - new_indptr[row_ix];
-            if (argsort_cols.size() < (size_t)size_this) {
-                argsort_cols.resize(size_this);
-                temp_int.resize(size_this);
-                temp_double.resize(size_this);
-            }
             std::iota(argsort_cols.begin(), argsort_cols.begin() + size_this,
                       new_indptr[row_ix]);
             std::sort(argsort_cols.begin(), argsort_cols.begin() + size_this,
@@ -201,12 +539,12 @@ Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector in
                     });
             for (int col = 0; col < size_this; col++) {
                 temp_int[col] = new_indices[argsort_cols[col]];
-                if (has_values)
+                if (std::is_same<CompileFlag, bool>::value)
                 temp_double[col] = new_values[argsort_cols[col]];
             }
             std::copy(temp_int.begin(), temp_int.begin() + size_this,
                       new_indices.begin() + new_indptr[row_ix]);
-            if (has_values)
+            if (std::is_same<CompileFlag, bool>::value)
             std::copy(temp_double.begin(), temp_double.begin() + size_this,
                       new_values.begin() + new_indptr[row_ix]);
         }
@@ -218,10 +556,73 @@ Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector in
     out["indices"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     new_indices.clear();
     if (values.size()) {
-        args.as_integer = false; args.from_cpp_vec = true; args.num_vec_from = &new_values;
+        if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
+            args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &new_values;
+            args.as_logical = true;
+        } else if (std::is_same<RcppVector, Rcpp::IntegerVector>::value) {
+            args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &new_values;
+        } else {
+            args.as_integer = false; args.from_cpp_vec = true; args.num_vec_from = &new_values;
+        }
         out["values"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     }
     return out;
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_arbitrary_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take
+)
+{
+    return copy_csr_arbitrary_template<Rcpp::NumericVector, double, bool>(
+        indptr,
+        indices,
+        values,
+        rows_take,
+        cols_take
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_arbitrary_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take
+)
+{
+    return copy_csr_arbitrary_template<Rcpp::LogicalVector, int, bool>(
+        indptr,
+        indices,
+        values,
+        rows_take,
+        cols_take
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List copy_csr_arbitrary_binary
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::IntegerVector rows_take,
+    Rcpp::IntegerVector cols_take
+)
+{
+    return copy_csr_arbitrary_template<Rcpp::NumericVector, double, int>(
+        indptr,
+        indices,
+        Rcpp::NumericVector(),
+        rows_take,
+        cols_take
+    );
 }
 
 // [[Rcpp::export(rng = false)]]
@@ -245,13 +646,14 @@ Rcpp::IntegerVector repeat_indices_n_times(Rcpp::IntegerVector indices,
     return out;
 }
 
-double extract_single_val_csr
+template <class real_t>
+real_t extract_single_val_csr
 (
     int *restrict indptr,
     int *restrict indices,
-    double *restrict values,
+    real_t *restrict values,
     const int row, const int col,
-    const bool check_sorted
+    const bool is_sorted
 )
 {
     if (indptr[row] == indptr[row+1])
@@ -260,24 +662,12 @@ double extract_single_val_csr
         int *st_this = indices + indptr[row];
         int *end_this = indices + indptr[row+1];
         size_t n_this = end_this - st_this;
-        if (check_sorted && !check_is_sorted(st_this, n_this))
+        if (!is_sorted)
         {
-            std::vector<size_t> argsorted(n_this);
-            std::vector<int> indices_sorted(n_this);
-            std::vector<double> values_sorted(n_this);
-            double *restrict values_ = values? (values + indptr[row]) : nullptr;
-            std::iota(argsorted.begin(), argsorted.end(), (size_t)0);
-            std::sort(argsorted.begin(), argsorted.end(),
-                      [&st_this](const size_t a, const size_t b)
-                      {return st_this[a] < st_this[b];});
-            for (size_t ix = 0; ix < n_this; ix++)
-                indices_sorted[ix] = st_this[argsorted[ix]];
-            if (values != nullptr)
-            for (size_t ix = 0; ix < n_this; ix++)
-                values_sorted[ix] = values_[argsorted[ix]];
-            std::copy(indices_sorted.begin(), indices_sorted.end(), st_this);
-            if (values != nullptr)
-            std::copy(values_sorted.begin(), values_sorted.end(), values_);
+            for (int *ix = st_this; ix < end_this; ix++)
+                if (*ix == col)
+                    return values? values[ix - indices] : 1;
+            return 0;
         }
 
         int *res = std::lower_bound(st_this, end_this, col);
@@ -294,6 +684,24 @@ double extract_single_val_csr
 
 }
 
+double extract_single_val_csr
+(
+    int *restrict indptr,
+    int *restrict indices,
+    double *restrict values,
+    const int row, const int col,
+    const bool is_sorted
+)
+{
+    return extract_single_val_csr<double>(
+        indptr,
+        indices,
+        values,
+        row, col,
+        is_sorted
+    );
+}
+
 // [[Rcpp::export(rng = false)]]
 double extract_single_val_csr_numeric
 (
@@ -303,11 +711,28 @@ double extract_single_val_csr_numeric
     int row, int col
 )
 {
-    return extract_single_val_csr(
+    return extract_single_val_csr<double>(
         INTEGER(indptr),
         INTEGER(indices),
         REAL(values),
-        row, col, true
+        row, col, false
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+int extract_single_val_csr_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    int row, int col
+)
+{
+    return extract_single_val_csr<int>(
+        INTEGER(indptr),
+        INTEGER(indices),
+        LOGICAL(values),
+        row, col, false
     );
 }
 
@@ -319,10 +744,10 @@ double extract_single_val_csr_binary
     int row, int col
 )
 {
-    return extract_single_val_csr(
+    return extract_single_val_csr<double>(
         INTEGER(indptr),
         INTEGER(indices),
         (double*)nullptr,
-        row, col, true
+        row, col, false
     );
 }

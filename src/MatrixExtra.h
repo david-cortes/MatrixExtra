@@ -2,12 +2,14 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <inttypes.h>
 #include <vector>
 #include <type_traits>
 #include <numeric>
 #include <algorithm>
 #include <unordered_set>
 #include <unordered_map>
+#include <chrono>
 #ifdef _OPENMP
 #   include <omp.h>
 #else
@@ -38,9 +40,10 @@ extern "C" {
 struct VectorConstructorArgs {
     bool as_integer = false;
     bool from_cpp_vec = false;
+    bool as_logical = false;
     size_t size = 0;
-    std::vector<int> *int_vec_from = NULL;
-    std::vector<double> *num_vec_from = NULL;
+    void *int_vec_from = NULL;
+    void *num_vec_from = NULL;
 };
 
 bool check_is_sorted(int* vec, size_t n);
@@ -53,11 +56,12 @@ bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
 enum RbindedType {dgRMatrix, lgRMatrix, ngRMatrix};
 
 /* slice.cpp */
+size_t get_size_reserve(size_t nnz, size_t take1, size_t take2);
 double extract_single_val_csr
 (
     int *restrict indptr,
     int *restrict indices,
     double *restrict values,
     const int row, const int col,
-    const bool check_sorted
+    const bool is_sorted
 );

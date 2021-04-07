@@ -27,7 +27,12 @@ rbind_csr <- function(...) {
     logical_types <- c("lsparseMatrix", "lsparseVector", "logical")
     cast_csr_same <- function(x) as.csr.matrix(x, binary=inherits(x, binary_types), logical=inherits(x, logical_types))
     cast_if_not_csr <- function(x) {
-        if (inherits(x, c("dgRMatrix", "ngRMatrix", "lgRMatrix", "sparseVector"))) {
+        if (inherits(x, c("dgRMatrix", "ngRMatrix", "lgRMatrix", "sparseVector")) ||
+            (inherits(x, c("dtRMatrix", "ltRMatrix", "ntRMatrix"))
+             && (!.hasSlot(x, "diag") || x@diag == "N"))
+        ) {
+            if (!inherits(x, "sparseVector"))
+                check_valid_matrix(x)
             return(x)
         } else {
             return(cast_csr_same(x))
@@ -94,21 +99,23 @@ rbind_csr <- function(...) {
 }
 
 #' @name rbind2-method
-#' @title Concatenate CSR matrices by rows
+#' @title Concatenate sparse matrices/vectors by rows
 #' @description `rbind2` method for the sparse matrix and sparse vector classes from `Matrix`,
 #' taking the most efficient route for the concatenation according to the input types.
 #' @param x First matrix to concatenate.
 #' @param y Second matrix to concatenate.
-#' @return Either a CSR matrix or a COO matrix depending on the input types.
+#' @return A sparse matrix, usually in CSR format but some combinations
+#' might return COO or CSC.
 #' @examples
 #' library(Matrix)
 #' library(MatrixExtra)
 #' set.seed(1)
 #' X <- rsparsematrix(3, 4, .3)
 #' X <- as(X, "RsparseMatrix")
-#' inherits(rbind2(X, X), "dgRMatrix")
-#' inherits(rbind(X, X, as.csc.matrix(X), X), "dgRMatrix")
-#' inherits(rbind2(as.coo.matrix(X), as.coo.matrix(X)), "dgTMatrix")
+#' inherits(rbind2(X, X), "RsparseMatrix")
+#' inherits(rbind(X, X, as.csc.matrix(X), X), "RsparseMatrix")
+#' inherits(rbind2(as.coo.matrix(X), as.coo.matrix(X)), "TsparseMatrix")
+#' inherits(rbind2(as.csc.matrix(X), as.csc.matrix(X)), "CsparseMatrix")
 NULL
 
 concat_dimname <- function(nm1, nm2, nrow1, nrow2) {
@@ -176,9 +183,13 @@ concat_as_logical <- function(v1, v2) {
 }
 
 rbind2_csr <- function(x, y, out) {
+    check_valid_matrix(x)
+    check_valid_matrix(y)
     Dim <- c(x@Dim[1L] + y@Dim[1L], max(x@Dim[2L], y@Dim[2L]))
     if (Dim[2L] >= .Machine$integer.max)
         stop("Resulting matrix has too many rows for R to handle.")
+    ### FAIL: this ended up being slower than 'Matrix'. Perhaps should
+    ### just switch to a cbind2(CSC,CSC) with t_shallow
     out_attr <- attributes(out)
     out_attr$Dim <- as.integer(Dim)
     out_attr$Dimnames <- concat_dimnames(x, y)
@@ -231,11 +242,42 @@ rbind2_generic <- function(x, y) {
     x_is_logical <- inherits(x, logical_types)
     y_is_binary <- inherits(y, binary_types)
     y_is_logical <- inherits(y, logical_types)
+    
+    x_is_csc <- inherits(x, "CsparseMatrix")
+    x_is_coo <- inherits(x, "TsparseMatrix")
+    y_is_csc <- inherits(y, "CsparseMatrix")
+    y_is_coo <- inherits(y, "TsparseMatrix")
+    
+    if (x_is_csc && y_is_csc) {
+        return(t_shallow(cbind_csr(t_shallow(x), t_shallow(y))))
+    } else if (x_is_coo && y_is_coo) {
+        throw_internal_error()
+    } else if ((x_is_csc || y_is_csc) && (x_is_coo || y_is_coo)) {
+        if (x_is_csc) {
+            x <- as.coo.matrix(x, logical=x_is_logical, binary=x_is_binary)
+        } else if (y_is_csc) {
+            y <- as.coo.matrix(y, logical=y_is_logical, binary=y_is_binary)
+        }
+        return(rbind2_coo(x, y))
+    }
+
+    ### TODO: maybe delete this whole functionality and keep just the t_shallow(s) + cbind
+    if (inherits(x, c("numeric", "integer", "logical")))
+        return(t_shallow(cbind2(x, t_shallow(y))))
+    if (inherits(y, c("numeric", "integer", "logical")))
+        return(t_shallow(cbind2(t_shallow(x), y)))
+    if (!inherits(x, "RsparseMatrix") || inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
+        x <- as.csr.matrix(x, logical=x_is_logical, binary=x_is_binary)
+    if (!inherits(y, "RsparseMatrix") || inherits(y, "symmetricMatrix") || (.hasSlot(y, "diag") && y@diag != "N"))
+        y <- as.csr.matrix(y, logical=y_is_logical, binary=y_is_binary)
+    return(t_shallow(cbind2(t_shallow(x), t_shallow(y))))
 
     if (inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
         x <- as.csr.matrix(x, logical=x_is_logical, binary=x_is_binary)
     if (inherits(x, "symmetricMatrix") || (.hasSlot(y, "diag") && y@diag != "N"))
         y <- as.csr.matrix(y, logical=y_is_logical, binary=y_is_binary)
+
+
 
     if (x_is_binary && y_is_binary) {
         return(rbind2_ngr(as.csr.matrix(x, binary=TRUE), as.csr.matrix(y, binary=TRUE)))
@@ -248,7 +290,10 @@ rbind2_generic <- function(x, y) {
 
 #' @rdname rbind2-method
 #' @export
-setMethod("rbind2", signature(x="RsparseMatrix", y="RsparseMatrix"), rbind2_generic)
+setMethod("rbind2", signature(x="RsparseMatrix", y="RsparseMatrix"), function(x, y) {
+    return(t_shallow(cbind2(t_shallow(x), t_shallow(y))))
+})
+# setMethod("rbind2", signature(x="RsparseMatrix", y="RsparseMatrix"), rbind2_generic)
 
 #' @rdname rbind2-method
 #' @export
@@ -296,8 +341,8 @@ setMethod("rbind2", signature(x="TsparseMatrix", y="RsparseMatrix"), rbind2_gene
 
 ### TODO: add tests for the ones below
 ### TODO: add tests with named vectors
-
-rbind2_tri <- function(x, y) {
+    
+rbind2_coo <- function(x, y) {
     x_is_binary <- inherits(x, "nsparseMatrix")
     x_is_logical <- inherits(x, "lsparseMatrix")
     y_is_binary <- inherits(y, "nsparseMatrix")
@@ -344,9 +389,9 @@ rbind2_tri <- function(x, y) {
 
 #' @rdname rbind2-method
 #' @export
-setMethod("rbind2", signature(x="TsparseMatrix", y="TsparseMatrix"), rbind2_tri)
+setMethod("rbind2", signature(x="TsparseMatrix", y="TsparseMatrix"), rbind2_coo)
 
-rbind2_tri_vec <- function(x, v, x_is_first) {
+rbind2_coo_vec <- function(x, v, x_is_first) {
     x_is_binary <- inherits(x, "nsparseMatrix")
     x_is_logical <- inherits(x, "lsparseMatrix")
     v_is_binary <- inherits(v, "nsparseVector")
@@ -395,8 +440,22 @@ rbind2_tri_vec <- function(x, v, x_is_first) {
 
 #' @rdname rbind2-method
 #' @export
-setMethod("rbind2", signature(x="TsparseMatrix", y="sparseVector"), function(x, y) rbind2_tri_vec(x, y, TRUE))
+setMethod("rbind2", signature(x="TsparseMatrix", y="sparseVector"), function(x, y) rbind2_coo_vec(x, y, TRUE))
 
 #' @rdname rbind2-method
 #' @export
-setMethod("rbind2", signature(x="sparseVector", y="TsparseMatrix"), function(x, y) rbind2_tri_vec(y, x, FALSE))
+setMethod("rbind2", signature(x="sparseVector", y="TsparseMatrix"), function(x, y) rbind2_coo_vec(y, x, FALSE))
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="TsparseMatrix", y="CsparseMatrix"), function(x, y) {
+    y <- as.coo.matrix(y, binary=inherits(y, "nsparseMatrix"), logical=inherits(y, "lsparseMatrix"))
+    return(rbind2(x, y))
+})
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="CsparseMatrix", y="TsparseMatrix"), function(x, y) {
+    x <- as.coo.matrix(x, binary=inherits(x, "nsparseMatrix"), logical=inherits(x, "lsparseMatrix"))
+    return(rbind2(x, y))
+})

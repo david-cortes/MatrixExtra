@@ -16,8 +16,8 @@ Description: Extends sparse matrix and vector classes from the 'Matrix' package 
   zero-valued entries; 
   (e) Fast transposes that work by outputting in the opposite storage format.
 License: GPL (>= 2)
-Depends: float, Rcpp, RhpcBLASctl
-Imports: Matrix (>= 1.3), methods
+Depends: Matrix (>= 1.3), methods
+Imports: Rcpp, RhpcBLASctl, float
 LinkingTo: Rcpp
 Suggests: testthat, data.table
 URL: https://www.github.com/david-cortes/MatrixExtra

@@ -22,6 +22,10 @@
 #' X ^ 2
 NULL
 
+### TODO: careful when it sort the indices about not rendering the input unusable:
+### e.g. if the input was 'lgRMatrix', gets converted to 'dgRMatrix', and then sorted,
+### it will become unusable later.
+
 multiply_csr_by_csr <- function(e1, e2) {
     if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
         stop("Matrices must have the same dimensions in order to multiply them.")
@@ -30,10 +34,17 @@ multiply_csr_by_csr <- function(e1, e2) {
         if (is_same_ngRMatrix(e1@p, e2@p, e1@j, e2@j))
             return(e1)
     }
+
+    check_valid_matrix(e1)
+    e1 <- deepcopy_before_sort(e1)
     e1 <- as.csr.matrix(e1)
-    e2 <- as.csr.matrix(e2)
     e1 <- sort_sparse_indices(e1)
+
+    check_valid_matrix(e2)
+    e2 <- deepcopy_before_sort(e2)
+    e2 <- as.csr.matrix(e2)
     e2 <- sort_sparse_indices(e2)
+
     res <- multiply_csr_elemwise(e1@p, e2@p, e1@j, e2@j, e1@x, e2@x)
     out <- new("dgRMatrix")
     out@Dim <- e1@Dim
@@ -48,9 +59,14 @@ multiply_csr_by_coo <- function(e1, e2) {
     if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
         warning("Matrices to multiply have different dimensions.")
 
+    check_valid_matrix(e1)
+    e1 <- deepcopy_before_sort(e1)
     e1 <- as.csr.matrix(e1)
-    e2 <- as.coo.matrix(e2)
     e1 <- sort_sparse_indices(e1)
+    
+    e2 <- as.coo.matrix(e2)
+    check_valid_matrix(e2)
+    
     res <- multiply_csr_by_coo_elemwise(
         e1@p, e1@j, e1@x,
         e2@i, e2@j, e2@x,
@@ -124,6 +140,7 @@ multiply_csr_by_dense <- function(e1, e2) {
         stop("Matrices must have the same dimensions in order to multiply them.")
 
     e1 <- as.csr.matrix(e1)
+    check_valid_matrix(e1)
     if (typeof(e2) == "double") {
         res <- multiply_csr_by_dense_elemwise_double(e1@p, e1@j, e1@x, e2)
     } else if (typeof(e2) == "integer") {
@@ -189,6 +206,8 @@ multiply_coo_by_dense <- function(e1, e2) {
         e1 <- as.coo.matrix(e1)
     }
 
+    check_valid_matrix(e1)
+
     if (typeof(e2) == "double") {
         res <- multiply_coo_by_dense_numeric(
             e2,
@@ -218,7 +237,7 @@ multiply_coo_by_dense <- function(e1, e2) {
             e1@x
         )
     } else {
-        stop("Internal error. Please open an issue in GitHub.")
+        throw_internal_error()
     }
 
     out <- new("dgTMatrix")
@@ -281,10 +300,16 @@ add_csr_matrices <- function(e1, e2, is_substraction=FALSE) {
             }
         }
     }
+    check_valid_matrix(e1)
+    e1 <- deepcopy_before_sort(e1)
     e1 <- as.csr.matrix(e1)
-    e2 <- as.csr.matrix(e2)
     e1 <- sort_sparse_indices(e1)
+
+    check_valid_matrix(e2)
+    e2 <- deepcopy_before_sort(e2)
+    e2 <- as.csr.matrix(e2)
     e2 <- sort_sparse_indices(e2)
+
     res <- add_csr_elemwise(e1@p, e2@p, e1@j, e2@j, e1@x, e2@x, is_substraction)
     out <- new("dgRMatrix")
     out@Dim <- e1@Dim

@@ -1,6 +1,6 @@
 # MatrixExtra
 
-`MatrixExtra` is an R package which extends the sparse matrix and sparse vector types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as selecting rows, concatenating by rows, or multi-threaded `<sparse, dense>` matrix multiplications.
+`MatrixExtra` is an R package which extends the sparse matrix and sparse vector types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as slicing (selecting rows/columns) or concatenating by rows/columns, along with replacing some `Matrix` methods with more efficient versions, such as multi-threaded `<sparse, dense>` matrix multiplications and much faster slicing for all the sparse types.
 
 Right now the package is in alpha status, with many methods yet to be implemented.
 
@@ -98,28 +98,32 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 
 # Features
 
-* Multi-threaded matrix multiplications (`%*%`), `crossprod` and `tcrossprod` for `<sparse,dense>` and `<dense,sparse>` types, including those from the [float](https://github.com/wrathematics/float) package.
-* Slicing or subsetting (operator `[`) CSR matrices.
-* Efficient rbinding (concatenating by rows) for different sparse matrices and sparse vector types (e.g. `rbind(CSR, CSR)`).
+* Multi-threaded matrix multiplications (`%*%`), `crossprod` and `tcrossprod` for many `<sparse,dense>` and `<dense,sparse>` types, including those from the [float](https://github.com/wrathematics/float) package.
+* Slicing or subsetting (operator `[`) CSR matrices, along with faster slicing of CSC and COO, and slicing with sparse vectors.
+* Efficient rbinding (concatenating by rows) and cbinding (concatenating by columns) for different sparse matrices and sparse vector types (e.g. `rbind(CSR, CSR)` and `cbind(CSR, CSR)`).
 * Overloaded operators for `<RsparseMatrix, RsparseMatrix>`  and some `<RsparseMatrix, TsparseMatrix>` types, such as `+`, `-`, `*`.
 * Overloaded mathematical functions and operators which act only on the non-zero entries for CSR and COO matrices, such as `sqrt(CSR)` or `CSR * scalar`.
 * Convenience conversion functions between different sparse formats, and registered coercion methods between pairs which are not in `Matrix` (e.g. `matrix` -> `ngRMatrix` or `dgRMatrix` -> `lgCMatrix`).
 * Fast transposes which work by outputting in the opposite format (CSR -> CSC and CSC -> CSR).
+* Methods for sparse vectors such as `rbind` and `cbind`.
 * Utility functions for sorting sparse indices and removing zero-valued entries.
 
 # TODO
 
+* Function to remove zeros.
 * Matrix multiplications between `float32` and `sparseVector`.
 * Function to set number of threads and to set `t_shallow` as the default.
-* Function to remove zeros.
 * Assignment operator (`[<-`).
 * `diag` and `diag<-`.
 * `norm`.
 * Some `sweep` routes with sparse vectors.
 * Better handling of dimension names of the output matrices.
+* Outer products with sparse vectors.
+* Option to override all `Matrix`'es `<dense,sparse` products with methods from here involving deep transposes.
 * Create vignette.
 * Try to port some parts to `Matrix`.
 * Submit to CRAN.
+* Add timings against the methods from `Matrix`.
 * Perhaps add methods specifically for symmetric and triangular matrices.
 
 # Examples
@@ -134,11 +138,16 @@ X[1:2, ]
 X + X
 X * X
 rbind(X, X)
-v = as(X[1,,drop=FALSE], "sparseVector")
-rbind(v, v)
+cbind(X, X)
 sqrt(X)
-t_shallow(X)
-X %*% matrix(c(1,2,3,4), ncol=1)
+X %*% 1:4
+
 as(as.matrix(X), "dgRMatrix")
 as.csc.matrix(X)
+
+### New and optional
+set_new_matrix_behavior()
+inherits(X[1,,drop=TRUE], "sparseVector")
+inherits(t(X), "CsparseMatrix")
+restore_old_matrix_behavior()
 ```

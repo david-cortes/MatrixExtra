@@ -16,7 +16,9 @@
 \alias{rbind2,TsparseMatrix,TsparseMatrix-method}
 \alias{rbind2,TsparseMatrix,sparseVector-method}
 \alias{rbind2,sparseVector,TsparseMatrix-method}
-\title{Concatenate CSR matrices by rows}
+\alias{rbind2,TsparseMatrix,CsparseMatrix-method}
+\alias{rbind2,CsparseMatrix,TsparseMatrix-method}
+\title{Concatenate sparse matrices/vectors by rows}
 \usage{
 \S4method{rbind2}{RsparseMatrix,RsparseMatrix}(x, y)
 
@@ -47,6 +49,10 @@
 \S4method{rbind2}{TsparseMatrix,sparseVector}(x, y)
 
 \S4method{rbind2}{sparseVector,TsparseMatrix}(x, y)
+
+\S4method{rbind2}{TsparseMatrix,CsparseMatrix}(x, y)
+
+\S4method{rbind2}{CsparseMatrix,TsparseMatrix}(x, y)
 }
 \arguments{
 \item{x}{First matrix to concatenate.}
@@ -54,7 +60,8 @@
 \item{y}{Second matrix to concatenate.}
 }
 \value{
-Either a CSR matrix or a COO matrix depending on the input types.
+A sparse matrix, usually in CSR format but some combinations
+might return COO or CSC.
 }
 \description{
 `rbind2` method for the sparse matrix and sparse vector classes from `Matrix`,
@@ -66,7 +73,8 @@ library(MatrixExtra)
 set.seed(1)
 X <- rsparsematrix(3, 4, .3)
 X <- as(X, "RsparseMatrix")
-inherits(rbind2(X, X), "dgRMatrix")
-inherits(rbind(X, X, as.csc.matrix(X), X), "dgRMatrix")
-inherits(rbind2(as.coo.matrix(X), as.coo.matrix(X)), "dgTMatrix")
+inherits(rbind2(X, X), "RsparseMatrix")
+inherits(rbind(X, X, as.csc.matrix(X), X), "RsparseMatrix")
+inherits(rbind2(as.coo.matrix(X), as.coo.matrix(X)), "TsparseMatrix")
+inherits(rbind2(as.csc.matrix(X), as.csc.matrix(X)), "CsparseMatrix")
 }

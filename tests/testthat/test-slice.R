@@ -1,5 +1,6 @@
 library("testthat")
 library("MatrixExtra")
+restore_old_matrix_behavior()
 context("RsparseMatrix subsets")
 
 nc <- 500L
@@ -10,28 +11,43 @@ colnames(m) <- as.character(seq_len(nc))
 rownames(m) <- as.character(seq_len(nr))
 m <- as(m, "RsparseMatrix")
 m_csc <- as(m, "CsparseMatrix")
+m_coo <- as(m, "TsparseMatrix")
 m_base <- as.matrix(m)
 
 test_that("RsparseMatrix subset cols and rows", {
     expect_equal(m, m[, ])
     expect_equal(m, m[])
-    expect_equal(m, m[, , ])
-    expect_equal(m[1:10, 1:100], as(m_csc[1:10, 1:100], "RsparseMatrix"))
-    expect_equal(m[as.character(1:10), 1:100], as(m_csc[as.character(1:10), 1:100], "RsparseMatrix"))
-    expect_equal(m["10", "20", drop=FALSE], as(m_csc["10", "20", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m["10", "20", drop=TRUE], m_csc["10", "20", drop=TRUE])
-    expect_equal(m[10, "20", drop=FALSE], as(m_csc[10, "20", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m["10", 20, drop=TRUE], m_csc["10", 20, drop=TRUE])
-    expect_equal(m["10", "20", drop=FALSE], as(m_csc["10", "20", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m[10, 20, drop=TRUE], m_csc[10, 20, drop=TRUE])
+    expect_error(m[, , ])
+    expect_equal(m[1:10, 1:100],
+                 as(m_base[1:10, 1:100], "RsparseMatrix"))
+    expect_equal(m[as.character(1:10), 1:100],
+                 as(m_base[as.character(1:10), 1:100], "RsparseMatrix"))
+    expect_equal(m["10", "20", drop=FALSE],
+                 as(m_base["10", "20", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["10", "20", drop=TRUE],
+                 m_base["10", "20", drop=TRUE])
+    expect_equal(m[10, "20", drop=FALSE],
+                 as(m_base[10, "20", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["10", 20, drop=TRUE],
+                 m_base["10", 20, drop=TRUE])
+    expect_equal(m["10", "20", drop=FALSE],
+                 as(m_base["10", "20", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m[10, 20, drop=TRUE],
+                 m_base[10, 20, drop=TRUE])
 
 
-    expect_equal(m["1000", "2", drop=FALSE], as(m_csc["1000", "2", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m["1000", "2", drop=TRUE], m_csc["1000", "2", drop=TRUE])
-    expect_equal(m[1000, "2", drop=FALSE], as(m_csc[1000, "2", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m["1000", 2, drop=TRUE], m_csc["1000", 2, drop=TRUE])
-    expect_equal(m["1000", "2", drop=FALSE], as(m_csc["1000", "2", drop=FALSE], "RsparseMatrix"))
-    expect_equal(m[1000, 2, drop=TRUE], m_csc[1000, 2, drop=TRUE])
+    expect_equal(m["1000", "2", drop=FALSE],
+                 as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["1000", "2", drop=TRUE],
+                 m_base["1000", "2", drop=TRUE])
+    expect_equal(m[1000, "2", drop=FALSE],
+                 as(m_base[1000, "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m["1000", 2, drop=TRUE],
+                 m_base["1000", 2, drop=TRUE])
+    expect_equal(m["1000", "2", drop=FALSE],
+                 as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"))
+    expect_equal(m[1000, 2, drop=TRUE],
+                 m_base[1000, 2, drop=TRUE])
 
     v1 <- m[,1,drop=FALSE]
     v2 <- m[1,,drop=FALSE]
@@ -44,7 +60,7 @@ test_that("RsparseMatrix subset cols and rows", {
 test_that("RsparseMatrix subset non sequential", {
     expect_equal(m, m[, ])
     expect_equal(m, m[])
-    expect_equal(m, m[, , ])
+    expect_error(m[, , ])
     expect_equal(m[c(5,2,1,7,4), c(5,2,1,7,4,10,100)],
                  as(m_base[c(5,2,1,7,4), c(5,2,1,7,4,10,100)], "RsparseMatrix"))
     expect_equal(m[as.character(c(5,2,1,7,4)), as.character(c(5,2,1,7,4,10,100))],
@@ -54,7 +70,7 @@ test_that("RsparseMatrix subset non sequential", {
 test_that("RsparseMatrix subset repeated", {
     expect_equal(m, m[, ])
     expect_equal(m, m[])
-    expect_equal(m, m[, , ])
+    expect_error(m[, , ])
     expect_equal(m[c(2,2,2,1,1,3), c(3,3,4,4,1,1,1)],
                  as(m_base[c(2,2,2,1,1,3), c(3,3,4,4,1,1,1)], "RsparseMatrix"))
     expect_equal(m[as.character(c(2,2,2,1,1,3)), as.character(c(3,3,4,4,1,1,1))],
@@ -67,23 +83,23 @@ test_that("RsparseMatrix subset repeated", {
 
 test_that("RsparseMatrix subset empty", {
     expect_equal(m[3:10, integer()],
-                 as(m_csc[3:10, integer()], "RsparseMatrix"))
+                 as(m_base[3:10, integer()], "RsparseMatrix"))
     expect_equal(m[c(2,2,2,1,1,3), integer()],
-                 as(m_csc[c(2,2,2,1,1,3), integer()], "RsparseMatrix"))
+                 as(m_base[c(2,2,2,1,1,3), integer()], "RsparseMatrix"))
     expect_equal(m[, integer()],
-                 as(m_csc[, integer()], "RsparseMatrix"))
+                 as(m_base[, integer()], "RsparseMatrix"))
 
     expect_equal(m[character(), ],
-                 as(m_csc[integer(), ], "RsparseMatrix"))
+                 as(m_base[integer(), ], "RsparseMatrix"))
     expect_equal(m[character(), as.character(c(3,3,4,4,1,1,1))],
-                 as(m_csc[integer(), c(3,3,4,4,1,1,1)], "RsparseMatrix"))
+                 as(m_base[integer(), c(3,3,4,4,1,1,1)], "RsparseMatrix"))
     expect_equal(m[character(), 3:10],
-                 as(m_csc[integer(), 3:10], "RsparseMatrix"))
+                 as(m_base[integer(), 3:10], "RsparseMatrix"))
 
     expect_equal(m[integer(), integer()],
-                 as(m_csc[integer(), integer()], "RsparseMatrix"))
+                 as(m_base[integer(), integer()], "RsparseMatrix"))
     expect_equal(m[character(), character()],
-                 as(m_csc[character(), character()], "RsparseMatrix"))
+                 as(m_base[character(), character()], "RsparseMatrix"))
 })
 
 test_that("RsparseMatrix subset cols", {
@@ -95,9 +111,9 @@ test_that("RsparseMatrix subset cols", {
     expect_equal(m[, as.character(2L:4L)], m[, 2L:4L])
     expect_error(m[, 501L])
     expect_error(m[, 500L:501L])
-    expect_equal(m[, -1, drop=FALSE], as(m_csc[, -1, drop=FALSE], "RsparseMatrix"))
-    expect_equal(m[, -1, drop=TRUE], as(m_csc[, -1, drop=TRUE], "RsparseMatrix"))
-    expect_equal(m[, -10:-1 ], as(m_csc[, -10:-1 ], "RsparseMatrix"))
+    expect_equal(m[, -1, drop=FALSE], as(m_base[, -1, drop=FALSE], "RsparseMatrix"))
+    expect_equal(m[, -1, drop=TRUE], as(m_base[, -1, drop=TRUE], "RsparseMatrix"))
+    expect_equal(m[, -10:-1 ], as(m_base[, -10:-1 ], "RsparseMatrix"))
 })
 
 test_that("RsparseMatrix subset rows", {
@@ -109,9 +125,9 @@ test_that("RsparseMatrix subset rows", {
     expect_equal(m[as.character(2L:4L), ], m[2L:4L, ] )
     expect_error(m[1001L, ])
     expect_error(m[900L:1001L, ])
-    expect_equal(m[-1, , drop=TRUE], as(m_csc[-1, , drop=TRUE], "RsparseMatrix"))
-    expect_equal(m[-1, , drop=TRUE], as(m_csc[-1, , drop=TRUE], "RsparseMatrix"))
-    expect_equal(m[-10:-1, ], as(m_csc[-10:-1, ], "RsparseMatrix"))
+    expect_equal(m[-1, , drop=TRUE], as(m_base[-1, , drop=TRUE], "RsparseMatrix"))
+    expect_equal(m[-1, , drop=TRUE], as(m_base[-1, , drop=TRUE], "RsparseMatrix"))
+    expect_equal(m[-10:-1, ], as(m_base[-10:-1, ], "RsparseMatrix"))
 })
 
 test_that("RsparseMatrix subset with boolean", {
@@ -121,17 +137,23 @@ test_that("RsparseMatrix subset with boolean", {
     long_vec_rows[2L] <- TRUE
     long_vec_cols[1L] <- TRUE
     long_vec_cols[2L] <- TRUE
-    expect_equal(m[long_vec_rows, ], as(m_csc[long_vec_rows, ], "RsparseMatrix"))
-    expect_equal(m[, long_vec_cols], as(m_csc[, long_vec_cols], "RsparseMatrix"))
-    expect_equal(m[c(TRUE, FALSE, TRUE), ], as(m_csc[c(TRUE, FALSE, TRUE), ], "RsparseMatrix"))
-    expect_equal(m[, c(TRUE, FALSE, TRUE)], as(m_csc[, c(TRUE, FALSE, TRUE)], "RsparseMatrix"))
-    expect_equal(m[as(c(TRUE, FALSE, TRUE), "nsparseVector"), ], as(m_csc[c(TRUE, FALSE, TRUE), ], "RsparseMatrix"))
-    expect_equal(m[, as(c(TRUE, FALSE, TRUE), "nsparseVector")], as(m_csc[, c(TRUE, FALSE, TRUE)], "RsparseMatrix"))
+    expect_equal(m[long_vec_rows, ],
+                 as(m_base[long_vec_rows, ], "RsparseMatrix"))
+    expect_equal(m[, long_vec_cols],
+                 as(m_base[, long_vec_cols], "RsparseMatrix"))
+    expect_equal(m[c(TRUE, FALSE, TRUE), ],
+                 as(m_base[c(TRUE, FALSE, TRUE), ], "RsparseMatrix"))
+    expect_equal(m[, c(TRUE, FALSE, TRUE)],
+                 as(m_base[, c(TRUE, FALSE, TRUE)], "RsparseMatrix"))
+    expect_equal(m[as(c(TRUE, FALSE, TRUE), "nsparseVector"), ],
+                 as(m_base[c(TRUE, FALSE, TRUE), ], "RsparseMatrix"))
+    expect_equal(m[, as(c(TRUE, FALSE, TRUE), "nsparseVector")],
+                 as(m_base[, c(TRUE, FALSE, TRUE)], "RsparseMatrix"))
 
-    expect_equal(m[FALSE, ], as(m_csc[FALSE, ], "RsparseMatrix"))
-    expect_equal(m[, FALSE], as(m_csc[, FALSE], "RsparseMatrix"))
-    expect_equal(m[FALSE, FALSE], as(m_csc[FALSE, FALSE], "RsparseMatrix"))
-    expect_equal(m[TRUE, TRUE], as(m_csc[TRUE, TRUE], "RsparseMatrix"))
+    expect_equal(m[FALSE, ], as(m_base[FALSE, ], "RsparseMatrix"))
+    expect_equal(m[, FALSE], as(m_base[, FALSE], "RsparseMatrix"))
+    expect_equal(m[FALSE, FALSE], as(m_base[FALSE, FALSE], "RsparseMatrix"))
+    expect_equal(m[TRUE, TRUE], as(m_base[TRUE, TRUE], "RsparseMatrix"))
 })
 
 test_that("RsparseMatrix other classes", {
@@ -204,4 +226,43 @@ test_that("RsparseMatrix other classes", {
         expect_equal(as.dense.matrix(slice_rowseq_randcols), dense_rowseq_randcols)
         expect_equal(as.dense.matrix(slice_rand), dense_rand)
     }
+})
+
+test_that("Reverse sequences", {
+    expect_equal(as.matrix(m[rev(5:100),]),
+                 m_base[rev(5:100),])
+    expect_equal(as.matrix(m[,rev(5:100)]),
+                 m_base[,rev(5:100)])
+    expect_equal(as.matrix(m[rev(5:100),rev(5:100)]),
+                 m_base[rev(5:100),rev(5:100)])
+    expect_equal(as.matrix(m[rev(5:100),3,drop=FALSE]),
+                 m_base[rev(5:100),3,drop=FALSE])
+    expect_equal(as.matrix(m[rev(5:100),c(5,3,4)]),
+                 m_base[rev(5:100),c(5,3,4)])
+    expect_equal(as.matrix(m[c(5,3,4),rev(5:100)]),
+                 m_base[c(5,3,4),rev(5:100)])
+    
+    expect_equal(as.matrix(m[rev(1:nrow(m)),]),
+                 m_base[rev(1:nrow(m)),])
+    expect_equal(as.matrix(m[,rev(1:ncol(m))]),
+                 m_base[,rev(1:ncol(m))])
+    expect_equal(as.matrix(m[rev(1:nrow(m)),rev(1:ncol(m))]),
+                 m_base[rev(1:nrow(m)),rev(1:ncol(m))])
+    expect_equal(as.matrix(m[rev(1:nrow(m)),3,drop=FALSE]),
+                 m_base[rev(1:nrow(m)),3,drop=FALSE])
+    expect_equal(as.matrix(m[rev(1:nrow(m)),c(5,3,4)]),
+                 m_base[rev(1:nrow(m)),c(5,3,4)])
+    expect_equal(as.matrix(m[c(5,3,4),rev(1:ncol(m))]),
+                 m_base[c(5,3,4),rev(1:ncol(m))])
+    
+    
+    expect_equal(as.matrix(m[rev(5:100),4:50]),
+                 m_base[rev(5:100),4:50])
+    expect_equal(as.matrix(m[rev(1:nrow(m)),4:50]),
+                 m_base[rev(1:nrow(m)),4:50])
+    
+    expect_equal(as.matrix(m[4:50,rev(5:100)]),
+                 m_base[4:50,rev(5:100)])
+    expect_equal(as.matrix(m[4:50,rev(1:ncol(m))]),
+                 m_base[4:50,rev(1:ncol(m))])
 })

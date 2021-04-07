@@ -65,9 +65,10 @@ for <sparse, dense> matrix combinations and <sparse, vector> combinations
 Objects from the `float` package are also supported for some combinations.
 }
 \details{
-Will try to use the same number of threads that are configured for BLAS.
-These can be set through the `RhpcBLASctl` package (see
-\link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
+Will try to use the maximum available number of threads for the computations
+when appropriate. The number of threads can be controlled through the package options
+(e.g. `options("MatrixExtra.nthreads" = 1)` - see \link{MatrixExtra-options}) and will
+be set to 1 after running \link{restore_old_matrix_behavior}.
 
 Be aware that sparse-dense matrix multiplications might suffer from reduced
 numerical precision, especially when using objects of type `float32`
@@ -75,7 +76,11 @@ numerical precision, especially when using objects of type `float32`
 
 Internally, these functions use BLAS level-1 routines, so their speed might depend on
 the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
-on a default install of R for Windows.
+on a default install of R for Windows. For the `float32` types, it doesn't use BLAS,
+but will rather ship with some BLAS replacements, which might run faster when compiling
+this library from source (`install.packages("MatrixExtra", type="source")`) rather
+than downloading a pre-compiled binary from CRAN (Windows and macOS), due to
+potentially using more advanced SIMD instructions from the CPU.
 
 When multiplying a sparse matrix by a sparse vector, their indices
 will be sorted in-place (see \link{sort_sparse_indices}).
@@ -85,14 +90,17 @@ operators, will assume their shape as follows:\itemize{
 \item MatMult(Matrix, vector): column vector if the matrix has more than one column
 or is empty, row vector if the matrix has only one column.
 \item MatMult(vector, Matrix): row vector if the matrix has more than one row,
-column vector if the matrix has only one row
+column vector if the matrix has only one row.
+\item MatMul(vector, vector): LHS is a row vector, RHS is a column vector.
 \item crossprod(Matrix, vector): column vector if the matrix has more than one row,
 row vector if the matrix has only one row.
 \item crossprod(vector, Matrix): column vector.
+\item crossprod(vector, vector): column vector.
 \item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
 column vector if the matrix has only one column, and will throw an error otherwise.
 \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
 column vector if the matrix has only one column.
+\item tcrossprod(vector, vector): column vector.
 }
 
 In general, the output returned by these functions will be a dense matrix from base R,
@@ -107,10 +115,10 @@ with the following exceptions:\itemize{
 \examples{
 library(Matrix)
 library(MatrixExtra)
-## Will use the same number of threads as for BLAS
-curr_nthreads <- RhpcBLASctl::blas_get_num_procs()
-## Set the number of threads here (will restore later)
-RhpcBLASctl::blas_set_num_threads(1L)
+### To use all available threads (default)
+options("MatrixExtra.nthreads" = parallel::detectCores())
+### Example will run with only 1 thread (CRAN policy)
+options("MatrixExtra.nthreads" = 1)
 
 ## Generate random matrices
 set.seed(1)
@@ -123,6 +131,6 @@ as.csr.matrix(A) \%*\% as.matrix(B)
 crossprod(as.matrix(B), as.csc.matrix(B))
 tcrossprod(as.csr.matrix(A), as.matrix(A))
 
-## Restore the number of threads for BLAS
-RhpcBLASctl::blas_set_num_threads(curr_nthreads)
+### Restore the number of threads
+options("MatrixExtra.nthreads" = parallel::detectCores())
 }

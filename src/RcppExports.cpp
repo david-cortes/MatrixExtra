@@ -5,6 +5,49 @@
 
 using namespace Rcpp;
 
+// cbind_csr_numeric
+Rcpp::List cbind_csr_numeric(Rcpp::IntegerVector X_csr_indptr, Rcpp::IntegerVector X_csr_indices, Rcpp::NumericVector X_csr_values, Rcpp::IntegerVector Y_csr_indptr, Rcpp::IntegerVector Y_csr_indices_plus_ncol, Rcpp::NumericVector Y_csr_values);
+RcppExport SEXP _MatrixExtra_cbind_csr_numeric(SEXP X_csr_indptrSEXP, SEXP X_csr_indicesSEXP, SEXP X_csr_valuesSEXP, SEXP Y_csr_indptrSEXP, SEXP Y_csr_indices_plus_ncolSEXP, SEXP Y_csr_valuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr(X_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indices(X_csr_indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type X_csr_values(X_csr_valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indptr(Y_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indices_plus_ncol(Y_csr_indices_plus_ncolSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_csr_values(Y_csr_valuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cbind_csr_numeric(X_csr_indptr, X_csr_indices, X_csr_values, Y_csr_indptr, Y_csr_indices_plus_ncol, Y_csr_values));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cbind_csr_logical
+Rcpp::List cbind_csr_logical(Rcpp::IntegerVector X_csr_indptr, Rcpp::IntegerVector X_csr_indices, Rcpp::LogicalVector X_csr_values, Rcpp::IntegerVector Y_csr_indptr, Rcpp::IntegerVector Y_csr_indices_plus_ncol, Rcpp::LogicalVector Y_csr_values);
+RcppExport SEXP _MatrixExtra_cbind_csr_logical(SEXP X_csr_indptrSEXP, SEXP X_csr_indicesSEXP, SEXP X_csr_valuesSEXP, SEXP Y_csr_indptrSEXP, SEXP Y_csr_indices_plus_ncolSEXP, SEXP Y_csr_valuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr(X_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indices(X_csr_indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type X_csr_values(X_csr_valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indptr(Y_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indices_plus_ncol(Y_csr_indices_plus_ncolSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type Y_csr_values(Y_csr_valuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cbind_csr_logical(X_csr_indptr, X_csr_indices, X_csr_values, Y_csr_indptr, Y_csr_indices_plus_ncol, Y_csr_values));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cbind_csr_binary
+Rcpp::List cbind_csr_binary(Rcpp::IntegerVector X_csr_indptr, Rcpp::IntegerVector X_csr_indices, Rcpp::IntegerVector Y_csr_indptr, Rcpp::IntegerVector Y_csr_indices_plus_ncol);
+RcppExport SEXP _MatrixExtra_cbind_csr_binary(SEXP X_csr_indptrSEXP, SEXP X_csr_indicesSEXP, SEXP Y_csr_indptrSEXP, SEXP Y_csr_indices_plus_ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr(X_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indices(X_csr_indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indptr(Y_csr_indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_csr_indices_plus_ncol(Y_csr_indices_plus_ncolSEXP);
+    rcpp_result_gen = Rcpp::wrap(cbind_csr_binary(X_csr_indptr, X_csr_indices, Y_csr_indptr, Y_csr_indices_plus_ncol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // matmul_dense_csc_numeric
 Rcpp::NumericMatrix matmul_dense_csc_numeric(Rcpp::NumericMatrix X_colmajor, Rcpp::IntegerVector Y_csc_indptr, Rcpp::IntegerVector Y_csc_indices, Rcpp::NumericVector Y_csc_values, int nthreads);
 RcppExport SEXP _MatrixExtra_matmul_dense_csc_numeric(SEXP X_colmajorSEXP, SEXP Y_csc_indptrSEXP, SEXP Y_csc_indicesSEXP, SEXP Y_csc_valuesSEXP, SEXP nthreadsSEXP) {
@@ -344,6 +387,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// check_indices_are_unsorted
+bool check_indices_are_unsorted(Rcpp::IntegerVector indptr, Rcpp::NumericVector indices);
+RcppExport SEXP _MatrixExtra_check_indices_are_unsorted(SEXP indptrSEXP, SEXP indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type indices(indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_indices_are_unsorted(indptr, indices));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sort_sparse_indices_numeric
 void sort_sparse_indices_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values);
 RcppExport SEXP _MatrixExtra_sort_sparse_indices_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
@@ -363,6 +417,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
     sort_sparse_indices_logical(indptr, indices, values);
+    return R_NilValue;
+END_RCPP
+}
+// sort_sparse_indices_numeric_known_ncol
+void sort_sparse_indices_numeric_known_ncol(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, int ncol);
+RcppExport SEXP _MatrixExtra_sort_sparse_indices_numeric_known_ncol(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
+    sort_sparse_indices_numeric_known_ncol(indptr, indices, values, ncol);
+    return R_NilValue;
+END_RCPP
+}
+// sort_sparse_indices_logical_known_ncol
+void sort_sparse_indices_logical_known_ncol(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, int ncol);
+RcppExport SEXP _MatrixExtra_sort_sparse_indices_logical_known_ncol(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
+    sort_sparse_indices_logical_known_ncol(indptr, indices, values, ncol);
     return R_NilValue;
 END_RCPP
 }
@@ -445,6 +523,46 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_base1(indices_base1SEXP);
     sort_vector_indices_binary(indices_base1);
     return R_NilValue;
+END_RCPP
+}
+// deepcopy_num
+Rcpp::NumericVector deepcopy_num(Rcpp::NumericVector x);
+RcppExport SEXP _MatrixExtra_deepcopy_num(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(deepcopy_num(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deepcopy_int
+Rcpp::IntegerVector deepcopy_int(Rcpp::IntegerVector x);
+RcppExport SEXP _MatrixExtra_deepcopy_int(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(deepcopy_int(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deepcopy_log
+Rcpp::LogicalVector deepcopy_log(Rcpp::LogicalVector x);
+RcppExport SEXP _MatrixExtra_deepcopy_log(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(deepcopy_log(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deepcopy_str
+Rcpp::String deepcopy_str(Rcpp::String x);
+RcppExport SEXP _MatrixExtra_deepcopy_str(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::String >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(deepcopy_str(x));
+    return rcpp_result_gen;
 END_RCPP
 }
 // multiply_csr_elemwise
@@ -618,22 +736,128 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// copy_csr_rows
-Rcpp::List copy_csr_rows(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take);
-RcppExport SEXP _MatrixExtra_copy_csr_rows(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP) {
+// check_is_rev_seq
+bool check_is_rev_seq(Rcpp::IntegerVector indices);
+RcppExport SEXP _MatrixExtra_check_is_rev_seq(SEXP indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_is_rev_seq(indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// reverse_rows_numeric
+Rcpp::List reverse_rows_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values);
+RcppExport SEXP _MatrixExtra_reverse_rows_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(reverse_rows_numeric(indptr, indices, values));
+    return rcpp_result_gen;
+END_RCPP
+}
+// reverse_rows_logical
+Rcpp::List reverse_rows_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values);
+RcppExport SEXP _MatrixExtra_reverse_rows_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(reverse_rows_logical(indptr, indices, values));
+    return rcpp_result_gen;
+END_RCPP
+}
+// reverse_rows_binary
+Rcpp::List reverse_rows_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices);
+RcppExport SEXP _MatrixExtra_reverse_rows_binary(SEXP indptrSEXP, SEXP indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(reverse_rows_binary(indptr, indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// reverse_columns_inplace_numeric
+void reverse_columns_inplace_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices_, Rcpp::NumericVector values_, int ncol);
+RcppExport SEXP _MatrixExtra_reverse_columns_inplace_numeric(SEXP indptrSEXP, SEXP indices_SEXP, SEXP values_SEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_(indices_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_(values_SEXP);
+    Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
+    reverse_columns_inplace_numeric(indptr, indices_, values_, ncol);
+    return R_NilValue;
+END_RCPP
+}
+// reverse_columns_inplace_logical
+void reverse_columns_inplace_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices_, Rcpp::LogicalVector values_, int ncol);
+RcppExport SEXP _MatrixExtra_reverse_columns_inplace_logical(SEXP indptrSEXP, SEXP indices_SEXP, SEXP values_SEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_(indices_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values_(values_SEXP);
+    Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
+    reverse_columns_inplace_logical(indptr, indices_, values_, ncol);
+    return R_NilValue;
+END_RCPP
+}
+// reverse_columns_inplace_binary
+void reverse_columns_inplace_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices_, Rcpp::NumericVector values_, int ncol);
+RcppExport SEXP _MatrixExtra_reverse_columns_inplace_binary(SEXP indptrSEXP, SEXP indices_SEXP, SEXP values_SEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_(indices_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_(values_SEXP);
+    Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
+    reverse_columns_inplace_binary(indptr, indices_, values_, ncol);
+    return R_NilValue;
+END_RCPP
+}
+// copy_csr_rows_numeric
+Rcpp::List copy_csr_rows_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
-    rcpp_result_gen = Rcpp::wrap(copy_csr_rows(indptr, indices, values, rows_take));
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_numeric(indptr, indices, values, rows_take));
     return rcpp_result_gen;
 END_RCPP
 }
-// copy_csr_rows_col_seq
-Rcpp::List copy_csr_rows_col_seq(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take);
-RcppExport SEXP _MatrixExtra_copy_csr_rows_col_seq(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP) {
+// copy_csr_rows_logical
+Rcpp::List copy_csr_rows_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, Rcpp::IntegerVector rows_take);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_logical(indptr, indices, values, rows_take));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_rows_binary
+Rcpp::List copy_csr_rows_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::IntegerVector rows_take);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_binary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP rows_takeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_binary(indptr, indices, rows_take));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_rows_col_seq_numeric
+Rcpp::List copy_csr_rows_col_seq_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take, const bool index1);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_col_seq_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP, SEXP index1SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
@@ -641,13 +865,43 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
-    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_col_seq(indptr, indices, values, rows_take, cols_take));
+    Rcpp::traits::input_parameter< const bool >::type index1(index1SEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_col_seq_numeric(indptr, indices, values, rows_take, cols_take, index1));
     return rcpp_result_gen;
 END_RCPP
 }
-// copy_csr_arbitrary
-Rcpp::List copy_csr_arbitrary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take);
-RcppExport SEXP _MatrixExtra_copy_csr_arbitrary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP) {
+// copy_csr_rows_col_seq_logical
+Rcpp::List copy_csr_rows_col_seq_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take, const bool index1);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_col_seq_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP, SEXP index1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type index1(index1SEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_col_seq_logical(indptr, indices, values, rows_take, cols_take, index1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_rows_col_seq_binary
+Rcpp::List copy_csr_rows_col_seq_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take, const bool index1);
+RcppExport SEXP _MatrixExtra_copy_csr_rows_col_seq_binary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP, SEXP index1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type index1(index1SEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_rows_col_seq_binary(indptr, indices, rows_take, cols_take, index1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_arbitrary_numeric
+Rcpp::List copy_csr_arbitrary_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take);
+RcppExport SEXP _MatrixExtra_copy_csr_arbitrary_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
@@ -655,7 +909,34 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
-    rcpp_result_gen = Rcpp::wrap(copy_csr_arbitrary(indptr, indices, values, rows_take, cols_take));
+    rcpp_result_gen = Rcpp::wrap(copy_csr_arbitrary_numeric(indptr, indices, values, rows_take, cols_take));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_arbitrary_logical
+Rcpp::List copy_csr_arbitrary_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take);
+RcppExport SEXP _MatrixExtra_copy_csr_arbitrary_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_arbitrary_logical(indptr, indices, values, rows_take, cols_take));
+    return rcpp_result_gen;
+END_RCPP
+}
+// copy_csr_arbitrary_binary
+Rcpp::List copy_csr_arbitrary_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::IntegerVector rows_take, Rcpp::IntegerVector cols_take);
+RcppExport SEXP _MatrixExtra_copy_csr_arbitrary_binary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP rows_takeSEXP, SEXP cols_takeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take(rows_takeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take(cols_takeSEXP);
+    rcpp_result_gen = Rcpp::wrap(copy_csr_arbitrary_binary(indptr, indices, rows_take, cols_take));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -686,6 +967,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// extract_single_val_csr_logical
+int extract_single_val_csr_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, int row, int col);
+RcppExport SEXP _MatrixExtra_extract_single_val_csr_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rowSEXP, SEXP colSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< int >::type row(rowSEXP);
+    Rcpp::traits::input_parameter< int >::type col(colSEXP);
+    rcpp_result_gen = Rcpp::wrap(extract_single_val_csr_logical(indptr, indices, values, row, col));
+    return rcpp_result_gen;
+END_RCPP
+}
 // extract_single_val_csr_binary
 double extract_single_val_csr_binary(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, int row, int col);
 RcppExport SEXP _MatrixExtra_extract_single_val_csr_binary(SEXP indptrSEXP, SEXP indicesSEXP, SEXP rowSEXP, SEXP colSEXP) {
@@ -699,8 +994,89 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// slice_coo_single
+int slice_coo_single(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, int i, int j);
+RcppExport SEXP _MatrixExtra_slice_coo_single(SEXP iiSEXP, SEXP jjSEXP, SEXP iSEXP, SEXP jSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_single(ii, jj, i, j));
+    return rcpp_result_gen;
+END_RCPP
+}
+// slice_coo_arbitrary_numeric
+Rcpp::List slice_coo_arbitrary_numeric(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::NumericVector xx, Rcpp::IntegerVector rows_take_base1, Rcpp::IntegerVector cols_take_base1, bool all_i, bool all_j, bool i_is_seq, bool j_is_seq, bool i_is_rev_seq, bool j_is_rev_seq, int nrows, int ncols);
+RcppExport SEXP _MatrixExtra_slice_coo_arbitrary_numeric(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP rows_take_base1SEXP, SEXP cols_take_base1SEXP, SEXP all_iSEXP, SEXP all_jSEXP, SEXP i_is_seqSEXP, SEXP j_is_seqSEXP, SEXP i_is_rev_seqSEXP, SEXP j_is_rev_seqSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take_base1(rows_take_base1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take_base1(cols_take_base1SEXP);
+    Rcpp::traits::input_parameter< bool >::type all_i(all_iSEXP);
+    Rcpp::traits::input_parameter< bool >::type all_j(all_jSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_seq(i_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_seq(j_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_rev_seq(i_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_rev_seq(j_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_arbitrary_numeric(ii, jj, xx, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// slice_coo_arbitrary_logical
+Rcpp::List slice_coo_arbitrary_logical(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::LogicalVector xx, Rcpp::IntegerVector rows_take_base1, Rcpp::IntegerVector cols_take_base1, bool all_i, bool all_j, bool i_is_seq, bool j_is_seq, bool i_is_rev_seq, bool j_is_rev_seq, int nrows, int ncols);
+RcppExport SEXP _MatrixExtra_slice_coo_arbitrary_logical(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP rows_take_base1SEXP, SEXP cols_take_base1SEXP, SEXP all_iSEXP, SEXP all_jSEXP, SEXP i_is_seqSEXP, SEXP j_is_seqSEXP, SEXP i_is_rev_seqSEXP, SEXP j_is_rev_seqSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take_base1(rows_take_base1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take_base1(cols_take_base1SEXP);
+    Rcpp::traits::input_parameter< bool >::type all_i(all_iSEXP);
+    Rcpp::traits::input_parameter< bool >::type all_j(all_jSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_seq(i_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_seq(j_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_rev_seq(i_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_rev_seq(j_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_arbitrary_logical(ii, jj, xx, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// slice_coo_arbitrary_binary
+Rcpp::List slice_coo_arbitrary_binary(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::IntegerVector rows_take_base1, Rcpp::IntegerVector cols_take_base1, bool all_i, bool all_j, bool i_is_seq, bool j_is_seq, bool i_is_rev_seq, bool j_is_rev_seq, int nrows, int ncols);
+RcppExport SEXP _MatrixExtra_slice_coo_arbitrary_binary(SEXP iiSEXP, SEXP jjSEXP, SEXP rows_take_base1SEXP, SEXP cols_take_base1SEXP, SEXP all_iSEXP, SEXP all_jSEXP, SEXP i_is_seqSEXP, SEXP j_is_seqSEXP, SEXP i_is_rev_seqSEXP, SEXP j_is_rev_seqSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_take_base1(rows_take_base1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_take_base1(cols_take_base1SEXP);
+    Rcpp::traits::input_parameter< bool >::type all_i(all_iSEXP);
+    Rcpp::traits::input_parameter< bool >::type all_j(all_jSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_seq(i_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_seq(j_is_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type i_is_rev_seq(i_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< bool >::type j_is_rev_seq(j_is_rev_seqSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_arbitrary_binary(ii, jj, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_MatrixExtra_cbind_csr_numeric", (DL_FUNC) &_MatrixExtra_cbind_csr_numeric, 6},
+    {"_MatrixExtra_cbind_csr_logical", (DL_FUNC) &_MatrixExtra_cbind_csr_logical, 6},
+    {"_MatrixExtra_cbind_csr_binary", (DL_FUNC) &_MatrixExtra_cbind_csr_binary, 4},
     {"_MatrixExtra_matmul_dense_csc_numeric", (DL_FUNC) &_MatrixExtra_matmul_dense_csc_numeric, 5},
     {"_MatrixExtra_matmul_dense_csc_float32", (DL_FUNC) &_MatrixExtra_matmul_dense_csc_float32, 5},
     {"_MatrixExtra_tcrossprod_dense_csr_numeric", (DL_FUNC) &_MatrixExtra_tcrossprod_dense_csr_numeric, 6},
@@ -725,8 +1101,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_logical", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_logical, 6},
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary, 5},
     {"_MatrixExtra_is_same_ngRMatrix", (DL_FUNC) &_MatrixExtra_is_same_ngRMatrix, 4},
+    {"_MatrixExtra_check_indices_are_unsorted", (DL_FUNC) &_MatrixExtra_check_indices_are_unsorted, 2},
     {"_MatrixExtra_sort_sparse_indices_numeric", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_numeric, 3},
     {"_MatrixExtra_sort_sparse_indices_logical", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_logical, 3},
+    {"_MatrixExtra_sort_sparse_indices_numeric_known_ncol", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_numeric_known_ncol, 4},
+    {"_MatrixExtra_sort_sparse_indices_logical_known_ncol", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_logical_known_ncol, 4},
     {"_MatrixExtra_sort_sparse_indices_binary", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_binary, 2},
     {"_MatrixExtra_sort_coo_indices_numeric", (DL_FUNC) &_MatrixExtra_sort_coo_indices_numeric, 3},
     {"_MatrixExtra_sort_coo_indices_logical", (DL_FUNC) &_MatrixExtra_sort_coo_indices_logical, 3},
@@ -735,6 +1114,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_sort_vector_indices_integer", (DL_FUNC) &_MatrixExtra_sort_vector_indices_integer, 2},
     {"_MatrixExtra_sort_vector_indices_logical", (DL_FUNC) &_MatrixExtra_sort_vector_indices_logical, 2},
     {"_MatrixExtra_sort_vector_indices_binary", (DL_FUNC) &_MatrixExtra_sort_vector_indices_binary, 1},
+    {"_MatrixExtra_deepcopy_num", (DL_FUNC) &_MatrixExtra_deepcopy_num, 1},
+    {"_MatrixExtra_deepcopy_int", (DL_FUNC) &_MatrixExtra_deepcopy_int, 1},
+    {"_MatrixExtra_deepcopy_log", (DL_FUNC) &_MatrixExtra_deepcopy_log, 1},
+    {"_MatrixExtra_deepcopy_str", (DL_FUNC) &_MatrixExtra_deepcopy_str, 1},
     {"_MatrixExtra_multiply_csr_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_elemwise, 6},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_double", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_double, 4},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_int", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_int, 4},
@@ -748,12 +1131,30 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_concat_indptr2", (DL_FUNC) &_MatrixExtra_concat_indptr2, 2},
     {"_MatrixExtra_concat_csr_batch", (DL_FUNC) &_MatrixExtra_concat_csr_batch, 2},
     {"_MatrixExtra_check_is_seq", (DL_FUNC) &_MatrixExtra_check_is_seq, 1},
-    {"_MatrixExtra_copy_csr_rows", (DL_FUNC) &_MatrixExtra_copy_csr_rows, 4},
-    {"_MatrixExtra_copy_csr_rows_col_seq", (DL_FUNC) &_MatrixExtra_copy_csr_rows_col_seq, 5},
-    {"_MatrixExtra_copy_csr_arbitrary", (DL_FUNC) &_MatrixExtra_copy_csr_arbitrary, 5},
+    {"_MatrixExtra_check_is_rev_seq", (DL_FUNC) &_MatrixExtra_check_is_rev_seq, 1},
+    {"_MatrixExtra_reverse_rows_numeric", (DL_FUNC) &_MatrixExtra_reverse_rows_numeric, 3},
+    {"_MatrixExtra_reverse_rows_logical", (DL_FUNC) &_MatrixExtra_reverse_rows_logical, 3},
+    {"_MatrixExtra_reverse_rows_binary", (DL_FUNC) &_MatrixExtra_reverse_rows_binary, 2},
+    {"_MatrixExtra_reverse_columns_inplace_numeric", (DL_FUNC) &_MatrixExtra_reverse_columns_inplace_numeric, 4},
+    {"_MatrixExtra_reverse_columns_inplace_logical", (DL_FUNC) &_MatrixExtra_reverse_columns_inplace_logical, 4},
+    {"_MatrixExtra_reverse_columns_inplace_binary", (DL_FUNC) &_MatrixExtra_reverse_columns_inplace_binary, 4},
+    {"_MatrixExtra_copy_csr_rows_numeric", (DL_FUNC) &_MatrixExtra_copy_csr_rows_numeric, 4},
+    {"_MatrixExtra_copy_csr_rows_logical", (DL_FUNC) &_MatrixExtra_copy_csr_rows_logical, 4},
+    {"_MatrixExtra_copy_csr_rows_binary", (DL_FUNC) &_MatrixExtra_copy_csr_rows_binary, 3},
+    {"_MatrixExtra_copy_csr_rows_col_seq_numeric", (DL_FUNC) &_MatrixExtra_copy_csr_rows_col_seq_numeric, 6},
+    {"_MatrixExtra_copy_csr_rows_col_seq_logical", (DL_FUNC) &_MatrixExtra_copy_csr_rows_col_seq_logical, 6},
+    {"_MatrixExtra_copy_csr_rows_col_seq_binary", (DL_FUNC) &_MatrixExtra_copy_csr_rows_col_seq_binary, 5},
+    {"_MatrixExtra_copy_csr_arbitrary_numeric", (DL_FUNC) &_MatrixExtra_copy_csr_arbitrary_numeric, 5},
+    {"_MatrixExtra_copy_csr_arbitrary_logical", (DL_FUNC) &_MatrixExtra_copy_csr_arbitrary_logical, 5},
+    {"_MatrixExtra_copy_csr_arbitrary_binary", (DL_FUNC) &_MatrixExtra_copy_csr_arbitrary_binary, 4},
     {"_MatrixExtra_repeat_indices_n_times", (DL_FUNC) &_MatrixExtra_repeat_indices_n_times, 4},
     {"_MatrixExtra_extract_single_val_csr_numeric", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_numeric, 5},
+    {"_MatrixExtra_extract_single_val_csr_logical", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_logical, 5},
     {"_MatrixExtra_extract_single_val_csr_binary", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_binary, 4},
+    {"_MatrixExtra_slice_coo_single", (DL_FUNC) &_MatrixExtra_slice_coo_single, 4},
+    {"_MatrixExtra_slice_coo_arbitrary_numeric", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_numeric, 13},
+    {"_MatrixExtra_slice_coo_arbitrary_logical", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_logical, 13},
+    {"_MatrixExtra_slice_coo_arbitrary_binary", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_binary, 12},
     {NULL, NULL, 0}
 };
 

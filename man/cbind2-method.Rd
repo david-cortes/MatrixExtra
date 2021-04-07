@@ -8,7 +8,18 @@
 \alias{cbind2,CsparseMatrix,sparseVector-method}
 \alias{cbind2,sparseVector,CsparseMatrix-method}
 \alias{cbind2,sparseVector,sparseVector-method}
-\title{Concatenate COO matrices by columns}
+\alias{cbind2,RsparseMatrix,RsparseMatrix-method}
+\alias{cbind2,TsparseMatrix,RsparseMatrix-method}
+\alias{cbind2,RsparseMatrix,TsparseMatrix-method}
+\alias{cbind2,RsparseMatrix,numeric-method}
+\alias{cbind2,RsparseMatrix,integer-method}
+\alias{cbind2,RsparseMatrix,logical-method}
+\alias{cbind2,RsparseMatrix,sparseVector-method}
+\alias{cbind2,numeric,RsparseMatrix-method}
+\alias{cbind2,integer,RsparseMatrix-method}
+\alias{cbind2,logical,RsparseMatrix-method}
+\alias{cbind2,sparseVector,RsparseMatrix-method}
+\title{Concatenate sparse matrices by columns}
 \usage{
 \S4method{cbind2}{TsparseMatrix,TsparseMatrix}(x, y)
 
@@ -21,6 +32,28 @@
 \S4method{cbind2}{sparseVector,CsparseMatrix}(x, y)
 
 \S4method{cbind2}{sparseVector,sparseVector}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,RsparseMatrix}(x, y)
+
+\S4method{cbind2}{TsparseMatrix,RsparseMatrix}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,TsparseMatrix}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,numeric}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,integer}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,logical}(x, y)
+
+\S4method{cbind2}{RsparseMatrix,sparseVector}(x, y)
+
+\S4method{cbind2}{numeric,RsparseMatrix}(x, y)
+
+\S4method{cbind2}{integer,RsparseMatrix}(x, y)
+
+\S4method{cbind2}{logical,RsparseMatrix}(x, y)
+
+\S4method{cbind2}{sparseVector,RsparseMatrix}(x, y)
 }
 \arguments{
 \item{x}{First matrix to concatenate.}
@@ -28,10 +61,11 @@
 \item{y}{Second matrix to concatenate.}
 }
 \value{
-A COO matrix.
+A sparse matrix (storage order varying depending on the input types).
 }
 \description{
-`cbind2` method for the sparse COO matrix and sparse vector classes from `Matrix`,
+`cbind2` method for the CSR and COO sparse matrix and
+sparse vector classes from `Matrix`,
 taking the most efficient route for the concatenation according to the input types.
 }
 \examples{
@@ -40,5 +74,5 @@ library(MatrixExtra)
 set.seed(1)
 X <- rsparsematrix(3, 4, .3)
 X <- as(X, "TsparseMatrix")
-inherits(cbind2(X, X), "dgTMatrix")
+inherits(cbind2(X, X), "TsparseMatrix")
 }

@@ -28,7 +28,11 @@
 ### tcrossprod(vec, vec): 'vec' is a column vector [n,1]
 
 
-### TODO: try to make the multiplications preserve the names
+### TODO: try to make the multiplications preserve the names the same way as base R
+
+### TODO: careful when it sort the indices about not rendering the input unusable:
+### e.g. if the input was 'lgRMatrix', gets converted to 'dgRMatrix', and then sorted,
+### it will become unusable later.
 
 #' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
 #' @description Multithreaded <matrix, matrix> multiplications
@@ -38,17 +42,22 @@
 #' (See signatures for supported combinations).
 #'
 #' Objects from the `float` package are also supported for some combinations.
-#' @details Will try to use the same number of threads that are configured for BLAS.
-#' These can be set through the `RhpcBLASctl` package (see
-#' \link[RhpcBLASctl]{blas_set_num_threads} and \link[RhpcBLASctl]{blas_get_num_procs}).
-#'
+#' @details Will try to use the maximum available number of threads for the computations
+#' when appropriate. The number of threads can be controlled through the package options
+#' (e.g. `options("MatrixExtra.nthreads" = 1)` - see \link{MatrixExtra-options}) and will
+#' be set to 1 after running \link{restore_old_matrix_behavior}.
+#' 
 #' Be aware that sparse-dense matrix multiplications might suffer from reduced
 #' numerical precision, especially when using objects of type `float32`
 #' (from the `float` package).
 #'
 #' Internally, these functions use BLAS level-1 routines, so their speed might depend on
 #' the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
-#' on a default install of R for Windows.
+#' on a default install of R for Windows. For the `float32` types, it doesn't use BLAS,
+#' but will rather ship with some BLAS replacements, which might run faster when compiling
+#' this library from source (`install.packages("MatrixExtra", type="source")`) rather
+#' than downloading a pre-compiled binary from CRAN (Windows and macOS), due to
+#' potentially using more advanced SIMD instructions from the CPU.
 #'
 #' When multiplying a sparse matrix by a sparse vector, their indices
 #' will be sorted in-place (see \link{sort_sparse_indices}).
@@ -58,14 +67,17 @@
 #' \item MatMult(Matrix, vector): column vector if the matrix has more than one column
 #' or is empty, row vector if the matrix has only one column.
 #' \item MatMult(vector, Matrix): row vector if the matrix has more than one row,
-#' column vector if the matrix has only one row
+#' column vector if the matrix has only one row.
+#' \item MatMul(vector, vector): LHS is a row vector, RHS is a column vector.
 #' \item crossprod(Matrix, vector): column vector if the matrix has more than one row,
 #' row vector if the matrix has only one row.
 #' \item crossprod(vector, Matrix): column vector.
+#' \item crossprod(vector, vector): column vector.
 #' \item tcrossprod(Matrix, vector): row vector if the matrix has only one row,
 #' column vector if the matrix has only one column, and will throw an error otherwise.
 #' \item tcrossprod(vector, Matrix): row vector if the matrix has more than one column,
 #' column vector if the matrix has only one column.
+#' \item tcrossprod(vector, vector): column vector.
 #' }
 #'
 #' In general, the output returned by these functions will be a dense matrix from base R,
@@ -86,10 +98,10 @@
 #' @examples
 #' library(Matrix)
 #' library(MatrixExtra)
-#' ## Will use the same number of threads as for BLAS
-#' curr_nthreads <- RhpcBLASctl::blas_get_num_procs()
-#' ## Set the number of threads here (will restore later)
-#' RhpcBLASctl::blas_set_num_threads(1L)
+#' ### To use all available threads (default)
+#' options("MatrixExtra.nthreads" = parallel::detectCores())
+#' ### Example will run with only 1 thread (CRAN policy)
+#' options("MatrixExtra.nthreads" = 1)
 #'
 #' ## Generate random matrices
 #' set.seed(1)
@@ -102,8 +114,8 @@
 #' crossprod(as.matrix(B), as.csc.matrix(B))
 #' tcrossprod(as.csr.matrix(A), as.matrix(A))
 #'
-#' ## Restore the number of threads for BLAS
-#' RhpcBLASctl::blas_set_num_threads(curr_nthreads)
+#' ### Restore the number of threads
+#' options("MatrixExtra.nthreads" = parallel::detectCores())
 NULL
 
 check_dimensions_match <- function(x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=FALSE) {
@@ -117,7 +129,7 @@ check_dimensions_match <- function(x, y, matmult=FALSE, crossprod=FALSE, tcrossp
         inner_x <- ncol(x)
         inner_y <- ncol(y)
     } else {
-        stop("Internal error. Please open a bug report in GitHub.")
+        throw_internal_error()
     }
 
     if (inner_x != inner_y)
@@ -135,7 +147,7 @@ set_dimnames <- function(res, x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=F
         rnames <- rownames(x)
         cnames <- rownames(y)
     } else {
-        stop("Internal error. Please open a bug report in GitHub.")
+        throw_internal_error()
     }
 
     if (!is.null(rnames))
@@ -153,15 +165,16 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
     check_dimensions_match(x, y, matmult=TRUE)
 
     # restore on exit
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
 
     # set num threads to 1 in order to avoid thread contention between BLAS and openmp threads
-    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
+    if (nthreads > 1L) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(x) != "double") mode(x) <- "double"
     y <- as.csc.matrix(y)
+    check_valid_matrix(y)
 
     res <- matmul_dense_csc_numeric(
         x,
@@ -187,12 +200,14 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
         ) {
             y <- as.csc.matrix(y)
         }
+        check_valid_matrix(y)
 
         ### To match base R, if 'y' has more than one row, 'x' is [1,n], otherwise [n,1]
         if (nrow(y) == 1L) {
 
             if (!inherits(y, "dsparseMatrix"))
                 y <- as.csr.matrix(y)
+            check_valid_matrix(y)
 
             res <- matmul_colvec_by_scolvecascsr_f32(
                 x@Data,
@@ -233,12 +248,13 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
     }
 
     check_dimensions_match(x, y, matmult=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
     if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     y <- as.csc.matrix(y)
+    check_valid_matrix(y)
 
     res <- matmul_dense_csc_float32(
         x@Data,
@@ -256,13 +272,14 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
 #' @export
 setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
     if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(x) != "double") mode(x) <- "double"
     y <- as.csr.matrix(y)
+    check_valid_matrix(y)
 
     res <- tcrossprod_dense_csr_numeric(
         x,
@@ -287,12 +304,14 @@ setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y
         ) {
             y <- as.csr.matrix(y)
         }
+        check_valid_matrix(y)
 
         ### To match with base R, if 'y' has only one column, x is [n,1], otherwise [1,n]
         if (ncol(y) == 1L) {
 
             if (!inherits(y, "dsparseMatrix"))
                 y <- as.csr.matrix(y)
+            check_valid_matrix(y)
 
             res <- matmul_colvec_by_scolvecascsr_f32(
                 x@Data,
@@ -331,12 +350,13 @@ setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y
     }
 
     check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
     if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     y <- as.csr.matrix(y)
+    check_valid_matrix(y)
 
     res <- tcrossprod_dense_csr_float32(
         x@Data,
@@ -369,6 +389,7 @@ setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), function(x, y)
         ) {
             y <- as.csc.matrix(y)
         }
+        check_valid_matrix(y)
         if (.hasSlot(y, "x")) {
             res <- matmul_rowvec_by_csc(
                 x@Data,
@@ -406,6 +427,7 @@ setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
                 (.hasSlot(x, "diag") && x@diag != "N")) {
                 x <- as.csr.matrix(x)
             }
+            check_valid_matrix(x)
             res <- matmul_colvec_by_scolvecascsr_f32(
                 y@Data,
                 x@p,
@@ -434,13 +456,14 @@ setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
 #' @export
 setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
     if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (typeof(y) != "double") mode(y) <- "double"
     x <- as.csr.matrix(x)
+    check_valid_matrix(x)
 
     res <- tcrossprod_csr_dense_numeric(
         x@p,
@@ -458,12 +481,13 @@ setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), function(x, y)
 #' @export
 setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    nthreads <- max(nthreads, 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(nthreads))
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
     if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     x <- as.csr.matrix(x)
+    check_valid_matrix(x)
 
     res <- tcrossprod_csr_dense_float32(
         x@p,
@@ -479,15 +503,20 @@ setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), function(x, y
 
 #### Vectors ----
 
+### TODO: these matrix-by-vector multiplications could be done more
+### efficiently for symmetric matrices and for unit diagonal
+
 gemv_csr_vec <- function(x, y) {
     if (ncol(x) != length(y))
         stop("Matrix-vector dimensions do not match.")
-    nthreads <- RhpcBLASctl::blas_get_num_procs()
-    x <- as.csr.matrix(x)
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    check_valid_matrix(x)
 
     if (!inherits(y, "sparseVector")) {
 
         ### dense vectors from base R
+        x <- as.csr.matrix(x)
+
         if (typeof(y) == "double") {
             res <- matmul_csr_dvec_numeric(
                 x@p,
@@ -530,7 +559,10 @@ gemv_csr_vec <- function(x, y) {
     } else {
 
         ### sparse vectors from matrix
+        x <- deepcopy_before_sort(x)
+        x <- as.csr.matrix(x)
         x <- sort_sparse_indices(x)
+        
         y <- sort_sparse_indices(y)
 
         if (inherits(y, "dsparseVector")) {
@@ -589,7 +621,7 @@ gemv_csr_vec <- function(x, y) {
 
 outerprod_csrsinglecol_by_dvec <- function(x, y) {
     if (ncol(x) != 1L)
-        stop("Internal error. Please create a bug report in GitHub.")
+        throw_internal_error()
 
     if (!inherits(x, "dsparseMatrix") ||
         inherits(x, "symmetricMatrix") ||
@@ -597,6 +629,7 @@ outerprod_csrsinglecol_by_dvec <- function(x, y) {
     ) {
         x <- as.csr.matrix(x)
     }
+    check_valid_matrix(x)
 
     if (inherits(y, "sparseVector")) {
         y <- sort_sparse_indices(y)
@@ -694,3 +727,5 @@ setMethod("%*%", signature(x="RsparseMatrix", y="integer"), matmul_csr_vec)
 #' @rdname matmult
 #' @export
 setMethod("%*%", signature(x="RsparseMatrix", y="sparseVector"), matmul_csr_vec)
+
+### TODO: is CSC %*% vector in 'Matrix' implemented efficiently?

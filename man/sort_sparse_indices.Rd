@@ -15,15 +15,17 @@ The same input `X` with its indices sorted, as invisible (no auto print).
 Note that the input is itself modified, so there is no need to reassign it.
 }
 \description{
-Sort the indices of a sparse matrix or sparse vector
-}
-\details{
 Will sort the indices of a sparse matrix or sparse vector.
 
-In general, the indices of sparse matrices are always meant to be sorted, and
+In general, the indices of sparse CSR and CSC matrices are always meant to be sorted, and
 it should be rare to have a matrix with unsorted indices when the matrix is the
 output of some built-in operation from either `Matrix` or `MatrixExtra`, but when
 the matrices are constructed manually this function can come in handy.
 
 \bold{Important:} the input matrix will be modified in-place.
+}
+\details{
+When passing a COO matrix ("TsparseMatrix"), it will sort it
+with rows as the major axis, which differs from `Matrix` that usually
+sorts them with columns as the major axis.
 }

@@ -129,6 +129,7 @@ void dgemm_csr_drm_as_dcm
         return;
     const int one = 1;
     double *restrict write_ptr;
+    nthreads = std::min(nthreads, m);
     std::unique_ptr<double[]> temp_arr(new double[(size_t)ldc*(size_t)nthreads]);
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
             shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values, one) \
@@ -159,6 +160,7 @@ void dgemm_csr_drm_as_dcm
         return;
     const size_t n = n_;
     float *restrict write_ptr;
+    nthreads = std::min(nthreads, m);
     std::unique_ptr<float[]> temp_arr(new float[(size_t)ldc*(size_t)nthreads]);
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
             shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values) \
@@ -365,6 +367,9 @@ Rcpp::IntegerMatrix tcrossprod_csr_dense_float32(Rcpp::IntegerVector X_csr_indpt
         nthreads
     );
 }
+
+/* TODO: these matrix-by-vector multiplications could be done more
+   efficiently for symmetric matrices and for unit diagonal */
 
 /* x %*% y */
 template <class RcppVector, class OutputVector, class OutputDType>
