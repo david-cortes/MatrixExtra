@@ -113,7 +113,9 @@ drop_slice <- function(x, drop) {
     
     if ((missing(drop) || isTRUE(drop)) && inherits(x, c("sparseMatrix", "float32"))) {
         if (nrow(x) == 1L || ncol(x) == 1L) {
-            if (!inherits(x, "float32") && getOption("MatrixExtra.drop_sparse", default=FALSE)) {
+            if (!(nrow(x) == 1L && ncol(x) == 1L) && !inherits(x, "float32") &&
+                getOption("MatrixExtra.drop_sparse", default=FALSE)
+            ) {
                 x <- as(x, "sparseVector")
             } else {
                 x <- as.vector(x)

@@ -309,8 +309,16 @@ extract_single_val_csr_binary <- function(indptr, indices, row, col) {
     .Call(`_MatrixExtra_extract_single_val_csr_binary`, indptr, indices, row, col)
 }
 
-slice_coo_single <- function(ii, jj, i, j) {
-    .Call(`_MatrixExtra_slice_coo_single`, ii, jj, i, j)
+slice_coo_single_numeric <- function(ii, jj, xx, i, j) {
+    .Call(`_MatrixExtra_slice_coo_single_numeric`, ii, jj, xx, i, j)
+}
+
+slice_coo_single_logical <- function(ii, jj, xx, i, j) {
+    .Call(`_MatrixExtra_slice_coo_single_logical`, ii, jj, xx, i, j)
+}
+
+slice_coo_single_binary <- function(ii, jj, i, j) {
+    .Call(`_MatrixExtra_slice_coo_single_binary`, ii, jj, i, j)
 }
 
 slice_coo_arbitrary_numeric <- function(ii, jj, xx, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols) {

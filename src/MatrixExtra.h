@@ -39,8 +39,9 @@ extern "C" {
 /* misc.cpp */
 struct VectorConstructorArgs {
     bool as_integer = false;
-    bool from_cpp_vec = false;
     bool as_logical = false;
+    bool from_cpp_vec = false;
+    bool cpp_lim_size = false;
     size_t size = 0;
     void *int_vec_from = NULL;
     void *num_vec_from = NULL;

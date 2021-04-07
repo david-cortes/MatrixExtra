@@ -1,22 +1,73 @@
 #include "MatrixExtra.h"
 
+template <class RcppVector, class InputDType, class CompileFlag>
+InputDType slice_coo_single_template
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    RcppVector xx,
+    const int i, const int j
+)
+{
+    const size_t nnz = ii.size();
+    for (size_t ix = 0; ix < nnz; ix++)
+    {
+        if (ii[ix] == i && jj[ix] == j)
+        {
+            return std::is_same<CompileFlag, bool>::value? xx[ix] : 1;
+        }
+    }
+    return 0;
+}
+
 // [[Rcpp::export(rng = false)]]
-int slice_coo_single
+double slice_coo_single_numeric
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::NumericVector xx,
+    int i, int j
+)
+{
+    return slice_coo_single_template<Rcpp::NumericVector, double, bool>(
+        ii,
+        jj,
+        xx,
+        i, j
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+bool slice_coo_single_logical
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::LogicalVector xx,
+    int i, int j
+)
+{
+    return slice_coo_single_template<Rcpp::LogicalVector, int, bool>(
+        ii,
+        jj,
+        xx,
+        i, j
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+bool slice_coo_single_binary
 (
     Rcpp::IntegerVector ii,
     Rcpp::IntegerVector jj,
     int i, int j
 )
 {
-    size_t nnz = ii.size();
-    for (size_t ix = 0; ix < nnz; ix++)
-    {
-        if (ii[ix] == i && jj[ix] == j)
-        {
-            return ix + 1;
-        }
-    }
-    return 0;
+    return slice_coo_single_template<bool*, bool, int>(
+        ii,
+        jj,
+        nullptr,
+        i, j
+    );
 }
 
 void process_i_arbitrary
@@ -189,9 +240,24 @@ Rcpp::List slice_coo_arbitrary_template
     if (false)
     {
         easy_end:
-        Rcpp::IntegerVector ii_out(curr);
-        Rcpp::IntegerVector jj_out(curr);
-        RcppVector xx_out(std::is_same<CompileFlag, bool>::value? curr : 0);
+        VectorConstructorArgs args;
+        args.as_integer = true; args.from_cpp_vec = false; args.as_logical = false; args.size = curr;
+        Rcpp::IntegerVector ii_out = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        Rcpp::IntegerVector jj_out = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        RcppVector xx_out;
+        if (std::is_same<CompileFlag, bool>::value)
+        {
+            if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
+                args.as_logical = true; args.as_integer = true;
+            }
+            else if (std::is_same<RcppVector, Rcpp::IntegerVector>::value) {
+                args.as_logical = false; args.as_integer = true;
+            } else {
+                args.as_integer = false;
+            }
+
+            xx_out = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        }
 
         for (size_t ix = 0; ix < curr; ix++) ii_out[ix] = ii[take[ix]];
         for (size_t ix = 0; ix < curr; ix++) jj_out[ix] = jj[take[ix]];
@@ -436,11 +502,28 @@ Rcpp::List slice_coo_arbitrary_template
     if (i_has_duplicates || j_has_duplicates)
         curr = ii_out.size();
 
-    Rcpp::IntegerVector ii_out_(ii_out.begin(), ii_out.begin() + curr);
-    Rcpp::IntegerVector jj_out_(jj_out.begin(), jj_out.begin() + curr);
+    VectorConstructorArgs args;
+    args.as_integer = true; args.from_cpp_vec = true; args.as_logical = false;
+    args.size = curr; args.cpp_lim_size = true; args.int_vec_from = &ii_out;
+    Rcpp::IntegerVector ii_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    ii_out.clear(); ii_out.shrink_to_fit();
+    args.int_vec_from = &jj_out;
+    Rcpp::IntegerVector jj_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    jj_out.clear(); jj_out.shrink_to_fit();
     RcppVector xx_out_;
     if (std::is_same<CompileFlag, bool>::value)
-    xx_out_ = RcppVector(xx_out.begin(), xx_out.begin() + curr);
+    {
+        if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
+            args.as_integer = true; args.as_logical = true; args.int_vec_from = &xx_out;
+        }
+        else if (std::is_same<RcppVector, Rcpp::IntegerVector>::value) {
+            args.as_integer = true; args.as_logical = false; args.int_vec_from = &xx_out;
+        }
+        else {
+            args.as_integer = false; args.as_logical = false; args.num_vec_from = &xx_out;
+        }
+        xx_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    }
 
 
     return Rcpp::List::create(

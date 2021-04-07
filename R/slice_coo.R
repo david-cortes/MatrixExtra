@@ -1,10 +1,3 @@
-### Note: this method is generally not any faster than the one in Matrix,
-### but having it redone here allows keeping the drop-to-sparse option
-### for all input types.
-### Additionally, there are issues when trying to use the function that Matrix
-### will call to slice COO matrices due to pontential problems with circular
-### references after having masked methods for CSC too.
-
 subset_coo <- function(x, i, j, drop) {
     
     check_valid_matrix(x)
@@ -47,14 +40,14 @@ subset_coo <- function(x, i, j, drop) {
                     }
                 }
 
-                ix_take <- slice_coo_single(x@i, x@j, i-1L, j-1L)
-                if (ix_take == 0) {
-                    res <- 0.
+                if (inherits(x, "dsparseMatrix")) {
+                    res <- slice_coo_single_numeric(x@i, x@j, x@x, i-1L, j-1L)
+                } else if (inherits(x, "lsparseMatrix")) {
+                    res <- slice_coo_single_logical(x@i, x@j, x@x, i-1L, j-1L)
+                } else if (inherits(x, "nsparseMatrix")) {
+                    res <- slice_coo_single_binary(x@i, x@j, i-1L, j-1L)
                 } else {
-                    if (.hasSlot(x, "x"))
-                        res <- x@x[ix_take]
-                    else
-                        res <- 1.
+                    throw_internal_error()
                 }
             }
         }

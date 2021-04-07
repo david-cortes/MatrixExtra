@@ -480,10 +480,9 @@ Rcpp::List copy_csr_arbitrary_template
     const int min_j = *std::min_element(cols_take.begin(), cols_take.end());
     const int max_j = *std::max_element(cols_take.begin(), cols_take.end());
 
-    Rcpp::IntegerVector new_indptr;
     VectorConstructorArgs args;
     args.as_integer = true; args.from_cpp_vec = false; args.size = rows_take.size() + 1;
-    new_indptr = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    Rcpp::IntegerVector new_indptr = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     std::vector<int> new_indices;
     std::vector<InputDType> new_values;
 

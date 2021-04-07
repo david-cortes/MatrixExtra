@@ -6,12 +6,21 @@ SEXP SafeRcppVector(void *args_)
     std::vector<int> *int_vec_from = (std::vector<int>*)args->int_vec_from;
     std::vector<double> *num_vec_from = (std::vector<double>*)args->num_vec_from;
     
-    if (args->as_integer) {
+    if (args->as_integer)
+    {
         if (args->from_cpp_vec) {
-            if (!args->as_logical)
-                return Rcpp::IntegerVector(int_vec_from->begin(), int_vec_from->end());
-            else
-                return Rcpp::LogicalVector(int_vec_from->begin(), int_vec_from->end());
+            if (!args->as_logical) {
+                if (!args->cpp_lim_size)
+                    return Rcpp::IntegerVector(int_vec_from->begin(), int_vec_from->end());
+                else
+                    return Rcpp::IntegerVector(int_vec_from->begin(), int_vec_from->begin() + args->size);
+            }
+            else {
+                if (!args->cpp_lim_size)
+                    return Rcpp::LogicalVector(int_vec_from->begin(), int_vec_from->end());
+                else
+                    return Rcpp::LogicalVector(int_vec_from->begin(), int_vec_from->begin() + args->size);
+            }
         }
 
         else {
@@ -22,9 +31,13 @@ SEXP SafeRcppVector(void *args_)
         }
     }
 
-    else {
+    else
+    {
         if (args->from_cpp_vec) {
-            return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->end());
+            if (!args->cpp_lim_size)
+                return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->end());
+            else
+                return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->begin() + args->size);
         }
 
         else {

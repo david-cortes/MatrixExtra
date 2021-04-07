@@ -13,6 +13,7 @@ m <- as(m, "RsparseMatrix")
 m_csc <- as(m, "CsparseMatrix")
 m_coo <- as(m, "TsparseMatrix")
 m_base <- as.matrix(m)
+restore_old_matrix_behavior()
 
 test_that("RsparseMatrix subset cols and rows", {
     expect_equal(m, m[, ])
@@ -187,10 +188,16 @@ test_that("RsparseMatrix other classes", {
     expect_s4_class(ex_ntRMatrix, "ntRMatrix")
 
     as.dense.matrix <- function(x) {
+        x_is_numeric <- inherits(x, c("dsparseMatrix", "dsparseVector"))
+        x_is_logical <- inherits(x, c("lsparseMatrix", "lsparseVector",
+                                      "nsparseMatrix", "nsparseVector"))
         if (inherits(x, "sparseMatrix"))
             x <- as.csc.matrix(x)
         x <- as.matrix(x)
-        mode(x) <- "double"
+        if (x_is_numeric)
+            mode(x) <- "double"
+        else
+            mode(x) <- "logical"
         x <- unname(as.matrix(x))
         return(x)
     }
@@ -225,6 +232,11 @@ test_that("RsparseMatrix other classes", {
         expect_equal(as.dense.matrix(slice_rowcol_seq), dense_rowcol_seq)
         expect_equal(as.dense.matrix(slice_rowseq_randcols), dense_rowseq_randcols)
         expect_equal(as.dense.matrix(slice_rand), dense_rand)
+        
+        if (inherits(inp, "sparseMatrix") && nrow(inp) >= 3 && ncol(inp) >= 3)
+            expect_equal(inp[3,3,drop=TRUE], inp_dense[3,3,drop=TRUE])
+        if (inherits(inp, "sparseMatrix") && nrow(inp) >= 6 && ncol(inp) >= 5)
+            expect_equal(inp[6,5,drop=TRUE], inp_dense[6,5,drop=TRUE])
     }
 })
 

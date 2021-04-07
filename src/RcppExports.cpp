@@ -994,16 +994,44 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// slice_coo_single
-int slice_coo_single(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, int i, int j);
-RcppExport SEXP _MatrixExtra_slice_coo_single(SEXP iiSEXP, SEXP jjSEXP, SEXP iSEXP, SEXP jSEXP) {
+// slice_coo_single_numeric
+double slice_coo_single_numeric(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::NumericVector xx, int i, int j);
+RcppExport SEXP _MatrixExtra_slice_coo_single_numeric(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP iSEXP, SEXP jSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_single_numeric(ii, jj, xx, i, j));
+    return rcpp_result_gen;
+END_RCPP
+}
+// slice_coo_single_logical
+bool slice_coo_single_logical(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::LogicalVector xx, int i, int j);
+RcppExport SEXP _MatrixExtra_slice_coo_single_logical(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP iSEXP, SEXP jSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    rcpp_result_gen = Rcpp::wrap(slice_coo_single_logical(ii, jj, xx, i, j));
+    return rcpp_result_gen;
+END_RCPP
+}
+// slice_coo_single_binary
+bool slice_coo_single_binary(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, int i, int j);
+RcppExport SEXP _MatrixExtra_slice_coo_single_binary(SEXP iiSEXP, SEXP jjSEXP, SEXP iSEXP, SEXP jSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
     Rcpp::traits::input_parameter< int >::type i(iSEXP);
     Rcpp::traits::input_parameter< int >::type j(jSEXP);
-    rcpp_result_gen = Rcpp::wrap(slice_coo_single(ii, jj, i, j));
+    rcpp_result_gen = Rcpp::wrap(slice_coo_single_binary(ii, jj, i, j));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1151,7 +1179,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_extract_single_val_csr_numeric", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_numeric, 5},
     {"_MatrixExtra_extract_single_val_csr_logical", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_logical, 5},
     {"_MatrixExtra_extract_single_val_csr_binary", (DL_FUNC) &_MatrixExtra_extract_single_val_csr_binary, 4},
-    {"_MatrixExtra_slice_coo_single", (DL_FUNC) &_MatrixExtra_slice_coo_single, 4},
+    {"_MatrixExtra_slice_coo_single_numeric", (DL_FUNC) &_MatrixExtra_slice_coo_single_numeric, 5},
+    {"_MatrixExtra_slice_coo_single_logical", (DL_FUNC) &_MatrixExtra_slice_coo_single_logical, 5},
+    {"_MatrixExtra_slice_coo_single_binary", (DL_FUNC) &_MatrixExtra_slice_coo_single_binary, 4},
     {"_MatrixExtra_slice_coo_arbitrary_numeric", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_numeric, 13},
     {"_MatrixExtra_slice_coo_arbitrary_logical", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_logical, 13},
     {"_MatrixExtra_slice_coo_arbitrary_binary", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_binary, 12},

@@ -89,8 +89,32 @@ cbind_csr <- function(x, y) {
     if (.hasSlot(out, "x"))
         out@x <- res$values
     out@Dim <- as.integer(c(max(nrow(x), nrow(y)), ncol(x)+ncol(y)))
+    
     Dimnames <- list(NULL, NULL)
-    ### TODO: handle dimnames here
+    if (!is.null(x@Dimnames[[1L]])) {
+        Dimnames[[1L]] <- x@Dimnames[[1L]]
+        if (nrow(x) < nrow(y)) {
+            if (is.null(y@Dimnames[[1L]])) {
+                Dimnames[[1L]] <- c(Dimnames[[1L]], rep("", nrow(y)-nrow(x)))
+            } else {
+                Dimnames[[1L]] <- c(Dimnames[[1L]], y@Dimnames[[1L]][seq(1L, nrow(y)-nrow(x))])
+            }
+        }
+    } else if (!is.null(y@Dimnames[[1L]])) {
+        Dimnames[[1L]] <- y@Dimnames[[1L]]
+        if (nrow(y) < nrow(x)) {
+            Dimnames[[1L]] <- c(Dimnames[[1L]], rep("", nrow(x)-nrow(y)))
+        }
+    }
+    if (!is.null(x@Dimnames[[2L]]) && !is.null(x@Dimnames[[2L]])) {
+        Dimnames[[2L]] <- c(x@Dimnames[[2L]], y@Dimnames[[2L]])
+    } else if (!is.null(x@Dimnames[[2L]])) {
+        Dimnames[[2L]] <- c(x@Dimnames[[2L]], rep("", ncol(y)))
+    } else if (!is.null(y@Dimnames[[2L]])) {
+        Dimnames[[2L]] <- c(rep("", ncol(x)), y@Dimnames[[2L]])
+    }
+    out@Dimnames <- Dimnames
+    
     return(out)
 }
 
