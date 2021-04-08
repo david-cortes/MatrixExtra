@@ -449,6 +449,8 @@ Rcpp::List copy_csr_arbitrary_template
     Rcpp::IntegerVector cols_take
 )
 {
+    Rcpp::IntegerVector new_indptr(rows_take.size()+1);
+
     std::unordered_map<int, int> new_mapping;
     for (int col = 0; col < (int)cols_take.size(); col++) new_mapping[cols_take[col]] = col;
     std::unordered_map<int, int> n_repeats;
@@ -480,9 +482,6 @@ Rcpp::List copy_csr_arbitrary_template
     const int min_j = *std::min_element(cols_take.begin(), cols_take.end());
     const int max_j = *std::max_element(cols_take.begin(), cols_take.end());
 
-    VectorConstructorArgs args;
-    args.as_integer = true; args.from_cpp_vec = false; args.size = rows_take.size() + 1;
-    Rcpp::IntegerVector new_indptr = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     std::vector<int> new_indices;
     std::vector<InputDType> new_values;
 
@@ -551,6 +550,7 @@ Rcpp::List copy_csr_arbitrary_template
 
     Rcpp::List out;
     out["indptr"] = new_indptr;
+    VectorConstructorArgs args;
     args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &new_indices;
     out["indices"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     new_indices.clear();
@@ -693,6 +693,24 @@ double extract_single_val_csr
 )
 {
     return extract_single_val_csr<double>(
+        indptr,
+        indices,
+        values,
+        row, col,
+        is_sorted
+    );
+}
+
+int extract_single_val_csr
+(
+    int *restrict indptr,
+    int *restrict indices,
+    int *restrict values,
+    const int row, const int col,
+    const bool is_sorted
+)
+{
+    return extract_single_val_csr<int>(
         indptr,
         indices,
         values,

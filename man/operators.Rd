@@ -10,32 +10,74 @@
 \alias{*,sparseMatrix,lgRMatrix-method}
 \alias{*,CsparseMatrix,TsparseMatrix-method}
 \alias{*,TsparseMatrix,CsparseMatrix-method}
+\alias{&,RsparseMatrix,sparseMatrix-method}
+\alias{&,ngRMatrix,sparseMatrix-method}
+\alias{&,lgRMatrix,sparseMatrix-method}
+\alias{&,sparseMatrix,RsparseMatrix-method}
+\alias{&,sparseMatrix,ngRMatrix-method}
+\alias{&,sparseMatrix,lgRMatrix-method}
+\alias{&,CsparseMatrix,TsparseMatrix-method}
+\alias{&,TsparseMatrix,CsparseMatrix-method}
 \alias{*,RsparseMatrix,matrix-method}
 \alias{*,ngRMatrix,matrix-method}
 \alias{*,lgRMatrix,matrix-method}
+\alias{*,RsparseMatrix,float32-method}
+\alias{*,ngRMatrix,float32-method}
+\alias{*,lgRMatrix,float32-method}
 \alias{*,matrix,RsparseMatrix-method}
 \alias{*,matrix,ngRMatrix-method}
 \alias{*,matrix,lgRMatrix-method}
+\alias{*,float32,RsparseMatrix-method}
+\alias{*,float32,ngRMatrix-method}
+\alias{*,float32,lgRMatrix-method}
+\alias{&,RsparseMatrix,matrix-method}
+\alias{&,ngRMatrix,matrix-method}
+\alias{&,lgRMatrix,matrix-method}
+\alias{&,matrix,RsparseMatrix-method}
+\alias{&,matrix,ngRMatrix-method}
+\alias{&,matrix,lgRMatrix-method}
 \alias{*,TsparseMatrix,matrix-method}
 \alias{*,TsparseMatrix,float32-method}
 \alias{*,ngTMatrix,matrix-method}
 \alias{*,lgTMatrix,matrix-method}
+\alias{*,ngTMatrix,float32-method}
+\alias{*,lgTMatrix,float32-method}
 \alias{*,matrix,TsparseMatrix-method}
 \alias{*,float32,TsparseMatrix-method}
 \alias{*,matrix,ngTMatrix-method}
 \alias{*,matrix,lgTMatrix-method}
+\alias{*,float32,ngTMatrix-method}
+\alias{*,float32,lgTMatrix-method}
+\alias{&,TsparseMatrix,matrix-method}
+\alias{&,ngTMatrix,matrix-method}
+\alias{&,lgTMatrix,matrix-method}
+\alias{&,matrix,TsparseMatrix-method}
+\alias{&,matrix,ngTMatrix-method}
+\alias{&,matrix,lgTMatrix-method}
 \alias{+,RsparseMatrix,sparseMatrix-method}
 \alias{+,ngRMatrix,sparseMatrix-method}
 \alias{+,lgRMatrix,sparseMatrix-method}
 \alias{+,sparseMatrix,RsparseMatrix-method}
 \alias{+,sparseMatrix,ngRMatrix-method}
 \alias{+,sparseMatrix,lgRMatrix-method}
+\alias{+,CsparseMatrix,TsparseMatrix-method}
+\alias{+,TsparseMatrix,CsparseMatrix-method}
 \alias{-,RsparseMatrix,sparseMatrix-method}
 \alias{-,ngRMatrix,sparseMatrix-method}
 \alias{-,lgRMatrix,sparseMatrix-method}
 \alias{-,sparseMatrix,RsparseMatrix-method}
 \alias{-,sparseMatrix,ngRMatrix-method}
 \alias{-,sparseMatrix,lgRMatrix-method}
+\alias{-,CsparseMatrix,TsparseMatrix-method}
+\alias{-,TsparseMatrix,CsparseMatrix-method}
+\alias{|,RsparseMatrix,sparseMatrix-method}
+\alias{|,ngRMatrix,sparseMatrix-method}
+\alias{|,lgRMatrix,sparseMatrix-method}
+\alias{|,sparseMatrix,RsparseMatrix-method}
+\alias{|,sparseMatrix,ngRMatrix-method}
+\alias{|,sparseMatrix,lgRMatrix-method}
+\alias{|,CsparseMatrix,TsparseMatrix-method}
+\alias{|,TsparseMatrix,CsparseMatrix-method}
 \alias{*,RsparseMatrix,integer-method}
 \alias{*,RsparseMatrix,numeric-method}
 \alias{*,RsparseMatrix,logical-method}
@@ -88,17 +130,57 @@
 
 \S4method{*}{TsparseMatrix,CsparseMatrix}(e1, e2)
 
+\S4method{&}{RsparseMatrix,sparseMatrix}(e1, e2)
+
+\S4method{&}{ngRMatrix,sparseMatrix}(e1, e2)
+
+\S4method{&}{lgRMatrix,sparseMatrix}(e1, e2)
+
+\S4method{&}{sparseMatrix,RsparseMatrix}(e1, e2)
+
+\S4method{&}{sparseMatrix,ngRMatrix}(e1, e2)
+
+\S4method{&}{sparseMatrix,lgRMatrix}(e1, e2)
+
+\S4method{&}{CsparseMatrix,TsparseMatrix}(e1, e2)
+
+\S4method{&}{TsparseMatrix,CsparseMatrix}(e1, e2)
+
 \S4method{*}{RsparseMatrix,matrix}(e1, e2)
 
 \S4method{*}{ngRMatrix,matrix}(e1, e2)
 
 \S4method{*}{lgRMatrix,matrix}(e1, e2)
 
+\S4method{*}{RsparseMatrix,float32}(e1, e2)
+
+\S4method{*}{ngRMatrix,float32}(e1, e2)
+
+\S4method{*}{lgRMatrix,float32}(e1, e2)
+
 \S4method{*}{matrix,RsparseMatrix}(e1, e2)
 
 \S4method{*}{matrix,ngRMatrix}(e1, e2)
 
 \S4method{*}{matrix,lgRMatrix}(e1, e2)
+
+\S4method{*}{float32,RsparseMatrix}(e1, e2)
+
+\S4method{*}{float32,ngRMatrix}(e1, e2)
+
+\S4method{*}{float32,lgRMatrix}(e1, e2)
+
+\S4method{&}{RsparseMatrix,matrix}(e1, e2)
+
+\S4method{&}{ngRMatrix,matrix}(e1, e2)
+
+\S4method{&}{lgRMatrix,matrix}(e1, e2)
+
+\S4method{&}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{&}{matrix,ngRMatrix}(e1, e2)
+
+\S4method{&}{matrix,lgRMatrix}(e1, e2)
 
 \S4method{*}{TsparseMatrix,matrix}(e1, e2)
 
@@ -108,6 +190,10 @@
 
 \S4method{*}{lgTMatrix,matrix}(e1, e2)
 
+\S4method{*}{ngTMatrix,float32}(e1, e2)
+
+\S4method{*}{lgTMatrix,float32}(e1, e2)
+
 \S4method{*}{matrix,TsparseMatrix}(e1, e2)
 
 \S4method{*}{float32,TsparseMatrix}(e1, e2)
@@ -115,6 +201,22 @@
 \S4method{*}{matrix,ngTMatrix}(e1, e2)
 
 \S4method{*}{matrix,lgTMatrix}(e1, e2)
+
+\S4method{*}{float32,ngTMatrix}(e1, e2)
+
+\S4method{*}{float32,lgTMatrix}(e1, e2)
+
+\S4method{&}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{&}{ngTMatrix,matrix}(e1, e2)
+
+\S4method{&}{lgTMatrix,matrix}(e1, e2)
+
+\S4method{&}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{&}{matrix,ngTMatrix}(e1, e2)
+
+\S4method{&}{matrix,lgTMatrix}(e1, e2)
 
 \S4method{+}{RsparseMatrix,sparseMatrix}(e1, e2)
 
@@ -128,6 +230,10 @@
 
 \S4method{+}{sparseMatrix,lgRMatrix}(e1, e2)
 
+\S4method{+}{CsparseMatrix,TsparseMatrix}(e1, e2)
+
+\S4method{+}{TsparseMatrix,CsparseMatrix}(e1, e2)
+
 \S4method{-}{RsparseMatrix,sparseMatrix}(e1, e2)
 
 \S4method{-}{ngRMatrix,sparseMatrix}(e1, e2)
@@ -139,6 +245,26 @@
 \S4method{-}{sparseMatrix,ngRMatrix}(e1, e2)
 
 \S4method{-}{sparseMatrix,lgRMatrix}(e1, e2)
+
+\S4method{-}{CsparseMatrix,TsparseMatrix}(e1, e2)
+
+\S4method{-}{TsparseMatrix,CsparseMatrix}(e1, e2)
+
+\S4method{|}{RsparseMatrix,sparseMatrix}(e1, e2)
+
+\S4method{|}{ngRMatrix,sparseMatrix}(e1, e2)
+
+\S4method{|}{lgRMatrix,sparseMatrix}(e1, e2)
+
+\S4method{|}{sparseMatrix,RsparseMatrix}(e1, e2)
+
+\S4method{|}{sparseMatrix,ngRMatrix}(e1, e2)
+
+\S4method{|}{sparseMatrix,lgRMatrix}(e1, e2)
+
+\S4method{|}{CsparseMatrix,TsparseMatrix}(e1, e2)
+
+\S4method{|}{TsparseMatrix,CsparseMatrix}(e1, e2)
 
 \S4method{*}{RsparseMatrix,integer}(e1, e2)
 
@@ -233,7 +359,7 @@ same behavior as in base R, the operations should be done in CSC format.
 library(Matrix)
 library(MatrixExtra)
 set.seed(1)
-X <- as.csr.matrix(rsparsematrix(4, 3, .5))
+X <- rsparsematrix(4, 3, .5, repr="R")
 X + X
 X * 2
 X ^ 2

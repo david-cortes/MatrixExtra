@@ -41,10 +41,13 @@ struct VectorConstructorArgs {
     bool as_integer = false;
     bool as_logical = false;
     bool from_cpp_vec = false;
+    bool from_pointer = false;
     bool cpp_lim_size = false;
     size_t size = 0;
     void *int_vec_from = NULL;
     void *num_vec_from = NULL;
+    void *int_pointer_from = NULL;
+    void *num_pointer_from = NULL;
 };
 
 bool check_is_sorted(int* vec, size_t n);
@@ -63,6 +66,14 @@ double extract_single_val_csr
     int *restrict indptr,
     int *restrict indices,
     double *restrict values,
+    const int row, const int col,
+    const bool is_sorted
+);
+int extract_single_val_csr
+(
+    int *restrict indptr,
+    int *restrict indices,
+    int *restrict values,
     const int row, const int col,
     const bool is_sorted
 );

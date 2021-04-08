@@ -131,8 +131,15 @@ sort_sparse_indices <- function(X) {
 }
 
 ### TODO: complete this and add it where necessary
-deepcopy_before_sort <- function(X) {
-    if (!inherits(X, "dsparseMatrix") ||
+deepcopy_before_sort <- function(X, logical=FALSE, binary=FALSE) {
+    if (logical)
+        target <- c("lsparseMatrix", "lsparseVector")
+    else
+        target <- c("dsparseMatrix", "dsparseVector")
+    
+    if ((!inherits(X, target) ||
+         (binary && !inherits(X, c("nsparseMatrix", "nsparseVector")))
+         ) ||
         inherits(X, "symmetricMatrix") ||
         (.hasSlot(X, "diag") && X@diag != "N")
     ) {
@@ -142,11 +149,12 @@ deepcopy_before_sort <- function(X) {
             X@i <- deepcopy_int(X@i)
         } else if (inherits(X, "TsparseMatrix")) {
             X@i <- deepcopy_int(X@i)
-            if (inherits(X, "dsparseMatrix")) {
-                X@x <- deepcopy_num(X@x)
-            } else if (inherits(X, "lsparseMatrix")) {
-                X@x <- deepcopy_log(X@x)
-            }
+        }
+
+        if (inherits(X, "dsparseMatrix")) {
+            X@x <- deepcopy_num(X@x)
+        } else if (inherits(X, "lsparseMatrix")) {
+            X@x <- deepcopy_log(X@x)
         }
     }
     return(X)
@@ -271,23 +279,28 @@ throw_internal_error <- function () {
 ### then fill in this
 
 get_vector_pointer <- function(vector) {
+    stop("Not yet implemented.")
     return(NULL)
 }
 
 add_linked_vec_to_indices <- function(indices, vector) {
+    stop("Not yet implemented.")
     return(indices)
 }
 
 remove_linked_vec_from_indices <- function(indices, vector) {
+    stop("Not yet implemented.")
     return(indices)
 }
 
 reset_linked_to_indices <- function(indices) {
+    stop("Not yet implemented.")
     attributes(indices)$linked <- NULL
     return(indices)
 }
 
 can_modify_indices <- function(indices, vector=NULL) {
+    stop("Not yet implemented.")
     return(TRUE)
 }
 

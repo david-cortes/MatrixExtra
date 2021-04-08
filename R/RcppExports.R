@@ -181,8 +181,16 @@ multiply_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1,
     .Call(`_MatrixExtra_multiply_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2)
 }
 
+logicaland_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, values2) {
+    .Call(`_MatrixExtra_logicaland_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2)
+}
+
 multiply_csr_by_dense_elemwise_double <- function(indptr, indices, values, dense_mat) {
     .Call(`_MatrixExtra_multiply_csr_by_dense_elemwise_double`, indptr, indices, values, dense_mat)
+}
+
+multiply_csr_by_dense_elemwise_float32 <- function(indptr, indices, values, dense_mat) {
+    .Call(`_MatrixExtra_multiply_csr_by_dense_elemwise_float32`, indptr, indices, values, dense_mat)
 }
 
 multiply_csr_by_dense_elemwise_int <- function(indptr, indices, values, dense_mat) {
@@ -193,12 +201,24 @@ multiply_csr_by_dense_elemwise_bool <- function(indptr, indices, values, dense_m
     .Call(`_MatrixExtra_multiply_csr_by_dense_elemwise_bool`, indptr, indices, values, dense_mat)
 }
 
+logicaland_csr_by_dense_cpp <- function(indptr, indices, values, dense_mat) {
+    .Call(`_MatrixExtra_logicaland_csr_by_dense_cpp`, indptr, indices, values, dense_mat)
+}
+
 add_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, values2, substract) {
     .Call(`_MatrixExtra_add_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2, substract)
 }
 
+logicalor_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, values2, xor_op) {
+    .Call(`_MatrixExtra_logicalor_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2, xor_op)
+}
+
 multiply_csr_by_coo_elemwise <- function(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X) {
     .Call(`_MatrixExtra_multiply_csr_by_coo_elemwise`, X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X)
+}
+
+logicaland_csr_by_coo_elemwise <- function(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X) {
+    .Call(`_MatrixExtra_logicaland_csr_by_coo_elemwise`, X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X)
 }
 
 multiply_coo_by_dense_numeric <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
@@ -215,6 +235,10 @@ multiply_coo_by_dense_logical <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
 
 multiply_coo_by_dense_float32 <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
     .Call(`_MatrixExtra_multiply_coo_by_dense_float32`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
+}
+
+logicaland_coo_by_dense_logical <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val) {
+    .Call(`_MatrixExtra_logicaland_coo_by_dense_logical`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
 }
 
 concat_indptr2 <- function(ptr1, ptr2) {

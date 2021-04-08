@@ -23,6 +23,16 @@ SEXP SafeRcppVector(void *args_)
             }
         }
 
+        else if (args->from_pointer) {
+            int *int_pointer_from = (int*)args->int_pointer_from;
+            if (!args->as_logical) {
+                return Rcpp::IntegerVector(int_pointer_from, int_pointer_from + args->size);
+            }
+            else {
+                return Rcpp::LogicalVector(int_pointer_from, int_pointer_from + args->size);
+            }
+        }
+
         else {
             if (!args->as_logical)
                 return Rcpp::IntegerVector(args->size);
@@ -38,6 +48,11 @@ SEXP SafeRcppVector(void *args_)
                 return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->end());
             else
                 return Rcpp::NumericVector(num_vec_from->begin(), num_vec_from->begin() + args->size);
+        }
+
+        else if (args->from_pointer) {
+            double *num_pointer_from = (double*)args->num_pointer_from;
+            return Rcpp::NumericVector(num_pointer_from, num_pointer_from + args->size);
         }
 
         else {

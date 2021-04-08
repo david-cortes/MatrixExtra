@@ -160,12 +160,12 @@ Rcpp::List slice_coo_arbitrary_template
     int first_j = cols_take_base1[0] - 1;
     int last_i  = rows_take_base1[rows_take_base1.size()-1] - 1;
     int last_j  = cols_take_base1[cols_take_base1.size()-1] - 1;
-    std::vector<size_t> take;
+    std::unique_ptr<size_t[]> take;
 
 
     if ((all_i || i_is_seq) && (all_j || j_is_seq))
     {
-        take = std::vector<size_t>(size_reserve);
+        take = std::unique_ptr<size_t[]>(new size_t[size_reserve]);
         int min_i = std::min(first_i, last_i), max_i = std::max(first_i, last_i);
         int min_j = std::min(first_j, last_j), max_j = std::max(first_j, last_j);
 
@@ -195,7 +195,7 @@ Rcpp::List slice_coo_arbitrary_template
 
     else if ((all_i || i_is_seq || i_is_rev_seq) && (all_j || j_is_seq || j_is_rev_seq))
     {
-        take = std::vector<size_t>(size_reserve);
+        take = std::unique_ptr<size_t[]>(new size_t[size_reserve]);
         int min_i = std::min(first_i, last_i), max_i = std::max(first_i, last_i);
         int min_j = std::min(first_j, last_j), max_j = std::max(first_j, last_j);
 
@@ -316,15 +316,26 @@ Rcpp::List slice_coo_arbitrary_template
     std::vector<int> ii_out;
     std::vector<int> jj_out;
     std::vector<InputDType> xx_out;
+    std::unique_ptr<int[]> ii_out_;
+    std::unique_ptr<int[]> jj_out_;
+    std::unique_ptr<InputDType[]> xx_out_;
+    bool use_vectors = false;
 
     if (!i_has_duplicates && !j_has_duplicates) {
         ii_out = std::vector<int>(size_reserve);
         jj_out = std::vector<int>(size_reserve);
         if (std::is_same<CompileFlag, bool>::value)
         xx_out = std::vector<InputDType>(size_reserve);
+
+        use_vectors = false;
+        ii_out_ = std::unique_ptr<int[]>(new int[size_reserve]);
+        jj_out_ = std::unique_ptr<int[]>(new int[size_reserve]);
+        if (std::is_same<CompileFlag, bool>::value)
+        xx_out_ = std::unique_ptr<InputDType[]>(new InputDType[size_reserve]);
     }
 
     else {
+        use_vectors = true;
         ii_out.reserve(size_reserve);
         jj_out.reserve(size_reserve);
         if (std::is_same<CompileFlag, bool>::value)
@@ -344,10 +355,10 @@ Rcpp::List slice_coo_arbitrary_template
                 res_j = j_mapping.find(jj[ix]);
                 if (res_j != j_mapping.end())
                 {
-                    ii_out[curr] = ii[ix];
-                    jj_out[curr] = res_j->second;
+                    ii_out_[curr] = ii[ix];
+                    jj_out_[curr] = res_j->second;
                     if (std::is_same<CompileFlag, bool>::value)
-                    xx_out[curr] = xx[ix];
+                    xx_out_[curr] = xx[ix];
                     curr++;
                 }
             }
@@ -366,10 +377,10 @@ Rcpp::List slice_coo_arbitrary_template
                 res_i = i_mapping.find(ii[ix]);
                 if (res_i != i_mapping.end())
                 {
-                    ii_out[curr] = res_i->second;
-                    jj_out[curr] = jj[ix];
+                    ii_out_[curr] = res_i->second;
+                    jj_out_[curr] = jj[ix];
                     if (std::is_same<CompileFlag, bool>::value)
-                    xx_out[curr] = xx[ix];
+                    xx_out_[curr] = xx[ix];
                     curr++;
                 }
             }
@@ -391,10 +402,10 @@ Rcpp::List slice_coo_arbitrary_template
                     res_j = j_mapping.find(jj[ix]);
                     if (res_j != j_mapping.end())
                     {
-                        ii_out[curr] = res_i->second;
-                        jj_out[curr] = res_j->second;
+                        ii_out_[curr] = res_i->second;
+                        jj_out_[curr] = res_j->second;
                         if (std::is_same<CompileFlag, bool>::value)
-                        xx_out[curr] = xx[ix];
+                        xx_out_[curr] = xx[ix];
                         curr++;
                     }
                 }
@@ -488,12 +499,12 @@ Rcpp::List slice_coo_arbitrary_template
     if (post_process)
     {
         post_process_seq(
-            ii_out.data(), curr,
+            use_vectors? ii_out.data() : ii_out_.get(), curr,
             all_i, i_is_seq, i_is_rev_seq,
             first_i, last_i
         );
         post_process_seq(
-            jj_out.data(), curr,
+            use_vectors? jj_out.data() : jj_out_.get(), curr,
             all_j, j_is_seq, j_is_rev_seq,
             first_j, last_j
         );
@@ -503,33 +514,54 @@ Rcpp::List slice_coo_arbitrary_template
         curr = ii_out.size();
 
     VectorConstructorArgs args;
-    args.as_integer = true; args.from_cpp_vec = true; args.as_logical = false;
-    args.size = curr; args.cpp_lim_size = true; args.int_vec_from = &ii_out;
-    Rcpp::IntegerVector ii_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
-    ii_out.clear(); ii_out.shrink_to_fit();
-    args.int_vec_from = &jj_out;
-    Rcpp::IntegerVector jj_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
-    jj_out.clear(); jj_out.shrink_to_fit();
-    RcppVector xx_out_;
+    args.as_integer = true; args.as_logical = false;
+    args.size = curr; args.cpp_lim_size = true;
+
+    if (use_vectors) {
+        args.from_cpp_vec = true;
+        args.int_vec_from = &ii_out;
+    } else {
+        args.from_cpp_vec = false;
+        args.from_pointer = true;
+        args.int_pointer_from = ii_out_.get();
+    }
+    Rcpp::IntegerVector ii_out__ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    ii_out.clear(); ii_out.shrink_to_fit(); ii_out_.reset();
+    args.int_vec_from = &jj_out; args.int_pointer_from = jj_out_.get();
+    Rcpp::IntegerVector jj_out__ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    jj_out.clear(); jj_out.shrink_to_fit(); jj_out_.reset();
+    RcppVector xx_out__;
     if (std::is_same<CompileFlag, bool>::value)
     {
         if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
-            args.as_integer = true; args.as_logical = true; args.int_vec_from = &xx_out;
+            args.as_integer = true; args.as_logical = true;
+            if (use_vectors)
+                args.int_vec_from = &xx_out;
+            else
+                args.int_pointer_from = xx_out_.get();
         }
         else if (std::is_same<RcppVector, Rcpp::IntegerVector>::value) {
-            args.as_integer = true; args.as_logical = false; args.int_vec_from = &xx_out;
+            args.as_integer = true; args.as_logical = false;
+            if (use_vectors)
+                args.int_vec_from = &xx_out;
+            else
+                args.int_pointer_from = xx_out_.get();
         }
         else {
-            args.as_integer = false; args.as_logical = false; args.num_vec_from = &xx_out;
+            args.as_integer = false; args.as_logical = false;
+            if (use_vectors)
+                args.num_vec_from = &xx_out;
+            else
+                args.num_pointer_from = xx_out_.get();
         }
-        xx_out_ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        xx_out__ = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     }
 
 
     return Rcpp::List::create(
-        Rcpp::_["ii"] = ii_out_,
-        Rcpp::_["jj"] = jj_out_,
-        Rcpp::_["xx"] = xx_out_
+        Rcpp::_["ii"] = ii_out__,
+        Rcpp::_["jj"] = jj_out__,
+        Rcpp::_["xx"] = xx_out__
     );
 }
 

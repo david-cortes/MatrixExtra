@@ -580,6 +580,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logicaland_csr_elemwise
+Rcpp::List logicaland_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2, Rcpp::LogicalVector values1, Rcpp::LogicalVector values2);
+RcppExport SEXP _MatrixExtra_logicaland_csr_elemwise(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP, SEXP values1SEXP, SEXP values2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr1(indptr1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr2(indptr2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices1(indices1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices2(indices2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values1(values1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values2(values2SEXP);
+    rcpp_result_gen = Rcpp::wrap(logicaland_csr_elemwise(indptr1, indptr2, indices1, indices2, values1, values2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // multiply_csr_by_dense_elemwise_double
 Rcpp::NumericVector multiply_csr_by_dense_elemwise_double(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::NumericVector dense_mat);
 RcppExport SEXP _MatrixExtra_multiply_csr_by_dense_elemwise_double(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dense_matSEXP) {
@@ -590,6 +605,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dense_mat(dense_matSEXP);
     rcpp_result_gen = Rcpp::wrap(multiply_csr_by_dense_elemwise_double(indptr, indices, values, dense_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_csr_by_dense_elemwise_float32
+Rcpp::NumericVector multiply_csr_by_dense_elemwise_float32(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector dense_mat);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_dense_elemwise_float32(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dense_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type dense_mat(dense_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_dense_elemwise_float32(indptr, indices, values, dense_mat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -619,6 +647,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logicaland_csr_by_dense_cpp
+Rcpp::LogicalVector logicaland_csr_by_dense_cpp(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, Rcpp::LogicalVector dense_mat);
+RcppExport SEXP _MatrixExtra_logicaland_csr_by_dense_cpp(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dense_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type dense_mat(dense_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(logicaland_csr_by_dense_cpp(indptr, indices, values, dense_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // add_csr_elemwise
 Rcpp::List add_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2, Rcpp::NumericVector values1, Rcpp::NumericVector values2, const bool substract);
 RcppExport SEXP _MatrixExtra_add_csr_elemwise(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP, SEXP values1SEXP, SEXP values2SEXP, SEXP substractSEXP) {
@@ -632,6 +673,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values2(values2SEXP);
     Rcpp::traits::input_parameter< const bool >::type substract(substractSEXP);
     rcpp_result_gen = Rcpp::wrap(add_csr_elemwise(indptr1, indptr2, indices1, indices2, values1, values2, substract));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logicalor_csr_elemwise
+Rcpp::List logicalor_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2, Rcpp::LogicalVector values1, Rcpp::LogicalVector values2, const bool xor_op);
+RcppExport SEXP _MatrixExtra_logicalor_csr_elemwise(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP, SEXP values1SEXP, SEXP values2SEXP, SEXP xor_opSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr1(indptr1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr2(indptr2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices1(indices1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices2(indices2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values1(values1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values2(values2SEXP);
+    Rcpp::traits::input_parameter< const bool >::type xor_op(xor_opSEXP);
+    rcpp_result_gen = Rcpp::wrap(logicalor_csr_elemwise(indptr1, indptr2, indices1, indices2, values1, values2, xor_op));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -649,6 +706,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type max_row_X(max_row_XSEXP);
     Rcpp::traits::input_parameter< int >::type max_col_X(max_col_XSEXP);
     rcpp_result_gen = Rcpp::wrap(multiply_csr_by_coo_elemwise(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logicaland_csr_by_coo_elemwise
+Rcpp::List logicaland_csr_by_coo_elemwise(Rcpp::IntegerVector X_csr_indptr_, Rcpp::IntegerVector X_csr_indices_, Rcpp::LogicalVector X_csr_values_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::LogicalVector Y_coo_val, int max_row_X, int max_col_X);
+RcppExport SEXP _MatrixExtra_logicaland_csr_by_coo_elemwise(SEXP X_csr_indptr_SEXP, SEXP X_csr_indices_SEXP, SEXP X_csr_values_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP, SEXP max_row_XSEXP, SEXP max_col_XSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indptr_(X_csr_indptr_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type X_csr_indices_(X_csr_indices_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type X_csr_values_(X_csr_values_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type Y_coo_val(Y_coo_valSEXP);
+    Rcpp::traits::input_parameter< int >::type max_row_X(max_row_XSEXP);
+    Rcpp::traits::input_parameter< int >::type max_col_X(max_col_XSEXP);
+    rcpp_result_gen = Rcpp::wrap(logicaland_csr_by_coo_elemwise(X_csr_indptr_, X_csr_indices_, X_csr_values_, Y_coo_row, Y_coo_col, Y_coo_val, max_row_X, max_col_X));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -701,6 +775,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type Y_coo_val(Y_coo_valSEXP);
     rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_float32(X_, Y_coo_row, Y_coo_col, Y_coo_val));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logicaland_coo_by_dense_logical
+Rcpp::List logicaland_coo_by_dense_logical(Rcpp::LogicalMatrix X_, Rcpp::IntegerVector Y_coo_row, Rcpp::IntegerVector Y_coo_col, Rcpp::LogicalVector Y_coo_val);
+RcppExport SEXP _MatrixExtra_logicaland_coo_by_dense_logical(SEXP X_SEXP, SEXP Y_coo_rowSEXP, SEXP Y_coo_colSEXP, SEXP Y_coo_valSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_row(Y_coo_rowSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type Y_coo_col(Y_coo_colSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type Y_coo_val(Y_coo_valSEXP);
+    rcpp_result_gen = Rcpp::wrap(logicaland_coo_by_dense_logical(X_, Y_coo_row, Y_coo_col, Y_coo_val));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1147,15 +1234,21 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_deepcopy_log", (DL_FUNC) &_MatrixExtra_deepcopy_log, 1},
     {"_MatrixExtra_deepcopy_str", (DL_FUNC) &_MatrixExtra_deepcopy_str, 1},
     {"_MatrixExtra_multiply_csr_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_elemwise, 6},
+    {"_MatrixExtra_logicaland_csr_elemwise", (DL_FUNC) &_MatrixExtra_logicaland_csr_elemwise, 6},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_double", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_double, 4},
+    {"_MatrixExtra_multiply_csr_by_dense_elemwise_float32", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_float32, 4},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_int", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_int, 4},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_bool", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_bool, 4},
+    {"_MatrixExtra_logicaland_csr_by_dense_cpp", (DL_FUNC) &_MatrixExtra_logicaland_csr_by_dense_cpp, 4},
     {"_MatrixExtra_add_csr_elemwise", (DL_FUNC) &_MatrixExtra_add_csr_elemwise, 7},
+    {"_MatrixExtra_logicalor_csr_elemwise", (DL_FUNC) &_MatrixExtra_logicalor_csr_elemwise, 7},
     {"_MatrixExtra_multiply_csr_by_coo_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_by_coo_elemwise, 8},
+    {"_MatrixExtra_logicaland_csr_by_coo_elemwise", (DL_FUNC) &_MatrixExtra_logicaland_csr_by_coo_elemwise, 8},
     {"_MatrixExtra_multiply_coo_by_dense_numeric", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_numeric, 4},
     {"_MatrixExtra_multiply_coo_by_dense_integer", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_integer, 4},
     {"_MatrixExtra_multiply_coo_by_dense_logical", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_logical, 4},
     {"_MatrixExtra_multiply_coo_by_dense_float32", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_float32, 4},
+    {"_MatrixExtra_logicaland_coo_by_dense_logical", (DL_FUNC) &_MatrixExtra_logicaland_coo_by_dense_logical, 4},
     {"_MatrixExtra_concat_indptr2", (DL_FUNC) &_MatrixExtra_concat_indptr2, 2},
     {"_MatrixExtra_concat_csr_batch", (DL_FUNC) &_MatrixExtra_concat_csr_batch, 2},
     {"_MatrixExtra_check_is_seq", (DL_FUNC) &_MatrixExtra_check_is_seq, 1},
