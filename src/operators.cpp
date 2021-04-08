@@ -1,8 +1,22 @@
 #include "MatrixExtra.h"
 
-#define R_logical_or(x, y) ((x == NA_LOGICAL || y == NA_LOGICAL)? NA_LOGICAL : ((bool)x || (bool)y))
-#define R_logical_and(x, y) ((x == NA_LOGICAL || y == NA_LOGICAL)? NA_LOGICAL : ((bool)x && (bool)y))
-#define R_logical_xor(x, y) ((x == NA_LOGICAL || y == NA_LOGICAL)? NA_LOGICAL : ((bool)x != (bool)y))
+/*  R's logic for boolean comparisons:
+        NA  & TRUE  = NA
+        NA  & FALSE = FALSE
+        NA  & NA    = NA
+        NA  | TRUE  = TRUE
+        NA  | FALSE = NA
+        NA  |  NA   = NA
+*/
+#define R_logical_or(x, y) ((x) == NA_LOGICAL)? \
+    ( ((y) == NA_LOGICAL)? NA_LOGICAL : ((y)? true : NA_LOGICAL) ) \
+        : \
+    ( ((y) == NA_LOGICAL)? ((x)? true : NA_LOGICAL) : ((bool)(x) || (bool)(y)) )
+#define R_logical_and(x, y) ((x) == NA_LOGICAL)? \
+    ( ((y) == NA_LOGICAL)? NA_LOGICAL : ((y)? NA_LOGICAL : false) ) \
+        : \
+    ( ((y) == NA_LOGICAL)? ((x)? NA_LOGICAL : false) : ((bool)(x) && (bool)(y)) )
+#define R_logical_xor(x, y) (((x) == NA_LOGICAL || (y) == NA_LOGICAL)? NA_LOGICAL : ((bool)(x) != (bool)(y)))
 
 /* TODO: change some of the vectors to unique_ptr when there is no dynamic reallocation,
    modify also the slicers. This way it saves memory by not being zero-allocated and
@@ -624,15 +638,7 @@ Rcpp::List multiply_coo_by_dense
     RcppVector Y_coo_val
 )
 {
-    InputDType *restrict X;
-    if (std::is_same<InputDType, float>::value)
-        X = (InputDType*)INTEGER(X_);
-    else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value)
-        X = (InputDType*)LOGICAL(X_);
-    else if (std::is_same<RcppMatrix, Rcpp::IntegerMatrix>::value)
-        X = (InputDType*)INTEGER(X_);
-    else
-        X = (InputDType*)REAL(X_);
+    InputDType *restrict X = (InputDType*)X_.begin();
 
     size_t nrows = X_.nrow();
     size_t nnz_y = Y_coo_row.size();
@@ -640,23 +646,29 @@ Rcpp::List multiply_coo_by_dense
 
     if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
     {
-        for (size_t ix = 0; ix < nnz_y; ix++)
-        {
-            if (std::is_same<InputDType, int>::value)
-                out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows] == NA_INTEGER)?
-                                   (NA_REAL) : (Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows]);
-            else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value)
-                out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows] == NA_LOGICAL)?
-                                   (NA_REAL) : (Y_coo_val[ix] * (bool)X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows]);
-            else
-                out_coo_val[ix] = Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows];
+        if (std::is_same<InputDType, int>::value) {
+            for (size_t ix = 0; ix < nnz_y; ix++)
+                out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows] == NA_INTEGER)?
+                                   (NA_REAL) : (Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows]);
+        }
+
+
+        else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value) {
+            for (size_t ix = 0; ix < nnz_y; ix++)
+                out_coo_val[ix] = (X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows] == NA_LOGICAL)?
+                                   (NA_REAL) : (Y_coo_val[ix] * (bool)X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows]);
+        }
+
+        else {
+            for (size_t ix = 0; ix < nnz_y; ix++)
+                out_coo_val[ix] = Y_coo_val[ix] * X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows];
         }
     }
 
     else
     {
         for (size_t ix = 0; ix < nnz_y; ix++)
-            out_coo_val[ix] = R_logical_and(Y_coo_val[ix], X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_val[ix]*nrows]);
+            out_coo_val[ix] = R_logical_and(Y_coo_val[ix], X[(size_t)Y_coo_row[ix] + (size_t)Y_coo_col[ix]*nrows]);
     }
 
     /* Note: avoid shallow copies as the indices might get sorted in some situations */
@@ -750,5 +762,607 @@ Rcpp::List logicaland_coo_by_dense_logical
         Y_coo_row,
         Y_coo_col,
         Y_coo_val
+    );
+}
+
+template <class RcppMatrix, class InputDType, class DenseType>
+Rcpp::List add_NAs_from_dense_after_elemenwise_mult_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppMatrix dense_
+)
+{
+    DenseType *restrict dense = (DenseType*)dense_.begin();
+    int *restrict indices_begin = indices.begin();
+    std::vector<int> ii;
+    std::vector<int> jj;
+    std::vector<InputDType> xx;
+
+    size_t nrows = dense_.nrow();
+    size_t ncols = dense_.ncol();
+
+    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (size_t row = 0; row < nrows; row++)
+            {
+                if (ISNAN(dense[row + col * nrows]))
+                {
+                    if (indptr[row] == indptr[row+1] ||
+                        col < indices_begin[indptr[row]] ||
+                        col > indices_begin[indptr[row+1]-1] ||
+                        std::lower_bound(indices_begin + indptr[row], indices_begin + indptr[row+1], col)
+                            >=
+                        indices_begin + indptr[row+1])
+                    {
+                        ii.push_back(row);
+                        jj.push_back(col);
+                        xx.push_back(NA_REAL);
+                    }
+                }
+            }
+        }
+    }
+
+    else if (std::is_same<DenseType, float>::value) /* <- float */
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (size_t row = 0; row < nrows; row++)
+            {
+                if (std::isnan(dense[row + col * nrows]))
+                {
+                    if (std::lower_bound(indices_begin + indptr[row], indices_begin + indptr[row+1], col)
+                            ==
+                        indices_begin + indptr[row+1])
+                    {
+                        ii.push_back(row);
+                        jj.push_back(col);
+                        xx.push_back(NA_REAL);
+                    }
+                }
+            }
+        }
+    }
+
+    else if (std::is_same<RcppMatrix, Rcpp::IntegerMatrix>::value) /* <- float */
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (size_t row = 0; row < nrows; row++)
+            {
+                if (dense[row + col * nrows] == NA_INTEGER)
+                {
+                    if (std::lower_bound(indices_begin + indptr[row], indices_begin + indptr[row+1], col)
+                            ==
+                        indices_begin + indptr[row+1])
+                    {
+                        ii.push_back(row);
+                        jj.push_back(col);
+                        xx.push_back(NA_REAL);
+                    }
+                }
+            }
+        }
+    }
+
+    else
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (size_t row = 0; row < nrows; row++)
+            {
+                if (dense[row + col * nrows] == NA_LOGICAL)
+                {
+                    if (std::lower_bound(indices_begin + indptr[row], indices_begin + indptr[row+1], col)
+                            ==
+                        indices_begin + indptr[row+1])
+                    {
+                        ii.push_back(row);
+                        jj.push_back(col);
+                        xx.push_back(NA_LOGICAL);
+                    }
+                }
+            }
+        }
+    }
+
+    Rcpp::List out;
+    if (!ii.size())
+        return out;
+
+    VectorConstructorArgs args;
+    args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &ii;
+    out["ii"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    ii.clear(); ii.shrink_to_fit();
+    args.int_vec_from = &jj;
+    out["jj"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    jj.clear(); jj.shrink_to_fit();
+    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value ||
+        std::is_same<DenseType, float>::value
+    ) {
+        args.as_integer = false; args.num_vec_from = &xx;
+    } else {
+        args.as_integer = true, args.as_logical = true; args.int_vec_from = &xx;
+    }
+    out["xx"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    return out;
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List add_NAs_from_dense_after_elemenwise_mult_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericMatrix dense_
+)
+{
+    return add_NAs_from_dense_after_elemenwise_mult_template<Rcpp::NumericMatrix, double, double>(
+        indptr,
+        indices,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List add_NAs_from_dense_after_elemenwise_mult_integer
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return add_NAs_from_dense_after_elemenwise_mult_template<Rcpp::IntegerMatrix, double, int>(
+        indptr,
+        indices,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List add_NAs_from_dense_after_elemenwise_mult_float32
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return add_NAs_from_dense_after_elemenwise_mult_template<Rcpp::IntegerMatrix, double, float>(
+        indptr,
+        indices,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List add_NAs_from_dense_after_elemenwise_mult_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalMatrix dense_
+)
+{
+    return add_NAs_from_dense_after_elemenwise_mult_template<Rcpp::LogicalMatrix, int, int>(
+        indptr,
+        indices,
+        dense_
+    );
+}
+
+template <class RcppMatrix, class RcppVector, class InputDType>
+RcppVector multiply_csc_by_dense_ignore_NAs
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppVector values,
+    RcppMatrix dense_
+)
+{
+    size_t ncols = indptr.size() - 1;
+    size_t nrows = dense_.nrow();
+    size_t nnz = indices.size();
+    RcppVector values_out(nnz);
+    InputDType *restrict dense = NULL;
+    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value) {
+        dense = (InputDType*)REAL(dense_);
+    } else if (std::is_same<RcppMatrix, Rcpp::LogicalMatrix>::value) {
+        dense = (InputDType*)LOGICAL(dense_);
+    } else {
+        dense = (InputDType*)INTEGER(dense_);
+    }
+
+    size_t curr = 0;
+
+    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value ||
+        std::is_same<InputDType, float>::value)
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (int ix = indptr[col]; ix < indptr[col+1]; ix++)
+            {
+                values_out[curr++] = values[ix] * dense[(size_t)indices[ix] + col*nrows];
+            }
+        }
+    }
+
+    else if (!std::is_same<RcppVector, Rcpp::LogicalVector>::value)
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (int ix = indptr[col]; ix < indptr[col+1]; ix++)
+            {
+                values_out[curr++] = (dense[(size_t)indices[ix] + col*nrows] == NA_INTEGER)?
+                                      NA_REAL : (values[ix] * dense[(size_t)indices[ix] + col*nrows]);
+            }
+        }
+    }
+
+    else /* <- this is '&' */
+    {
+        for (size_t col = 0; col < ncols; col++)
+        {
+            for (int ix = indptr[col]; ix < indptr[col+1]; ix++)
+            {
+                values_out[curr++] = R_logical_and(values[ix], dense[(size_t)indices[ix] + col*nrows]);
+            }
+        }
+    }
+
+    return values_out;
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::NumericVector multiply_csc_by_dense_ignore_NAs_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::NumericMatrix dense_
+)
+{
+    return multiply_csc_by_dense_ignore_NAs<Rcpp::NumericMatrix, Rcpp::NumericVector, double>(
+        indptr,
+        indices,
+        values,
+        dense_
+    );
+}
+// [[Rcpp::export(rng = false)]]
+Rcpp::NumericVector multiply_csc_by_dense_ignore_NAs_float32
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return multiply_csc_by_dense_ignore_NAs<Rcpp::IntegerMatrix, Rcpp::NumericVector, float>(
+        indptr,
+        indices,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::NumericVector multiply_csc_by_dense_ignore_NAs_integer
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return multiply_csc_by_dense_ignore_NAs<Rcpp::IntegerMatrix, Rcpp::NumericVector, int>(
+        indptr,
+        indices,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::NumericVector multiply_csc_by_dense_ignore_NAs_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    Rcpp::LogicalMatrix dense_
+)
+{
+    return multiply_csc_by_dense_ignore_NAs<Rcpp::LogicalMatrix, Rcpp::NumericVector, int>(
+        indptr,
+        indices,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::LogicalVector logicaland_csc_by_dense_ignore_NAs
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    Rcpp::LogicalMatrix dense_
+)
+{
+    return multiply_csc_by_dense_ignore_NAs<Rcpp::LogicalMatrix, Rcpp::LogicalVector, int>(
+        indptr,
+        indices,
+        values,
+        dense_
+    );
+}
+
+template <class RcppVector, class RcppMatrix, class InputDType, class OutputDType>
+Rcpp::List multiply_csc_by_dense_keep_NAs_template
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    RcppVector values,
+    RcppMatrix dense_
+)
+{
+    size_t ncols = indptr.size() - 1;
+    size_t nrows = dense_.nrow();
+    InputDType *restrict dense = (InputDType*)dense_.begin();
+    int *restrict indices = indices_.begin();
+
+    Rcpp::IntegerVector indptr_out(ncols + 1);
+    std::vector<int> indices_out;
+    std::vector<OutputDType> values_out;
+    indices_out.reserve(indices_.size());
+    values_out.reserve(values.size());
+
+    int *ptr, *end;
+    int row;
+
+    for (size_t col = 0; col < ncols; col++)
+    {
+        if (indptr[col] == indptr[col+1])
+        {
+            if (std::is_same<InputDType, double>::value || std::is_same<InputDType, float>::value)
+            {
+                for (size_t row = 0; row < nrows; row++)
+                {
+                    if (ISNAN(dense[row + col*nrows]))
+                    {
+                        indices_out.push_back(row);
+                        values_out.push_back(NA_REAL);
+                    }
+                }
+            }
+
+            else if (std::is_same<InputDType, int>::value)
+            {
+                for (size_t row = 0; row < nrows; row++)
+                {
+                    if (dense[row + col*nrows] == NA_INTEGER)
+                    {
+                        indices_out.push_back(row);
+                        values_out.push_back(NA_REAL);
+                    }
+                }
+            }
+
+            else
+            {
+                for (size_t row = 0; row < nrows; row++)
+                {
+                    if (dense[row + col*nrows] == NA_LOGICAL)
+                    {
+                        indices_out.push_back(row);
+                        values_out.push_back(NA_LOGICAL);
+                    }
+                }
+            }
+            goto next_col;
+        }
+
+        ptr = indices + indptr[col];
+        end = indices + indptr[col+1];
+        row = 0;
+
+        while (true)
+        {
+
+            if (ptr >= end) {
+                if (std::is_same<InputDType, double>::value || std::is_same<InputDType, float>::value)
+                {
+                    for (; row < (int)nrows; row++) {
+                        if (ISNAN(dense[(size_t)row + col*nrows])) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_REAL);
+                        }
+                    }
+                }
+
+                else if (std::is_same<InputDType, int>::value)
+                {
+                    for (; row < (int)nrows; row++) {
+                        if (dense[(size_t)row + col*nrows] == NA_INTEGER) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_REAL);
+                        }
+                    }
+                }
+
+                else
+                {
+                    for (; row < (int)nrows; row++) {
+                        if (dense[(size_t)row + col*nrows] == NA_LOGICAL) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_LOGICAL);
+                        }
+                    }
+                }
+                goto next_col;
+            }
+
+
+
+            else if (*ptr == row) {
+                indices_out.push_back(row);
+                if (std::is_same<InputDType, double>::value || std::is_same<InputDType, float>::value)
+                    values_out.push_back(values[ptr - indices] * dense[(size_t)row + col*nrows]);
+                else if (std::is_same<InputDType, int>::value)
+                    values_out.push_back((dense[(size_t)row + col*nrows] == NA_INTEGER)?
+                                          NA_REAL : values[ptr - indices] * dense[(size_t)row + col*nrows]);
+                else
+                    values_out.push_back(R_logical_and(values[ptr - indices], dense[(size_t)row + col*nrows]));
+                ptr++;
+                row++;
+            }
+
+
+            else if (*ptr < row) {
+                ptr = std::lower_bound(ptr, end, row);
+            }
+
+
+            else {
+                if (std::is_same<InputDType, double>::value || std::is_same<InputDType, float>::value)
+                {
+                    for (; row < *ptr; row++) {
+                        if (ISNAN(dense[(size_t)row + col*nrows])) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_REAL);
+                        }
+                    }
+                }
+
+                else if (std::is_same<InputDType, int>::value)
+                {
+                    for (; row < *ptr; row++) {
+                        if (dense[(size_t)row + col*nrows] == NA_INTEGER) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_REAL);
+                        }
+                    }
+                }
+
+                else
+                {
+                    for (; row < *ptr; row++) {
+                        if (dense[(size_t)row + col*nrows] == NA_LOGICAL) {
+                            indices_out.push_back(row);
+                            values_out.push_back(NA_LOGICAL);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        next_col:
+        indptr_out[col+1] = indices_out.size();
+    }
+
+
+    Rcpp::List out;
+    out["indptr"] = indptr_out;
+    VectorConstructorArgs args;
+    args.as_integer = true; args.from_cpp_vec = true; args.int_vec_from = &indices_out;
+    out["indices"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    indices_out.clear(); indices_out.shrink_to_fit();
+    if (std::is_same<OutputDType, double>::value) {
+        args.as_integer = false; args.num_vec_from = &values_out;
+    } else {
+        args.as_integer = true; args.as_logical = true; args.int_vec_from = &values_out;
+    }
+    out["values"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    return out;
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_csc_by_dense_keep_NAs_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values,
+    Rcpp::NumericMatrix dense_
+)
+{
+    return multiply_csc_by_dense_keep_NAs_template<
+            Rcpp::NumericVector, Rcpp::NumericMatrix, double, double>(
+        indptr,
+        indices_,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_csc_by_dense_keep_NAs_integer
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return multiply_csc_by_dense_keep_NAs_template<
+            Rcpp::NumericVector, Rcpp::IntegerMatrix, int, double>(
+        indptr,
+        indices_,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_csc_by_dense_keep_NAs_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values,
+    Rcpp::LogicalMatrix dense_
+)
+{
+    return multiply_csc_by_dense_keep_NAs_template<
+            Rcpp::NumericVector, Rcpp::LogicalMatrix, int, double>(
+        indptr,
+        indices_,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_csc_by_dense_keep_NAs_float32
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::NumericVector values,
+    Rcpp::IntegerMatrix dense_
+)
+{
+    return multiply_csc_by_dense_keep_NAs_template<
+            Rcpp::NumericVector, Rcpp::IntegerMatrix, float, double>(
+        indptr,
+        indices_,
+        values,
+        dense_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List logicaland_csc_by_dense_keep_NAs
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices_,
+    Rcpp::LogicalVector values,
+    Rcpp::LogicalMatrix dense_
+)
+{
+    return multiply_csc_by_dense_keep_NAs_template<
+            Rcpp::LogicalVector, Rcpp::LogicalMatrix, int, int>(
+        indptr,
+        indices_,
+        values,
+        dense_
     );
 }

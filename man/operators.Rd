@@ -54,6 +54,14 @@
 \alias{&,matrix,TsparseMatrix-method}
 \alias{&,matrix,ngTMatrix-method}
 \alias{&,matrix,lgTMatrix-method}
+\alias{*,CsparseMatrix,matrix-method}
+\alias{*,CsparseMatrix,float32-method}
+\alias{*,matrix,CsparseMatrix-method}
+\alias{*,float32,CsparseMatrix-method}
+\alias{&,CsparseMatrix,matrix-method}
+\alias{&,CsparseMatrix,float32-method}
+\alias{&,matrix,CsparseMatrix-method}
+\alias{&,float32,CsparseMatrix-method}
 \alias{+,RsparseMatrix,sparseMatrix-method}
 \alias{+,ngRMatrix,sparseMatrix-method}
 \alias{+,lgRMatrix,sparseMatrix-method}
@@ -218,6 +226,22 @@
 
 \S4method{&}{matrix,lgTMatrix}(e1, e2)
 
+\S4method{*}{CsparseMatrix,matrix}(e1, e2)
+
+\S4method{*}{CsparseMatrix,float32}(e1, e2)
+
+\S4method{*}{matrix,CsparseMatrix}(e1, e2)
+
+\S4method{*}{float32,CsparseMatrix}(e1, e2)
+
+\S4method{&}{CsparseMatrix,matrix}(e1, e2)
+
+\S4method{&}{CsparseMatrix,float32}(e1, e2)
+
+\S4method{&}{matrix,CsparseMatrix}(e1, e2)
+
+\S4method{&}{float32,CsparseMatrix}(e1, e2)
+
 \S4method{+}{RsparseMatrix,sparseMatrix}(e1, e2)
 
 \S4method{+}{ngRMatrix,sparseMatrix}(e1, e2)
@@ -344,16 +368,20 @@ A CSR or COO matrix depending on the input type and operation.
 }
 \description{
 Implements some mathematical operators between CSR
-(a.k.a. RsparseMatrix) / COO (a.k.a. TsparseMatrix) matrices such as addition and multiplication,
+(a.k.a. RsparseMatrix), COO (a.k.a. TsparseMatrix), and dense matrices, such as addition and multiplication,
  and between CSR/COO matrices and numeric constants, such as division and multiplication.
 }
 \details{
+By default, when doing elementwise multiplication (`*`) between a sparse and a dense
+matrix or vice-versa, if the dense matrix has missing values (`NA` / `NaN`) at some coordinate in
+which the sparse matrix has no present entry, the resulting output will not have an entry there either,
+which differs from the behavior of `Matrix` and base R, but makes the operation much faster.
+
+If such missing values are to be preserved, this behavior can be changed through the package
+options (i.e. `options("MatrixExtra.ignore_na" = FALSE)` - see \link{MatrixExtra-options}).
+
 The indices of the matrices might be sorted in-place for some operations
 (see \link{sort_sparse_indices}).
-
-\bold{Important:}: Multiplying NAs by zero here will be treated differently from base R,
-as it will assume 0*NA = 0 (no entry in the matrix) vs. base R's 0*NA=NA. In order to get the
-same behavior as in base R, the operations should be done in CSC format.
 }
 \examples{
 library(Matrix)

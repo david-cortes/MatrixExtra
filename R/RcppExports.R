@@ -241,6 +241,62 @@ logicaland_coo_by_dense_logical <- function(X_, Y_coo_row, Y_coo_col, Y_coo_val)
     .Call(`_MatrixExtra_logicaland_coo_by_dense_logical`, X_, Y_coo_row, Y_coo_col, Y_coo_val)
 }
 
+add_NAs_from_dense_after_elemenwise_mult_numeric <- function(indptr, indices, dense_) {
+    .Call(`_MatrixExtra_add_NAs_from_dense_after_elemenwise_mult_numeric`, indptr, indices, dense_)
+}
+
+add_NAs_from_dense_after_elemenwise_mult_integer <- function(indptr, indices, dense_) {
+    .Call(`_MatrixExtra_add_NAs_from_dense_after_elemenwise_mult_integer`, indptr, indices, dense_)
+}
+
+add_NAs_from_dense_after_elemenwise_mult_float32 <- function(indptr, indices, dense_) {
+    .Call(`_MatrixExtra_add_NAs_from_dense_after_elemenwise_mult_float32`, indptr, indices, dense_)
+}
+
+add_NAs_from_dense_after_elemenwise_mult_logical <- function(indptr, indices, dense_) {
+    .Call(`_MatrixExtra_add_NAs_from_dense_after_elemenwise_mult_logical`, indptr, indices, dense_)
+}
+
+multiply_csc_by_dense_ignore_NAs_numeric <- function(indptr, indices, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_ignore_NAs_numeric`, indptr, indices, values, dense_)
+}
+
+multiply_csc_by_dense_ignore_NAs_float32 <- function(indptr, indices, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_ignore_NAs_float32`, indptr, indices, values, dense_)
+}
+
+multiply_csc_by_dense_ignore_NAs_integer <- function(indptr, indices, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_ignore_NAs_integer`, indptr, indices, values, dense_)
+}
+
+multiply_csc_by_dense_ignore_NAs_logical <- function(indptr, indices, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_ignore_NAs_logical`, indptr, indices, values, dense_)
+}
+
+logicaland_csc_by_dense_ignore_NAs <- function(indptr, indices, values, dense_) {
+    .Call(`_MatrixExtra_logicaland_csc_by_dense_ignore_NAs`, indptr, indices, values, dense_)
+}
+
+multiply_csc_by_dense_keep_NAs_numeric <- function(indptr, indices_, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_keep_NAs_numeric`, indptr, indices_, values, dense_)
+}
+
+multiply_csc_by_dense_keep_NAs_integer <- function(indptr, indices_, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_keep_NAs_integer`, indptr, indices_, values, dense_)
+}
+
+multiply_csc_by_dense_keep_NAs_logical <- function(indptr, indices_, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_keep_NAs_logical`, indptr, indices_, values, dense_)
+}
+
+multiply_csc_by_dense_keep_NAs_float32 <- function(indptr, indices_, values, dense_) {
+    .Call(`_MatrixExtra_multiply_csc_by_dense_keep_NAs_float32`, indptr, indices_, values, dense_)
+}
+
+logicaland_csc_by_dense_keep_NAs <- function(indptr, indices_, values, dense_) {
+    .Call(`_MatrixExtra_logicaland_csc_by_dense_keep_NAs`, indptr, indices_, values, dense_)
+}
+
 concat_indptr2 <- function(ptr1, ptr2) {
     .Call(`_MatrixExtra_concat_indptr2`, ptr1, ptr2)
 }

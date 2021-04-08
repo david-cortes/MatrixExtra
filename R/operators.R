@@ -1,14 +1,18 @@
 #' @name operators
 #' @title Mathematical operators on CSR and COO matrices
 #' @description Implements some mathematical operators between CSR
-#' (a.k.a. RsparseMatrix) / COO (a.k.a. TsparseMatrix) matrices such as addition and multiplication,
+#' (a.k.a. RsparseMatrix), COO (a.k.a. TsparseMatrix), and dense matrices, such as addition and multiplication,
 #'  and between CSR/COO matrices and numeric constants, such as division and multiplication.
-#' @details The indices of the matrices might be sorted in-place for some operations
-#' (see \link{sort_sparse_indices}).
+#' @details By default, when doing elementwise multiplication (`*`) between a sparse and a dense
+#' matrix or vice-versa, if the dense matrix has missing values (`NA` / `NaN`) at some coordinate in
+#' which the sparse matrix has no present entry, the resulting output will not have an entry there either,
+#' which differs from the behavior of `Matrix` and base R, but makes the operation much faster.
 #' 
-#' \bold{Important:}: Multiplying NAs by zero here will be treated differently from base R,
-#' as it will assume 0*NA = 0 (no entry in the matrix) vs. base R's 0*NA=NA. In order to get the
-#' same behavior as in base R, the operations should be done in CSC format.
+#' If such missing values are to be preserved, this behavior can be changed through the package
+#' options (i.e. `options("MatrixExtra.ignore_na" = FALSE)` - see \link{MatrixExtra-options}).
+#' 
+#' The indices of the matrices might be sorted in-place for some operations
+#' (see \link{sort_sparse_indices}).
 #' @param e1 A sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.
 #' @param e2 Another sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.
 #' @return A CSR or COO matrix depending on the input type and operation.
@@ -217,8 +221,14 @@ multiply_csr_by_dense_internal <- function(e1, e2, logical=FALSE) {
     if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
         stop("Matrices must have the same dimensions in order to multiply them.")
 
+    keep_NAs <- !logical && !getOption("MatrixExtra.ignore_na", default=FALSE)
+
     check_valid_matrix(e1)
+    if (keep_NAs)
+        e1 <- deepcopy_before_sort(e1, logical=logical)
     e1 <- as.csr.matrix(e1, logical=logical)
+    if (keep_NAs)
+        sort_sparse_indices(e1)
 
     if (!logical) {
         if (typeof(e2) == "double") {
@@ -242,6 +252,33 @@ multiply_csr_by_dense_internal <- function(e1, e2, logical=FALSE) {
 
     out <- e1
     out@x <- res
+
+    ### TODO: can this be done more efficiently?
+    if (keep_NAs) {
+
+        if (!logical) {
+
+            if (typeof(e2) == "double") {
+                res <- add_NAs_from_dense_after_elemenwise_mult_numeric(e1@p, e1@j, e2)
+            } else if (typeof(e2) == "integer") {
+                res <- add_NAs_from_dense_after_elemenwise_mult_integer(e1@p, e1@j, e2)
+            } else if (inherits(e2, "float32")) {
+                res <- add_NAs_from_dense_after_elemenwise_mult_float32(e1@p, e1@j, e2@Data)
+            }
+            
+        } else {
+            res <- add_NAs_from_dense_after_elemenwise_mult_logical(e1@p, e1@j, e2)
+        }
+
+        if (length(res)) {
+            out <- as.coo.matrix(out, logical=inherits(out, "lsparseMatrix"))
+            X_attr <- attributes(out)
+            X_attr$i <- c(X_attr$i, res$ii)
+            X_attr$j <- c(X_attr$j, res$jj)
+            X_attr$x <- c(X_attr$x, res$xx)
+            attributes(out) <- X_attr
+        }
+    }
     return(out)
 }
 
@@ -329,10 +366,15 @@ setMethod("&", signature(e1="matrix", e2="lgRMatrix"), function(e1, e2) logicala
 
 
 multiply_coo_by_dense_internal <- function(e1, e2, logical=FALSE) {
+
+    if (!logical && !getOption("MatrixExtra.ignore_na", default=FALSE) && anyNA(e2)) {
+        e1 <- as.csc.matrix(e1, logical=inherits(e1, "lsparseMatrix"), binary=inherits(e1, "nsparseMatrix"))
+        return(multiply_csc_by_dense_internal(e1, e2, logical))
+    }
     
     e2 <- recycle_float32_vector(e1, e2)
     if (nrow(e2) < nrow(e1) || ncol(e2) < ncol(e1))
-        stop("Cannot multiply matrices - dimensions do not match.")
+        stop("Cannot multiply matrices elementwise - dimensions do not match.")
 
     if (inherits(e1, "symmetricMatrix") ||
         !inherits(e1, ifelse(logical, "lsparseMatrix", "dsparseMatrix")) ||
@@ -478,6 +520,130 @@ setMethod("&", signature(e1="matrix", e2="ngTMatrix"), function(e1, e2) logicala
 #' @rdname operators
 #' @export
 setMethod("&", signature(e1="matrix", e2="lgTMatrix"), function(e1, e2) logicaland_coo_by_dense(e2, e1))
+
+### TODO: this will not handle names correctly, need to add an extra step at the end
+
+multiply_csc_by_dense_internal <- function(e1, e2, logical=FALSE) {
+    e2 <- recycle_float32_vector(e1, e2)
+    if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
+        stop("Matrices must have the same dimensions in order to multiply them.")
+    check_valid_matrix(e1)
+
+    ignore_NAs <- logical || getOption("MatrixExtra.ignore_na", default=FALSE)
+
+    if (ignore_NAs) {
+
+        e1 <- as.csc.matrix(e1, logical=logical)
+        if (!logical) {
+            if (typeof(e2) == "double") {
+                res <- multiply_csc_by_dense_ignore_NAs_numeric(e1@p, e1@i, e1@x, e2)
+            } else if (typeof(e2) == "integer") {
+                res <- multiply_csc_by_dense_ignore_NAs_integer(e1@p, e1@i, e1@x, e2)
+            } else if (typeof(e2) == "logical") {
+                res <- multiply_csc_by_dense_ignore_NAs_logical(e1@p, e1@i, e1@x, e2)
+            } else if (inherits(e2, "float32")) {
+                res <- multiply_csc_by_dense_ignore_NAs_float32(e1@p, e1@i, e1@x, e2@Data)
+            } else {
+                mode(e2) <- "double"
+                return(multiply_csc_by_dense_internal(e1, e2))
+            }
+        }
+
+        else {
+            mode(e2) <- "logical"
+            res <- logicaland_csc_by_dense_ignore_NAs(e1@p, e1@i, e1@x, e2)
+        }
+
+        X_attr <- attributes(e1)
+        X_attr$x <- res
+        X_attr$i <- deepcopy_int(X_attr$i)
+        attributes(e1) <- X_attr
+        return(e1)
+
+    } else {
+
+        e1 <- deepcopy_before_sort(e1, logical=logical)
+        e1 <- as.csc.matrix(e1, logical=logical)
+        sort_sparse_indices(e1)
+
+        if (!logical) {
+
+            if (typeof(e2) == "double") {
+                res <- multiply_csc_by_dense_keep_NAs_numeric(e1@p, e1@i, e1@x, e2)
+            } else if (typeof(e2) == "integer") {
+                res <- multiply_csc_by_dense_keep_NAs_integer(e1@p, e1@i, e1@x, e2)
+            } else if (typeof(e2) == "logical") {
+                res <- multiply_csc_by_dense_keep_NAs_logical(e1@p, e1@i, e1@x, e2)
+            } else if (inherits(e2, "float32")) {
+                res <- multiply_csc_by_dense_keep_NAs_float32(e1@p, e1@i, e1@x, e2@Data)
+            } else {
+                mode(e2) <- "double"
+                return(multiply_csc_by_dense_internal(e1, e2))
+            }
+
+        } else {
+
+            mode(e2) <- "logical"
+            res <- logicaland_csc_by_dense_keep_NAs(e1@p, e1@i, e1@x, e2)
+
+        }
+
+        X_attr <- attributes(e1)
+        X_attr$p <- res$indptr
+        X_attr$i <- res$indices
+        X_attr$x <- res$values
+        attributes(e1) <- X_attr
+        return(e1)
+    }
+}
+
+multiply_csc_by_dense <- function(e1, e2) {
+    return(multiply_csc_by_dense_internal(e1, e2, FALSE))
+}
+
+logicaland_csc_by_dense <- function(e1, e2) {
+    return(multiply_csc_by_dense_internal(e1, e2, TRUE))
+}
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="CsparseMatrix", e2="matrix"), multiply_csc_by_dense)
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="CsparseMatrix", e2="float32"), multiply_csc_by_dense)
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="matrix", e2="CsparseMatrix"), function(e1, e2) {
+    return(multiply_csc_by_dense(e2, e1))
+})
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="float32", e2="CsparseMatrix"), function(e1, e2) {
+    return(multiply_csc_by_dense(e2, e1))
+})
+
+#' @rdname operators
+#' @export
+setMethod("&", signature(e1="CsparseMatrix", e2="matrix"), logicaland_csc_by_dense)
+
+#' @rdname operators
+#' @export
+setMethod("&", signature(e1="CsparseMatrix", e2="float32"), logicaland_csc_by_dense)
+
+#' @rdname operators
+#' @export
+setMethod("&", signature(e1="matrix", e2="CsparseMatrix"), function(e1, e2) {
+    return(logicaland_csc_by_dense(e2, e1))
+})
+
+#' @rdname operators
+#' @export
+setMethod("&", signature(e1="float32", e2="CsparseMatrix"), function(e1, e2) {
+    return(logicaland_csc_by_dense(e2, e1))
+})
 
 ### TODO: add tests for XOR
 

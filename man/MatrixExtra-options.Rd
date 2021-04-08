@@ -43,6 +43,15 @@ a sparse data structure.
 vector (see \link{slice}). It can be changed back to the `Matrix` behavior
 through `options("MatrixExtra.drop_sparse" = FALSE)`.
 
+\item When doing elementwise multiplication (`*`) of a sparse matrix by a
+dense matrix or vice-versa, if the dense matrix has a `NA` or `NaN` element
+in a coordinate at which the sparse matrix has no entry, `Matrix` will preserve
+the `NA` in the resulting output, as does base R.
+
+`MatrixExtra` will instead ignore such `NA`s, which makes the operation much
+faster. The old `Matrix` behavior can be brought back through
+`options("MatrixExtra.ignore_na" = FALSE)`.
+
 \item When doing sparse-dense matrix multiplications, `Matrix` will run
 single-threaded, which is typically undesirable as modern CPUs have the capacity
 to perform such operations much faster by exploiting both multi-threading and SIMD
@@ -56,12 +65,18 @@ These behaviors will change at the moment one loads `MatrixExtra` through
 `library(MatrixExtra)`, save for the number of threads which will also be set
 to the maximum when calling functions as e.g. `MatrixExtra::crossprod(x,y)`
 
-The package provides two functions to make these changes simultaneously:\itemize{
+The package provides two functions to make all these changes simultaneously:\itemize{
 \item `restore_old_matrix_behavior`: Will change the transpose behavior to deep
-transposes in the same format, drop behavior to dense vectors, and number of threads
+transposes in the same format, drop behavior to dense vectors, preserve NAs that are
+not in a sparse matrix in elementwise multiplication, and number of threads
 to 1.
+
+These all match with how the `Matrix` package behaves in such situations.
 \item `set_new_matrix_behavior`: Will change the transpose behavior to shallow
-transposes in the opposite format, drop behavior to sparse vectors, and number of
+transposes in the opposite format, drop behavior to sparse vectors, ignore NAs that
+are not in a sparse matrix in elementwise multiplication, and number of
 threads to the available number of threads in the system.
+
+These all differ with how the `Matrix` package behaves in such situations.
 }
 }

@@ -367,3 +367,83 @@ test_that("Types of objects", {
                  as.csr.matrix(Mat, binary=TRUE) & as.csr.matrix(as.csr.matrix(Mat, logical=TRUE)))
 
 })
+
+test_that("CSC and dense", {
+    Dense <- matrix(1:10, nrow=5L)
+    Sparse <- as.csc.matrix(matrix(c(0,0,1,2,3, 11,12,13,14,15),
+                                   nrow=5L, ncol=2L, byrow=FALSE))
+    expect_equal(as.matrix(Dense * Sparse), Dense * as.matrix(Sparse))
+    expect_s4_class(Dense * Sparse, "dgCMatrix")
+    expect_equal(as.matrix(Sparse * Dense), Dense * as.matrix(Sparse))
+    expect_s4_class(Sparse * Dense, "dgCMatrix")
+    
+    DenseNew <- Dense
+    DenseNew[1,1] <- NA_real_
+    
+    set_new_matrix_behavior()
+    expect_equal(as.matrix(DenseNew * Sparse), Dense * as.matrix(Sparse))
+    expect_s4_class(DenseNew * Sparse, "dgCMatrix")
+    expect_equal(as.matrix(Sparse * DenseNew), Dense * as.matrix(Sparse))
+    expect_s4_class(Sparse * DenseNew, "dgCMatrix")
+    
+    restore_old_matrix_behavior()
+    expect_equal(as.matrix(DenseNew * Sparse), DenseNew * as.matrix(Sparse))
+    expect_s4_class(DenseNew * Sparse, "dgCMatrix")
+    expect_equal(as.matrix(Sparse * DenseNew), DenseNew * as.matrix(Sparse))
+    expect_s4_class(Sparse * DenseNew, "dgCMatrix")
+    
+    
+    set_new_matrix_behavior()
+    expect_equal(as.matrix(DenseNew & Sparse), unname(DenseNew & as.matrix(Sparse)))
+    expect_s4_class(DenseNew & Sparse, "lgCMatrix")
+    expect_equal(as.matrix(Sparse & DenseNew), unname(as.matrix(Sparse) & DenseNew))
+    expect_s4_class(Sparse & DenseNew, "lgCMatrix")
+    
+    restore_old_matrix_behavior()
+    expect_equal(as.matrix(DenseNew & Sparse), unname(DenseNew & as.matrix(Sparse)))
+    expect_s4_class(DenseNew & Sparse, "lgCMatrix")
+    expect_equal(as.matrix(Sparse & DenseNew), unname(as.matrix(Sparse) & DenseNew))
+    expect_s4_class(Sparse & DenseNew, "lgCMatrix")
+})
+
+test_that("NAs in multiplication and ampersand", {
+    Dense <- matrix(1:10, nrow=5L)
+    Sparse <- as.csc.matrix(matrix(c(0,0,1,2,3, 11,12,13,14,15),
+                                   nrow=5L, ncol=2L, byrow=FALSE))
+    DenseNew <- Dense
+    DenseNew[1,1] <- NA_real_
+    DenseNew[2,2] <- 0
+    DenseNew[3,2] <- 0
+    DenseNew[5,2] <- NA_real_
+    Sparse <- as.matrix(Sparse)
+    Sparse[2,2] <- NA_real_
+    Sparse[4,2] <- NA_real_
+    Sparse[5,2] <- NA_real_
+    Sparse <- as.csc.matrix(Sparse)
+    DenseFilled <- DenseNew
+    DenseFilled[is.na(DenseNew)] <- 0
+    SparseFilled <- as.matrix(Sparse)
+    SparseFilled[is.na(DenseNew) & !is.na(SparseFilled)] <- 0
+    
+    run_tests <- function(Sparse, DenseNew, SparseFilled, DenseFilled) {
+        set_new_matrix_behavior()
+        expect_equal(unname(as.matrix(DenseNew * Sparse)), unname(DenseFilled * SparseFilled))
+        expect_equal(unname(as.matrix(Sparse * DenseNew)), unname(DenseFilled * SparseFilled))
+        
+        restore_old_matrix_behavior()
+        expect_equal(unname(as.matrix(DenseNew * Sparse)), unname(DenseNew * as.matrix(Sparse)))
+        expect_equal(unname(as.matrix(Sparse * DenseNew)), unname(DenseNew * as.matrix(Sparse)))
+        
+        set_new_matrix_behavior()
+        expect_equal(as.matrix(DenseNew & Sparse), unname(DenseNew & as.matrix(Sparse)))
+        expect_equal(as.matrix(Sparse & DenseNew), unname(as.matrix(Sparse) & DenseNew))
+        
+        restore_old_matrix_behavior()
+        expect_equal(as.matrix(DenseNew & Sparse), unname(DenseNew & as.matrix(Sparse)))
+        expect_equal(as.matrix(Sparse & DenseNew), unname(as.matrix(Sparse) & DenseNew))
+    }
+    
+    run_tests(as.coo.matrix(Sparse), DenseNew, SparseFilled, DenseFilled)
+    run_tests(as.csr.matrix(Sparse), DenseNew, SparseFilled, DenseFilled)
+    run_tests(as.csc.matrix(Sparse), DenseNew, SparseFilled, DenseFilled)
+})
