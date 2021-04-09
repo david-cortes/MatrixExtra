@@ -4,6 +4,9 @@ library("MatrixExtra")
 library("float")
 context("Matrix multiplications")
 
+set_new_matrix_behavior()
+options("MatrixExtra.nthreads" = 2)
+
 ### TODO: add tests about the names of objects
 
 test_that("matmult dense-CSC", {
@@ -220,3 +223,5 @@ test_that("float32 vectors", {
                  as.matrix(A[1:10,1,drop=FALSE]) %*% float::dbl(v2),
                  tolerance=1e-5)
 })
+
+set_new_matrix_behavior()

@@ -177,6 +177,46 @@ deepcopy_str <- function(x) {
     .Call(`_MatrixExtra_deepcopy_str`, x)
 }
 
+remove_zero_valued_csr_numeric <- function(indptr, indices, values, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_csr_numeric`, indptr, indices, values, remove_NAs)
+}
+
+remove_zero_valued_csr_logical <- function(indptr, indices, values, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_csr_logical`, indptr, indices, values, remove_NAs)
+}
+
+remove_zero_valued_coo_numeric <- function(ii, jj, xx, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_coo_numeric`, ii, jj, xx, remove_NAs)
+}
+
+remove_zero_valued_coo_logical <- function(ii, jj, xx, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_coo_logical`, ii, jj, xx, remove_NAs)
+}
+
+remove_zero_valued_svec_numeric <- function(ii, xx, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_svec_numeric`, ii, xx, remove_NAs)
+}
+
+remove_zero_valued_svec_integer <- function(ii, xx, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_svec_integer`, ii, xx, remove_NAs)
+}
+
+remove_zero_valued_svec_logical <- function(ii, xx, remove_NAs) {
+    .Call(`_MatrixExtra_remove_zero_valued_svec_logical`, ii, xx, remove_NAs)
+}
+
+check_valid_csr_matrix <- function(indptr, indices, nrows, ncols) {
+    .Call(`_MatrixExtra_check_valid_csr_matrix`, indptr, indices, nrows, ncols)
+}
+
+check_valid_coo_matrix <- function(ii, jj, nrows, ncols) {
+    .Call(`_MatrixExtra_check_valid_coo_matrix`, ii, jj, nrows, ncols)
+}
+
+check_valid_svec <- function(ii, nrows) {
+    .Call(`_MatrixExtra_check_valid_svec`, ii, nrows)
+}
+
 multiply_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, values2) {
     .Call(`_MatrixExtra_multiply_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2)
 }

@@ -26,6 +26,8 @@ expect_unmodified <- function(csr1, csr2, csc1, csc2, emat, mat1, mat2, eden) {
     expect_equal(as.matrix(emat), eden)
 }
 
+set_new_matrix_behavior()
+
 test_that("Operations CSR-CSR", {
     expect_equal(as.matrix(csr1 + csr2), as.matrix(mat1 + mat2))
     expect_unmodified(csr1, csr2, csc1, csc2, emat, mat1, mat2, eden)

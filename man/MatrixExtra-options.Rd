@@ -43,6 +43,25 @@ a sparse data structure.
 vector (see \link{slice}). It can be changed back to the `Matrix` behavior
 through `options("MatrixExtra.drop_sparse" = FALSE)`.
 
+\item When doing some operations which require the indices of sparse matrices to
+be sorted, such as elementwise addition and multiplication, `Matrix` will create
+deep copies of the indices and values, which takes extra time but ensures that
+no external references to the same objects are impacted, thus playing well with
+R's pass-by-value and copy-on-modify semantics, but at the expense of extra time
+and memory requirements.
+
+`MatrixExtra` will instead sort the indices in-place when needed, only doing
+deep copies when the values are to be cast to a different type, so that the
+object being passed to a given function or operator will always remain usable
+(having the same values at the same indices). However, when the indices of a given
+object are unsorted and get sorted in-place, if any other R object has references
+to the same vector of indices separately from the vector of values or vice-versa,
+those objects will see a new vector which is modified, potentially rendering
+those external objects unusable.
+
+If this behavior is problematic, it can be changed back to always making deep copies
+through `options("MatrixExtra.inplace_sort" = FALSE)`.
+
 \item When doing elementwise multiplication (`*`) of a sparse matrix by a
 dense matrix or vice-versa, if the dense matrix has a `NA` or `NaN` element
 in a coordinate at which the sparse matrix has no entry, `Matrix` will preserve
@@ -68,16 +87,35 @@ to the maximum when calling functions as e.g. `MatrixExtra::<function>(<args>)`
 The package provides two short-hand functions to switch all these options
 simultaneously:\itemize{
 \item `restore_old_matrix_behavior`: Will change the transpose behavior to deep
-transposes in the same format, drop behavior to dense vectors, preserve NAs that are
-not in a sparse matrix in elementwise multiplication, and set the number of threads
-to 1.
+transposes in the same format, drop behavior to dense vectors, avoid in-place
+sorting of sparse indices, preserve NAs that are not in a sparse matrix in
+elementwise multiplication, and set the number of threads to 1.
 
 These all match with how the `Matrix` package behaves in such situations.
 \item `set_new_matrix_behavior`: Will change the transpose behavior to shallow
-transposes in the opposite format, drop behavior to sparse vectors, ignore NAs that
-are not in a sparse matrix in elementwise multiplication, and set the number of
-threads to the available number of threads in the system.
+transposes in the opposite format, drop behavior to sparse vectors, sort sparse
+indices in-place when possible, ignore NAs that are not in a sparse matrix in
+elementwise multiplication, and set the number of threads to the available
+number of threads in the system.
 
 These all differ with how the `Matrix` package behaves in such situations.
 }
 }
+\section{All options}{
+
+List of options with the short-hand command to make them match with `Matrix`.
+\itemize{
+\item `options("MatrixExtra.fast_transpose" = FALSE)` :
+Option for behavior of `t(CSR)` and `t(CSC)`.
+\item `options("MatrixExtra.drop_sparse" = FALSE)` :
+Option for behavior of `drop=TRUE` when subsetting.
+\item `options("MatrixExtra.inplace_sort" = FALSE)` :
+Option for behavior of inplace-vs-copy operations.
+\item `options("MatrixExtra.ignore_na" = FALSE)` :
+Option for behavior of `NA`s in elementwise
+sparse-dense multipliction.
+\item `options("MatrixExtra.nthreads" = 1L)` :
+Number of parallel threads to use in sparse-dense matrix
+}
+}
+

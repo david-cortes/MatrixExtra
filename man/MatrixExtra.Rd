@@ -25,13 +25,13 @@ including the dense `float32` types from the `float` package
 (see \link[MatrixExtra]{mathematical-functions}).
 \item Fast transposes which change the storage format (see \link[MatrixExtra]{t_shallow}).
 \item Utility functions for sparse matrices (see e.g.
-\link[MatrixExtra]{sort_sparse_indices}).
+\link[MatrixExtra]{sort_sparse_indices} and \link[MatrixExtra]{remove_sparse_zeros}).
 \item Faster replacements for many methods from `Matrix` for all the sparse formats
 (COO, CSR, CSC), such as `[` (\link[MatrixExtra]{slice}), addition (`+`),
 elementwise multiplication (`*`), among others (see \link[MatrixExtra]{operators}).
 }
 
-\bold{Important:} `MatrixExtra` changes some important behaviors from the `Matrix` library.
-See \link{MatrixExtra-options} for details.
+\bold{Important:} `MatrixExtra` modifies some important behaviors from the
+`Matrix` library. See \link{MatrixExtra-options} for details.
 }
 \keyword{package}

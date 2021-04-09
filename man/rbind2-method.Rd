@@ -13,6 +13,12 @@
 \alias{rbind2,CsparseMatrix,RsparseMatrix-method}
 \alias{rbind2,RsparseMatrix,TsparseMatrix-method}
 \alias{rbind2,TsparseMatrix,RsparseMatrix-method}
+\alias{rbind2,RsparseMatrix,numeric-method}
+\alias{rbind2,RsparseMatrix,integer-method}
+\alias{rbind2,RsparseMatrix,logical-method}
+\alias{rbind2,numeric,RsparseMatrix-method}
+\alias{rbind2,integer,RsparseMatrix-method}
+\alias{rbind2,logical,RsparseMatrix-method}
 \alias{rbind2,TsparseMatrix,TsparseMatrix-method}
 \alias{rbind2,TsparseMatrix,sparseVector-method}
 \alias{rbind2,sparseVector,TsparseMatrix-method}
@@ -43,6 +49,18 @@
 \S4method{rbind2}{RsparseMatrix,TsparseMatrix}(x, y)
 
 \S4method{rbind2}{TsparseMatrix,RsparseMatrix}(x, y)
+
+\S4method{rbind2}{RsparseMatrix,numeric}(x, y)
+
+\S4method{rbind2}{RsparseMatrix,integer}(x, y)
+
+\S4method{rbind2}{RsparseMatrix,logical}(x, y)
+
+\S4method{rbind2}{numeric,RsparseMatrix}(x, y)
+
+\S4method{rbind2}{integer,RsparseMatrix}(x, y)
+
+\S4method{rbind2}{logical,RsparseMatrix}(x, y)
 
 \S4method{rbind2}{TsparseMatrix,TsparseMatrix}(x, y)
 

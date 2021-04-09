@@ -159,6 +159,15 @@ test_that("Batched rbinding", {
     expect_equal(rbind_csr(X, X_bin, X_bool), rbind(X, X_bin, X_bool))
 
     expect_equal(rbind_csr(X, v_bin, X_bin, X_bool, v_int), rbind(X, v_bin_csr, X_bin, X_bool, v_int_csr))
+    
+    X_dempty <- matrix(numeric(), ncol=ncol(X))
+    X_rempty <- as.csr.matrix(X_dempty)
+    X_cempty <- as.csc.matrix(X_dempty)
+    
+    expect_equal(unname(as.matrix(rbind_csr(X_dempty, X_cempty))),
+                 unname(rbind(X_dempty, X_dempty)))
+    expect_equal(unname(as.matrix(rbind_csr(X_cempty, X_cempty))),
+                 unname(rbind(X_dempty, X_dempty)))
 })
 
 test_that("rbind COO", {

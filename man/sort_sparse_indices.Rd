@@ -4,11 +4,19 @@
 \alias{sort_sparse_indices}
 \title{Sort the indices of a sparse matrix or sparse vector}
 \usage{
-sort_sparse_indices(X)
+sort_sparse_indices(X, copy = FALSE, byrow = TRUE)
 }
 \arguments{
 \item{X}{A sparse matrix in CSR, CSC, or COO format; or a sparse vector
 (from the `Matrix` package.)}
+
+\item{copy}{Whether to make a deep copy of the indices and the values before sorting
+them, so that the in-place modifications will not affect any potential external
+references to the same arrays.}
+
+\item{byrow}{When passing a COO matrix ("TsparseMatrix"), whether to sort it
+with rows as the major axis, which differs from `Matrix` that usually
+sorts them with columns as the major axis.}
 }
 \value{
 The same input `X` with its indices sorted, as invisible (no auto print).
@@ -22,10 +30,6 @@ it should be rare to have a matrix with unsorted indices when the matrix is the
 output of some built-in operation from either `Matrix` or `MatrixExtra`, but when
 the matrices are constructed manually this function can come in handy.
 
-\bold{Important:} the input matrix will be modified in-place.
-}
-\details{
-When passing a COO matrix ("TsparseMatrix"), it will sort it
-with rows as the major axis, which differs from `Matrix` that usually
-sorts them with columns as the major axis.
+\bold{Important:} the input matrix will be modified in-place, unless passing
+`copy=TRUE`.
 }

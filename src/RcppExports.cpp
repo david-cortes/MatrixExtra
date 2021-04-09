@@ -565,6 +565,131 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// remove_zero_valued_csr_numeric
+Rcpp::List remove_zero_valued_csr_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_csr_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_csr_numeric(indptr, indices, values, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_csr_logical
+Rcpp::List remove_zero_valued_csr_logical(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_csr_logical(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_csr_logical(indptr, indices, values, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_coo_numeric
+Rcpp::List remove_zero_valued_coo_numeric(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::NumericVector xx, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_coo_numeric(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_coo_numeric(ii, jj, xx, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_coo_logical
+Rcpp::List remove_zero_valued_coo_logical(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::LogicalVector xx, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_coo_logical(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_coo_logical(ii, jj, xx, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_svec_numeric
+Rcpp::List remove_zero_valued_svec_numeric(Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_svec_numeric(SEXP iiSEXP, SEXP xxSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_svec_numeric(ii, xx, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_svec_integer
+Rcpp::List remove_zero_valued_svec_integer(Rcpp::IntegerVector ii, Rcpp::IntegerVector xx, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_svec_integer(SEXP iiSEXP, SEXP xxSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_svec_integer(ii, xx, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_zero_valued_svec_logical
+Rcpp::List remove_zero_valued_svec_logical(Rcpp::IntegerVector ii, Rcpp::LogicalVector xx, const bool remove_NAs);
+RcppExport SEXP _MatrixExtra_remove_zero_valued_svec_logical(SEXP iiSEXP, SEXP xxSEXP, SEXP remove_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const bool >::type remove_NAs(remove_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(remove_zero_valued_svec_logical(ii, xx, remove_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_valid_csr_matrix
+Rcpp::List check_valid_csr_matrix(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, int nrows, int ncols);
+RcppExport SEXP _MatrixExtra_check_valid_csr_matrix(SEXP indptrSEXP, SEXP indicesSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_valid_csr_matrix(indptr, indices, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_valid_coo_matrix
+Rcpp::List check_valid_coo_matrix(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, int nrows, int ncols);
+RcppExport SEXP _MatrixExtra_check_valid_coo_matrix(SEXP iiSEXP, SEXP jjSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_valid_coo_matrix(ii, jj, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_valid_svec
+Rcpp::List check_valid_svec(Rcpp::IntegerVector ii, int nrows);
+RcppExport SEXP _MatrixExtra_check_valid_svec(SEXP iiSEXP, SEXP nrowsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_valid_svec(ii, nrows));
+    return rcpp_result_gen;
+END_RCPP
+}
 // multiply_csr_elemwise
 Rcpp::List multiply_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2, Rcpp::NumericVector values1, Rcpp::NumericVector values2);
 RcppExport SEXP _MatrixExtra_multiply_csr_elemwise(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP, SEXP values1SEXP, SEXP values2SEXP) {
@@ -1411,6 +1536,16 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_deepcopy_int", (DL_FUNC) &_MatrixExtra_deepcopy_int, 1},
     {"_MatrixExtra_deepcopy_log", (DL_FUNC) &_MatrixExtra_deepcopy_log, 1},
     {"_MatrixExtra_deepcopy_str", (DL_FUNC) &_MatrixExtra_deepcopy_str, 1},
+    {"_MatrixExtra_remove_zero_valued_csr_numeric", (DL_FUNC) &_MatrixExtra_remove_zero_valued_csr_numeric, 4},
+    {"_MatrixExtra_remove_zero_valued_csr_logical", (DL_FUNC) &_MatrixExtra_remove_zero_valued_csr_logical, 4},
+    {"_MatrixExtra_remove_zero_valued_coo_numeric", (DL_FUNC) &_MatrixExtra_remove_zero_valued_coo_numeric, 4},
+    {"_MatrixExtra_remove_zero_valued_coo_logical", (DL_FUNC) &_MatrixExtra_remove_zero_valued_coo_logical, 4},
+    {"_MatrixExtra_remove_zero_valued_svec_numeric", (DL_FUNC) &_MatrixExtra_remove_zero_valued_svec_numeric, 3},
+    {"_MatrixExtra_remove_zero_valued_svec_integer", (DL_FUNC) &_MatrixExtra_remove_zero_valued_svec_integer, 3},
+    {"_MatrixExtra_remove_zero_valued_svec_logical", (DL_FUNC) &_MatrixExtra_remove_zero_valued_svec_logical, 3},
+    {"_MatrixExtra_check_valid_csr_matrix", (DL_FUNC) &_MatrixExtra_check_valid_csr_matrix, 4},
+    {"_MatrixExtra_check_valid_coo_matrix", (DL_FUNC) &_MatrixExtra_check_valid_coo_matrix, 4},
+    {"_MatrixExtra_check_valid_svec", (DL_FUNC) &_MatrixExtra_check_valid_svec, 2},
     {"_MatrixExtra_multiply_csr_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_elemwise, 6},
     {"_MatrixExtra_logicaland_csr_elemwise", (DL_FUNC) &_MatrixExtra_logicaland_csr_elemwise, 6},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_double", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_double, 4},

@@ -14,7 +14,9 @@ Description: Extends sparse matrix and vector classes from the 'Matrix' package 
   such as 'dgCMatrix' -> 'ngRMatrix', as well as convenience conversion functions; 
   (d) Utility functions for sparse matrices such as sorting the indices or removing 
   zero-valued entries; 
-  (e) Fast transposes that work by outputting in the opposite storage format.
+  (e) Fast transposes that work by outputting in the opposite storage format;
+  (f) Faster replacements for many 'Matrix' methods for all sparse types, such as
+  slicing and elementwise multiplication.
 License: GPL (>= 2)
 Depends: Matrix (>= 1.3), methods
 Imports: Rcpp, RhpcBLASctl, float

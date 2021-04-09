@@ -43,15 +43,19 @@ multiply_csr_by_csr <- function(e1, e2, logical=FALSE) {
             return(e1)
     }
 
+    inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+
     check_valid_matrix(e1)
-    e1 <- deepcopy_before_sort(e1, logical=logical)
+    if (inplace_sort)
+        e1 <- deepcopy_before_sort(e1, logical=logical)
     e1 <- as.csr.matrix(e1, logical=logical)
-    e1 <- sort_sparse_indices(e1)
+    e1 <- sort_sparse_indices(e1, copy=!inplace_sort)
 
     check_valid_matrix(e2)
-    e2 <- deepcopy_before_sort(e2, logical=logical)
+    if (inplace_sort)
+        e2 <- deepcopy_before_sort(e2, logical=logical)
     e2 <- as.csr.matrix(e2, logical=logical)
-    e2 <- sort_sparse_indices(e2)
+    e2 <- sort_sparse_indices(e2, copy=!inplace_sort)
 
     if (!logical) {
         res <- multiply_csr_elemwise(e1@p, e2@p, e1@j, e2@j, e1@x, e2@x)
@@ -72,10 +76,13 @@ multiply_csr_by_coo <- function(e1, e2, logical=FALSE) {
     if (nrow(e1) != nrow(e2) || ncol(e1) != ncol(e2))
         warning("Matrices to multiply have different dimensions.")
 
+    inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+
     check_valid_matrix(e1)
-    e1 <- deepcopy_before_sort(e1, logical=logical)
+    if (inplace_sort)
+        e1 <- deepcopy_before_sort(e1, logical=logical)
     e1 <- as.csr.matrix(e1, logical=logical)
-    e1 <- sort_sparse_indices(e1)
+    e1 <- sort_sparse_indices(e1, copy=!inplace_sort)
     
     e2 <- as.coo.matrix(e2, logical=logical)
     check_valid_matrix(e2)
@@ -222,13 +229,14 @@ multiply_csr_by_dense_internal <- function(e1, e2, logical=FALSE) {
         stop("Matrices must have the same dimensions in order to multiply them.")
 
     keep_NAs <- !logical && !getOption("MatrixExtra.ignore_na", default=FALSE)
+    inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
 
     check_valid_matrix(e1)
-    if (keep_NAs)
+    if (keep_NAs && inplace_sort)
         e1 <- deepcopy_before_sort(e1, logical=logical)
     e1 <- as.csr.matrix(e1, logical=logical)
     if (keep_NAs)
-        sort_sparse_indices(e1)
+        e1 <- sort_sparse_indices(e1, copy=!inplace_sort)
 
     if (!logical) {
         if (typeof(e2) == "double") {
@@ -562,9 +570,11 @@ multiply_csc_by_dense_internal <- function(e1, e2, logical=FALSE) {
 
     } else {
 
-        e1 <- deepcopy_before_sort(e1, logical=logical)
+        inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+        if (inplace_sort)
+            e1 <- deepcopy_before_sort(e1, logical=logical)
         e1 <- as.csc.matrix(e1, logical=logical)
-        sort_sparse_indices(e1)
+        e1 <- sort_sparse_indices(e1, copy=!inplace_sort)
 
         if (!logical) {
 
@@ -676,15 +686,19 @@ add_csr_matrices_internal <- function(e1, e2, is_substraction=FALSE,
         }
     }
 
+    inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+
     check_valid_matrix(e1)
-    e1 <- deepcopy_before_sort(e1, logical=logical)
+    if (inplace_sort)
+        e1 <- deepcopy_before_sort(e1, logical=logical)
     e1 <- as.csr.matrix(e1, logical=logical)
-    e1 <- sort_sparse_indices(e1)
+    e1 <- sort_sparse_indices(e1, copy=!inplace_sort)
 
     check_valid_matrix(e2)
-    e2 <- deepcopy_before_sort(e2, logical=logical)
+    if (inplace_sort)
+        e2 <- deepcopy_before_sort(e2, logical=logical)
     e2 <- as.csr.matrix(e2, logical=logical)
-    e2 <- sort_sparse_indices(e2)
+    e2 <- sort_sparse_indices(e2, copy=!inplace_sort)
 
     if (!logical) {
         res <- add_csr_elemwise(e1@p, e2@p, e1@j, e2@j, e1@x, e2@x, is_substraction)

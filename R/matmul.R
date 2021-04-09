@@ -30,10 +30,6 @@
 
 ### TODO: try to make the multiplications preserve the names the same way as base R
 
-### TODO: careful when it sort the indices about not rendering the input unusable:
-### e.g. if the input was 'lgRMatrix', gets converted to 'dgRMatrix', and then sorted,
-### it will become unusable later.
-
 #' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
 #' @description Multithreaded <matrix, matrix> multiplications
 #' (`\%*\%`, `crossprod`, and `tcrossprod`)
@@ -559,11 +555,13 @@ gemv_csr_vec <- function(x, y) {
     } else {
 
         ### sparse vectors from matrix
-        x <- deepcopy_before_sort(x)
+        inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+        if (inplace_sort)
+            x <- deepcopy_before_sort(x)
         x <- as.csr.matrix(x)
-        x <- sort_sparse_indices(x)
+        x <- sort_sparse_indices(x, copy=!inplace_sort)
         
-        y <- sort_sparse_indices(y)
+        y <- sort_sparse_indices(y, copy=!inplace_sort)
 
         if (inherits(y, "dsparseVector")) {
             res <- matmul_csr_svec_numeric(
@@ -632,7 +630,7 @@ outerprod_csrsinglecol_by_dvec <- function(x, y) {
     check_valid_matrix(x)
 
     if (inherits(y, "sparseVector")) {
-        y <- sort_sparse_indices(y)
+        y <- sort_sparse_indices(y, copy=!getOption("MatrixExtra.inplace_sort", default=FALSE))
 
         if (inherits(y, "dsparseVector")) {
             res <- matmul_spcolvec_by_scolvecascsr_numeric(

@@ -39,9 +39,23 @@ rbind_csr <- function(...) {
         }
     }
     args <- lapply(list(...), cast_if_not_csr)
+    ncols <- max(sapply(args, function(x) if (inherits(x, "sparseVector")) x@length else NCOL(x)))
+
+    filter_empty <- function(x) {
+        if (inherits(x, "sparseVector")) {
+            return(TRUE)
+        } else {
+            return(nrow(x) > 0L)
+        }
+    }
+    args_keep <- sapply(args, filter_empty)
+    if (any(!args_keep))
+        args <- args[args_keep]
 
     if (length(args) == 0L) {
-        return(new("dgRMatrix"))
+        out <- new("dgRMatrix")
+        out@Dim <- as.integer(c(0L, ncols))
+        return(out)
     } else if (length(args) == 1L) {
         return(cast_csr_same(args[[1L]]))
     } else if (length(args) == 2L) {
@@ -60,7 +74,7 @@ rbind_csr <- function(...) {
     }
 
     nrows <- sum(sapply(args, function(x) ifelse(inherits(x, "sparseMatrix"), nrow(x), 1L)))
-    ncols <- max(sapply(args, function(x) ifelse(inherits(x, "sparseMatrix"), ncol(x), length(x))))
+    # ncols <- max(sapply(args, function(x) ifelse(inherits(x, "sparseMatrix"), ncol(x), length(x))))
     nnz <- sum(sapply(args, function(x) ifelse(inherits(x, "sparseMatrix"), length(x@j), length(x@i))))
     if (nrows >= .Machine$integer.max)
         stop("Result has too many rows for R to handle.")
@@ -236,6 +250,19 @@ rbind2_ngr <- function(x, y) {
 }
 
 rbind2_generic <- function(x, y) {
+    if (!inherits(x, "sparseVector") && nrow(x) <= 0L) {
+        if (inherits(y, "sparseVector"))
+            y <- as(y, "RsparseMatrix")
+        y@Dim[2L] <- as.integer(max(y@Dim[2L], ncol(x)))
+        return(y)
+    }
+    if (!inherits(y, "sparseVector") && nrow(y) <= 0L) {
+        if (inherits(x, "sparseVector"))
+            x <- as(x, "RsparseMatrix")
+        x@Dim[2L] <- as.integer(max(x@Dim[2L], ncol(y)))
+        return(x)
+    }
+
     binary_types <- c("nsparseMatrix", "nsparseVector")
     logical_types <- c("lsparseMatrix", "lsparseVector")
     x_is_binary <- inherits(x, binary_types)
@@ -271,6 +298,7 @@ rbind2_generic <- function(x, y) {
     if (!inherits(y, "RsparseMatrix") || inherits(y, "symmetricMatrix") || (.hasSlot(y, "diag") && y@diag != "N"))
         y <- as.csr.matrix(y, logical=y_is_logical, binary=y_is_binary)
     return(t_shallow(cbind2(t_shallow(x), t_shallow(y))))
+
 
     if (inherits(x, "symmetricMatrix") || (.hasSlot(x, "diag") && x@diag != "N"))
         x <- as.csr.matrix(x, logical=x_is_logical, binary=x_is_binary)
@@ -339,10 +367,55 @@ setMethod("rbind2", signature(x="RsparseMatrix", y="TsparseMatrix"), rbind2_gene
 #' @export
 setMethod("rbind2", signature(x="TsparseMatrix", y="RsparseMatrix"), rbind2_generic)
 
-### TODO: add tests for the ones below
+rbind_csr_vec <- function(x, y) {
+    return(t_shallow(cbind2(t_shallow(x), y)))
+}
+
+rbind_vec_csr <- function(x, y) {
+    return(t_shallow(cbind2(x, t_shallow(y))))
+}
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="RsparseMatrix", y="numeric"), rbind_csr_vec)
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="RsparseMatrix", y="integer"), rbind_csr_vec)
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="RsparseMatrix", y="logical"), rbind_csr_vec)
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="numeric", y="RsparseMatrix"), rbind_vec_csr)
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="integer", y="RsparseMatrix"), rbind_vec_csr)
+
+#' @rdname rbind2-method
+#' @export
+setMethod("rbind2", signature(x="logical", y="RsparseMatrix"), rbind_vec_csr)
+
 ### TODO: add tests with named vectors
     
 rbind2_coo <- function(x, y) {
+    
+    if (nrow(x) <= 0L) {
+        if (inherits(y, "sparseVector"))
+            y <- as(y, "RsparseMatrix")
+        y@Dim[2L] <- as.integer(max(y@Dim[2L], ncol(x)))
+        return(y)
+    }
+    if (nrow(y) <= 0L) {
+        if (inherits(x, "sparseVector"))
+            x <- as(x, "RsparseMatrix")
+        x@Dim[2L] <- as.integer(max(x@Dim[2L], ncol(y)))
+        return(x)
+    }
+
     x_is_binary <- inherits(x, "nsparseMatrix")
     x_is_logical <- inherits(x, "lsparseMatrix")
     y_is_binary <- inherits(y, "nsparseMatrix")
@@ -392,6 +465,13 @@ rbind2_coo <- function(x, y) {
 setMethod("rbind2", signature(x="TsparseMatrix", y="TsparseMatrix"), rbind2_coo)
 
 rbind2_coo_vec <- function(x, v, x_is_first) {
+
+    if (nrow(x) <= 0L) {
+        v <- as(v, "RsparseMatrix")
+        v@Dim[2L] <- as.integer(max(v@Dim[2L], ncol(x)))
+        return(v)
+    }
+
     x_is_binary <- inherits(x, "nsparseMatrix")
     x_is_logical <- inherits(x, "lsparseMatrix")
     v_is_binary <- inherits(v, "nsparseVector")

@@ -36,8 +36,8 @@ Can only pass one of `binary` or `logical`.}
 (inheriting from `lsparseMatrix`/`lsparseVector`).
 Can only pass one of `binary` or `logical`.}
 
-\item{sort}{Whether to sort the indices in case they are not sorted. Note that in some
-cases it might also end up sorting the indices of the input matrix.}
+\item{sort}{Whether to sort the indices in case they are not sorted. Note that it will
+perform deep copies of the indices and values along the way.}
 
 \item{integer}{Whether the result should be a vector with integer type ('isparseVector').}
 }

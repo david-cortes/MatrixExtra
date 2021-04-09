@@ -473,3 +473,549 @@ Rcpp::String deepcopy_str(Rcpp::String x)
 {
     return Rcpp::String(x);
 }
+
+template <class RcppVector, class InputDType>
+Rcpp::List remove_zero_valued_csr
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    RcppVector values,
+    const bool remove_NAs
+)
+{
+    if (!remove_NAs)
+    {
+        for (auto el : values)
+            if (!el)
+                goto remove_zeros;
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (auto el : values)
+                if (!el || ISNAN(el))
+                    goto remove_zeros;
+        }
+
+        else
+        {
+            for (auto el : values)
+                if (!el || el == NA_LOGICAL)
+                    goto remove_zeros;
+        }
+    }
+
+    return Rcpp::List::create(
+        Rcpp::_["indptr"] = indptr,
+        Rcpp::_["indices"] = indices,
+        Rcpp::_["values"] = values
+    );
+
+    remove_zeros:
+    Rcpp::IntegerVector indptr_new(indptr.size());
+    std::unique_ptr<int[]> indices_new(new int[indices.size()]);
+    std::unique_ptr<InputDType[]> values_new(new InputDType[values.size()]);
+    int nrows = indptr.size() - 1;
+
+    int curr = 0;
+    if (!remove_NAs)
+    {
+        for (int row = 0; row < nrows; row++)
+        {
+            for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+            {
+                if (values[ix])
+                {
+                    indices_new[curr] = indices[ix];
+                    values_new[curr] = values[ix];
+                    curr++;
+                }
+            }
+            indptr_new[row+1] = curr;
+        }
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (int row = 0; row < nrows; row++)
+            {
+                for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+                {
+                    if (values[ix] && !ISNAN(values[ix]))
+                    {
+                        indices_new[curr] = indices[ix];
+                        values_new[curr] = values[ix];
+                        curr++;
+                    }
+                }
+                indptr_new[row+1] = curr;
+            }
+        }
+
+        else
+        {
+            for (int row = 0; row < nrows; row++)
+            {
+                for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+                {
+                    if (values[ix] != NA_LOGICAL)
+                    {
+                        indices_new[curr] = indices[ix];
+                        values_new[curr] = values[ix];
+                        curr++;
+                    }
+                }
+                indptr_new[row+1] = curr;
+            }
+        }
+    }
+
+    Rcpp::List out;
+    out["indptr"] = indptr_new;
+    VectorConstructorArgs args;
+    args.as_integer = true; args.from_pointer = true;
+    args.size = curr; args.int_pointer_from = indices_new.get();
+    out["indices"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    indices_new.reset();
+    args.as_integer = false; args.from_pointer = true;
+    args.num_pointer_from = values_new.get();
+    out["values"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    return out;
+}
+
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_csr_numeric
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_csr<Rcpp::NumericVector, double>(
+        indptr,
+        indices,
+        values,
+        remove_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_csr_logical
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::LogicalVector values,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_csr<Rcpp::LogicalVector, int>(
+        indptr,
+        indices,
+        values,
+        remove_NAs
+    );
+}
+
+template <class RcppVector, class InputDType>
+Rcpp::List remove_zero_valued_coo
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    RcppVector xx,
+    const bool remove_NAs
+)
+{
+    size_t nnz = ii.size();
+    if (!remove_NAs)
+    {
+        for (auto el : xx)
+            if (!el)
+                goto remove_zeros;
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (auto el : xx)
+                if (!el || ISNAN(el))
+                    goto remove_zeros;
+        }
+
+        else
+        {
+            for (auto el : xx)
+                if (!el || el == NA_LOGICAL)
+                    goto remove_zeros;
+        }
+    }
+
+    return Rcpp::List::create(
+        Rcpp::_["ii"] = ii,
+        Rcpp::_["jj"] = jj,
+        Rcpp::_["xx"] = xx
+    );
+
+    remove_zeros:
+    std::unique_ptr<size_t[]> take(new size_t[nnz]);
+    size_t curr = 0;
+    if (!remove_NAs)
+    {
+        for (size_t ix = 0; ix < nnz; ix++)
+            if (xx[ix])
+                take[curr++] = ix;
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+                if (xx[ix] && !ISNAN(xx[ix]))
+                    take[curr++] = ix;
+        }
+
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+                if (xx[ix] && xx[ix] != NA_LOGICAL)
+                    take[curr++] = ix;
+        }
+    }
+
+    VectorConstructorArgs args;
+    args.as_integer = true; args.size = curr;
+    Rcpp::IntegerVector ii_new = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    Rcpp::IntegerVector jj_new = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    if (std::is_same<RcppVector, Rcpp::NumericVector>::value) {
+        args.as_integer = false;
+    } else {
+        args.as_integer = true; args.as_logical = true;
+    }
+    RcppVector xx_new = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+
+    for (size_t ix = 0; ix < curr; ix++) ii_new[ix] = ii[take[ix]];
+    for (size_t ix = 0; ix < curr; ix++) jj_new[ix] = jj[take[ix]];
+    for (size_t ix = 0; ix < curr; ix++) xx_new[ix] = xx[take[ix]];
+
+    return Rcpp::List::create(
+        Rcpp::_["ii"] = ii_new,
+        Rcpp::_["jj"] = jj_new,
+        Rcpp::_["xx"] = xx_new
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_coo_numeric
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::NumericVector xx,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_coo<Rcpp::NumericVector, double>(
+        ii,
+        jj,
+        xx,
+        remove_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_coo_logical
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::LogicalVector xx,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_coo<Rcpp::LogicalVector, int>(
+        ii,
+        jj,
+        xx,
+        remove_NAs
+    );
+}
+
+template <class RcppVector, class InputDType>
+Rcpp::List remove_zero_valued_svec
+(
+    Rcpp::IntegerVector ii,
+    RcppVector xx,
+    const bool remove_NAs
+)
+{
+    size_t nnz = ii.size();
+    if (!remove_NAs)
+    {
+        for (auto el : xx)
+            if (!el)
+                goto remove_zeros;
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (auto el : xx)
+                if (!el || ISNAN(el))
+                    goto remove_zeros;
+        }
+
+        else if (std::is_same<RcppVector, Rcpp::LogicalVector>::value)
+        {
+            for (auto el : xx)
+                if (!el || el == NA_LOGICAL)
+                    goto remove_zeros;
+        }
+
+        else
+        {
+            for (auto el : xx)
+                if (!el || el == NA_INTEGER)
+                    goto remove_zeros;
+        }
+    }
+
+    return Rcpp::List::create(
+        Rcpp::_["ii"] = ii,
+        Rcpp::_["xx"] = xx
+    );
+
+    remove_zeros:
+    std::unique_ptr<size_t[]> take(new size_t[nnz]);
+    size_t curr = 0;
+
+    if (!remove_NAs)
+    {
+        for (size_t ix = 0; ix < nnz; ix++)
+            if (xx[ix])
+                take[curr++] = ix;
+    }
+
+    else
+    {
+        if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+                if (xx[ix])
+                    take[curr++] = ix;
+        }
+
+        else if (std::is_same<RcppVector, Rcpp::LogicalVector>::value)
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+                if (xx[ix] && xx[ix] != NA_LOGICAL)
+                    take[curr++] = ix;
+        }
+
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+                if (xx[ix] && xx[ix] != NA_INTEGER)
+                    take[curr++] = ix;
+        }
+    }
+
+    VectorConstructorArgs args;
+    args.as_integer = true; args.size = curr;
+    Rcpp::IntegerVector ii_new = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    if (std::is_same<RcppVector, Rcpp::NumericVector>::value) {
+        args.as_integer = false;
+    } else if (std::is_same<RcppVector, Rcpp::LogicalVector>::value) {
+        args.as_integer = true; args.as_logical = true;
+    } else {
+        args.as_integer = true;
+    }
+    Rcpp::IntegerVector xx_new = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+
+    for (size_t ix = 0; ix < curr; ix++) ii_new[ix] = ii[take[ix]];
+    for (size_t ix = 0; ix < curr; ix++) xx_new[ix] = xx[take[ix]];
+
+    return Rcpp::List::create(
+        Rcpp::_["ii"] = ii_new,
+        Rcpp::_["xx"] = xx_new
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_svec_numeric
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_svec<Rcpp::NumericVector, double>(
+        ii,
+        xx,
+        remove_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_svec_integer
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector xx,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_svec<Rcpp::IntegerVector, int>(
+        ii,
+        xx,
+        remove_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List remove_zero_valued_svec_logical
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::LogicalVector xx,
+    const bool remove_NAs
+)
+{
+    return remove_zero_valued_svec<Rcpp::LogicalVector, int>(
+        ii,
+        xx,
+        remove_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List check_valid_csr_matrix
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    int nrows, int ncols
+)
+{
+    int imin = *std::min_element(indices.begin(), indices.end());
+    if (imin < 0) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has negative indices.")
+        );
+    }
+    int imax = *std::max_element(indices.begin(), indices.end());
+    if (imax >= ncols) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has invalid column indices.")
+        );
+    }
+
+    for (auto el : indices) {
+        if (el == NA_INTEGER) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix has indices with missing values.")
+            );
+        }
+    }
+
+    for (auto el : indptr) {
+        if (el == NA_INTEGER) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix has missing values in the index pointer.")
+            );
+        }
+    }
+
+    for (int ix = 0; ix < nrows; ix++) {
+        if (indptr[ix] > indptr[ix+1]) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix index pointer is not monotonicaly increasing.")
+            );
+        }
+    }
+
+    return Rcpp::List();
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List check_valid_coo_matrix
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    int nrows, int ncols
+)
+{
+    int imin = *std::min_element(ii.begin(), ii.end());
+    if (imin < 0) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has negative indices.")
+        );
+    }
+    int imax = *std::max_element(ii.begin(), ii.end());
+    if (imax >= nrows) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has invalid column indices.")
+        );
+    }
+    for (auto el : ii) {
+        if (el == NA_INTEGER) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix has indices with missing values.")
+            );
+        }
+    }
+
+    int jmin = *std::min_element(jj.begin(), jj.end());
+    if (jmin < 0) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has negative indices.")
+        );
+    }
+    int jmax = *std::max_element(jj.begin(), jj.end());
+    if (jmax >= ncols) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has invalid column indices.")
+        );
+    }
+    for (auto el : jj) {
+        if (el == NA_INTEGER) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix has indices with missing values.")
+            );
+        }
+    }
+
+    return Rcpp::List();
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List check_valid_svec
+(
+    Rcpp::IntegerVector ii,
+    int nrows
+)
+{
+    int imin = *std::min_element(ii.begin(), ii.end());
+    if (imin < 0) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has negative indices.")
+        );
+    }
+    int imax = *std::max_element(ii.begin(), ii.end());
+    if (imax >= nrows) {
+        return Rcpp::List::create(
+            Rcpp::_["err"] = Rcpp::String("Matrix has invalid column indices.")
+        );
+    }
+    for (auto el : ii) {
+        if (el == NA_INTEGER) {
+            return Rcpp::List::create(
+                Rcpp::_["err"] = Rcpp::String("Matrix has indices with missing values.")
+            );
+        }
+    }
+
+    return Rcpp::List(); 
+}

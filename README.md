@@ -109,7 +109,6 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 
 # TODO
 
-* Function to remove zeros.
 * Matrix multiplications between `float32` and `sparseVector`.
 * Assignment operator (`[<-`).
 * Some `sweep` routes with sparse vectors.

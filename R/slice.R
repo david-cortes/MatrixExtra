@@ -1,8 +1,9 @@
 
 get_indices_integer <- function(i, max_i, index_names) {
 
-    if (inherits(i, c("lsparseVector", "nsparseVector")))
-        i <- sort_sparse_indices(i)
+    if (inherits(i, c("lsparseVector", "nsparseVector"))) {
+        i <- sort_sparse_indices(i, copy=!getOption("MatrixExtra.inplace_sort", default=FALSE))
+    }
 
     if (inherits(i, "lsparseVector")) {
         if (anyNA(i@x))

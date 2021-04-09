@@ -55,6 +55,20 @@ setMethod("cbind2", signature(x="sparseVector", y="sparseVector"), function(x, y
 
 
 cbind_csr <- function(x, y) {
+
+    if (!inherits(x, "sparseVector") && ncol(x) <= 0L) {
+        if (inherits(y, "sparseVector"))
+            y <- as(y, "RsparseMatrix")
+        y@Dim[1L] <- as.integer(max(y@Dim[1L], nrow(x)))
+        return(y)
+    }
+    if (!inherits(y, "sparseVector") && ncol(y) <= 0L) {
+        if (inherits(x, "sparseVector"))
+            x <- as(x, "RsparseMatrix")
+        x@Dim[1L] <- as.integer(max(x@Dim[1L], nrow(y)))
+        return(x)
+    }
+
     check_valid_matrix(x)
     check_valid_matrix(y)
 
