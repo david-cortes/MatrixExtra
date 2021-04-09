@@ -3,7 +3,7 @@
 \docType{package}
 \name{MatrixExtra}
 \alias{MatrixExtra}
-\title{MatrixExtra}
+\title{MatrixExtra package}
 \description{
 Additional methods for the sparse matrices and sparse vector classes
 from the `Matrix` package, with an emphasis on the CSR (compressed sparse row) format
@@ -11,22 +11,27 @@ from the `Matrix` package, with an emphasis on the CSR (compressed sparse row) f
 
 This package provides, among others:\itemize{
 \item Fast and multi-threaded matrix multiplications for various combinations of
-`<sparse,dense>` and `<dense,sparse>` types, including those from the `float` package
-(see \link[MatrixExtra]{matmult}).
+`<sparse,dense>` and `<dense,sparse>` types (see \link[MatrixExtra]{matmult}),
+including the dense `float32` types from the `float` package
+(see \link[float]{float-package}).
 \item Operations that work efficiently in the CSR format, such as concatenating by rows
-(see \link[MatrixExtra]{rbind2-method}) or slicing (see \link[MatrixExtra]{slice}).
+(see \link[MatrixExtra]{rbind2-method}) or selecting rows (see \link[MatrixExtra]{slice}).
 \item Convenience conversion functions for the different sparse matrix types
 (see \link[MatrixExtra]{conversions}).
-\item Overloaded operators such as "+" for `<RsparseMatrix,RsparseMatrix>`
-and `<RsparseMatrix,scalar>` (see \link[MatrixExtra]{operators}).
+\item Overloaded operators such as "+" or "*" for many combinations of
+`<RsparseMatrix,RsparseMatrix>`, `<RsparseMatrix,TsparseMatrix>`,
+`<RsparseMatrix,matrix>`, and `<RsparseMatrix,scalar>` (see \link[MatrixExtra]{operators}).
 \item Overloaded mathematical functions that work only on the non-zero entries of matrices
 (see \link[MatrixExtra]{mathematical-functions}).
 \item Fast transposes which change the storage format (see \link[MatrixExtra]{t_shallow}).
 \item Utility functions for sparse matrices (see e.g.
 \link[MatrixExtra]{sort_sparse_indices}).
+\item Faster replacements for many methods from `Matrix` for all the sparse formats
+(COO, CSR, CSC), such as `[` (\link[MatrixExtra]{slice}), addition (`+`),
+elementwise multiplication (`*`), among others (see \link[MatrixExtra]{operators}).
 }
 
 \bold{Important:} `MatrixExtra` changes some important behaviors from the `Matrix` library.
-See \link{MatrixExtra-options}.
+See \link{MatrixExtra-options} for details.
 }
 \keyword{package}

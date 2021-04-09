@@ -11,9 +11,9 @@ set_new_matrix_behavior()
 restore_old_matrix_behavior()
 }
 \description{
-Controls some of the behaviors when calling method from
-`MatrixExtra` which differ very significantly from `Matrix` and which
-have the potential for breaking existing code in other packages.
+Controls some of the behaviors when calling methods from
+`MatrixExtra` which differ very significantly from the same methods in
+`Matrix` and which have the potential for breaking existing code in other packages.
 
 The `Matrix` package has some particular choice of behaviors which can
 inadvertently make operations very inefficient. Particularly:\itemize{
@@ -34,7 +34,7 @@ The old `Matrix` behavior can be brought back through
 `options("MatrixExtra.fast_transpose" = FALSE)`.
 
 \item When selecting slices of a sparse matrix with only one row or only one
-column, it will by default simplify them to a \bold{dense} vector, which goes
+column, `Matrix` will by default simplify them to a \bold{dense} vector, which goes
 against the purpose of using sparse structures. With this being the default,
 it's possible to inadvertently do this and end up losing all the benefits of
 a sparse data structure.
@@ -63,18 +63,19 @@ The number of threads can be controlled through `options("MatrixExtra.nthreads" 
 
 These behaviors will change at the moment one loads `MatrixExtra` through
 `library(MatrixExtra)`, save for the number of threads which will also be set
-to the maximum when calling functions as e.g. `MatrixExtra::crossprod(x,y)`
+to the maximum when calling functions as e.g. `MatrixExtra::<function>(<args>)`
 
-The package provides two functions to make all these changes simultaneously:\itemize{
+The package provides two short-hand functions to switch all these options
+simultaneously:\itemize{
 \item `restore_old_matrix_behavior`: Will change the transpose behavior to deep
 transposes in the same format, drop behavior to dense vectors, preserve NAs that are
-not in a sparse matrix in elementwise multiplication, and number of threads
+not in a sparse matrix in elementwise multiplication, and set the number of threads
 to 1.
 
 These all match with how the `Matrix` package behaves in such situations.
 \item `set_new_matrix_behavior`: Will change the transpose behavior to shallow
 transposes in the opposite format, drop behavior to sparse vectors, ignore NAs that
-are not in a sparse matrix in elementwise multiplication, and number of
+are not in a sparse matrix in elementwise multiplication, and set the number of
 threads to the available number of threads in the system.
 
 These all differ with how the `Matrix` package behaves in such situations.

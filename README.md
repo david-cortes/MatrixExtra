@@ -112,8 +112,6 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 * Function to remove zeros.
 * Matrix multiplications between `float32` and `sparseVector`.
 * Assignment operator (`[<-`).
-* `diag` and `diag<-`.
-* `norm`.
 * Some `sweep` routes with sparse vectors.
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
