@@ -8,9 +8,9 @@
 \alias{tcrossprod,float32,RsparseMatrix-method}
 \alias{crossprod,matrix,CsparseMatrix-method}
 \alias{crossprod,float32,CsparseMatrix-method}
+\alias{tcrossprod,RsparseMatrix,matrix-method}
 \alias{\%*\%,RsparseMatrix,matrix-method}
 \alias{\%*\%,RsparseMatrix,float32-method}
-\alias{tcrossprod,RsparseMatrix,matrix-method}
 \alias{tcrossprod,RsparseMatrix,float32-method}
 \alias{\%*\%,RsparseMatrix,numeric-method}
 \alias{\%*\%,RsparseMatrix,logical-method}
@@ -30,11 +30,11 @@
 
 \S4method{crossprod}{float32,CsparseMatrix}(x, y)
 
+\S4method{tcrossprod}{RsparseMatrix,matrix}(x, y)
+
 \S4method{\%*\%}{RsparseMatrix,matrix}(x, y)
 
 \S4method{\%*\%}{RsparseMatrix,float32}(x, y)
-
-\S4method{tcrossprod}{RsparseMatrix,matrix}(x, y)
 
 \S4method{tcrossprod}{RsparseMatrix,float32}(x, y)
 

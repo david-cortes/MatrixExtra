@@ -30,8 +30,6 @@
 
 ### TODO: try to make the multiplications preserve the names the same way as base R
 
-### TODO: put these methods in their own functions so thay they wouldn't create circular
-### references in 'Matrix' when 'MatrixExtra' is forcibly de-attached.
 
 #' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
 #' @description Multithreaded <matrix, matrix> multiplications
@@ -158,9 +156,7 @@ set_dimnames <- function(res, x, y, matmult=FALSE, crossprod=FALSE, tcrossprod=F
 
 #### Matrices ----
 
-#' @rdname matmult
-#' @export
-setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
+gemm_dense_csc <- function(x, y) {
     check_dimensions_match(x, y, matmult=TRUE)
 
     # restore on exit
@@ -185,11 +181,13 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
 
     res <- set_dimnames(res, x, y, matmult=TRUE)
     return(res)
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
+setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), gemm_dense_csc)
+
+gemm_f32_csc <- function(x, y) {
 
     if (is.vector(x@Data)) {
 
@@ -265,11 +263,13 @@ setMethod("%*%", signature(x="float32", y="CsparseMatrix"), function(x, y) {
 
     res <- set_dimnames(res, x, y, matmult=TRUE)
     return(new("float32", Data=res))
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y) {
+setMethod("%*%", signature(x="float32", y="CsparseMatrix"), gemm_f32_csc)
+
+tcrossprod_dense_csr <- function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
     nthreads <- max(as.integer(nthreads), 1L)
@@ -289,11 +289,13 @@ setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), function(x, y)
     )
     res <- set_dimnames(res, x, y, tcrossprod=TRUE)
     return(res)
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y) {
+setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), tcrossprod_dense_csr)
+
+tcrossprod_f32_csr <- function(x, y) {
 
     if (is.vector(x@Data)) {
 
@@ -366,18 +368,21 @@ setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), function(x, y
     )
     res <- set_dimnames(res, x, y, tcrossprod=TRUE)
     return(new("float32", Data=res))
-})
-
-
-#' @rdname matmult
-#' @export
-setMethod("crossprod", signature(x="matrix", y="CsparseMatrix"), function(x, y) {
-    return(t(x) %*% y)
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), function(x, y) {
+setMethod("tcrossprod", signature(x="float32", y="RsparseMatrix"), tcrossprod_f32_csr)
+
+crossprod_dense_csc <- function(x, y) {
+    return(gemm_dense_csc(t(x), y))
+}
+
+#' @rdname matmult
+#' @export
+setMethod("crossprod", signature(x="matrix", y="CsparseMatrix"), crossprod_dense_csc)
+
+crossprod_f32_csc <- function(x, y) {
 
     if (is.vector(x@Data)) {
         if (length(x@Data) != nrow(y))
@@ -407,17 +412,48 @@ setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), function(x, y)
     }
 
     return(t(x) %*% y)
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
-    return(tcrossprod(x, t(y)))
-})
+setMethod("crossprod", signature(x="float32", y="CsparseMatrix"), crossprod_f32_csc)
+
+tcrossprod_csr_dense <- function(x, y) {
+    check_dimensions_match(x, y, tcrossprod=TRUE)
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
+
+    if (typeof(y) != "double") mode(y) <- "double"
+    x <- as.csr.matrix(x)
+    check_valid_matrix(x)
+
+    res <- tcrossprod_csr_dense_numeric(
+        x@p,
+        x@j,
+        x@x,
+        y,
+        nthreads
+    )
+
+    res <- set_dimnames(res, x, y, tcrossprod=TRUE)
+    return(res)
+}
 
 #' @rdname matmult
 #' @export
-setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
+setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), tcrossprod_csr_dense)
+
+gemm_csr_dense <- function(x, y) {
+    return(tcrossprod_csr_dense(x, t(y)))
+}
+
+#' @rdname matmult
+#' @export
+setMethod("%*%", signature(x="RsparseMatrix", y="matrix"), gemm_csr_dense)
+
+gemm_csr_f32 <- function(x, y) {
 
     if (is.vector(y@Data)) {
         if (ncol(x) == 1L) {
@@ -449,36 +485,13 @@ setMethod("%*%", signature(x="RsparseMatrix", y="float32"), function(x, y) {
     }
 
     return(tcrossprod(x, t(y)))
-})
+}
 
 #' @rdname matmult
 #' @export
-setMethod("tcrossprod", signature(x="RsparseMatrix", y="matrix"), function(x, y) {
-    check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
-    nthreads <- max(as.integer(nthreads), 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
-    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
+setMethod("%*%", signature(x="RsparseMatrix", y="float32"), gemm_csr_f32)
 
-    if (typeof(y) != "double") mode(y) <- "double"
-    x <- as.csr.matrix(x)
-    check_valid_matrix(x)
-
-    res <- tcrossprod_csr_dense_numeric(
-        x@p,
-        x@j,
-        x@x,
-        y,
-        nthreads
-    )
-
-    res <- set_dimnames(res, x, y, tcrossprod=TRUE)
-    return(res)
-})
-
-#' @rdname matmult
-#' @export
-setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), function(x, y) {
+tcrossprod_csr_f32 <- function(x, y) {
     check_dimensions_match(x, y, tcrossprod=TRUE)
     nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
     nthreads <- max(as.integer(nthreads), 1L)
@@ -498,7 +511,11 @@ setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), function(x, y
 
     res <- set_dimnames(res, x, y, tcrossprod=TRUE)
     return(new("float32", Data=res))
-})
+}
+
+#' @rdname matmult
+#' @export
+setMethod("tcrossprod", signature(x="RsparseMatrix", y="float32"), tcrossprod_csr_f32)
 
 #### Vectors ----
 

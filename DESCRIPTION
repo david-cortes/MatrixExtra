@@ -33,3 +33,4 @@ URL: https://www.github.com/david-cortes/MatrixExtra
 BugReports: https://www.github.com/david-cortes/MatrixExtra/issues
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
+VignetteBuilder: knitr
