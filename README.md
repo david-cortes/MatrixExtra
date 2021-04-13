@@ -10,7 +10,7 @@ This package is based on code originally written for the [rsparse](https://githu
 
 The `Matrix` package provides a rich set of sparse matrix and sparse vector classes with many methods and operators so that they could be used as drop-in replacements of base R's matrices. Unfortunately, the whole package is centered around the CSC format (`CsparseMatrix`, column-major), and calling methods and operators which in principle should be efficient in CSR or COO formats will imply first converting the whole matrix to CSC format (a slow and inefficient operation which duplicates the data), on which the operation might be less efficient due to the storage order.
 
-*(longer introduction in the [vignette](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/vignettes/Introducing_MatrixExtra.html))*
+*(Longer introduction in the [vignette](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/inst/doc/Introducing_MatrixExtra.html))*
 
 Examples:
 
@@ -98,7 +98,7 @@ remotes::install_github("david-cortes/MatrixExtra")
 
 Documentation is internally available in the installed package (e.g. `?MatrixExtra::<tab>` or `?MatrixExtra::slice`).
 
-A package vignette is available [here](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/vignettes/Introducing_MatrixExtra.html).
+A package vignette is available [here](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/inst/doc/Introducing_MatrixExtra.html).
 
 # Features
 
