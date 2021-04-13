@@ -138,7 +138,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="sparse-matrix-formats" class="section level1">
 <h1>Sparse Matrix Formats</h1>
 <p>Matrices in which most of the values are zero can be more efficiently handled in a sparse representation in which only the non-zero elements and the indices which are non-zero are kept track of. Such object classes in R are provided by packages like <code>Matrix</code> or <code>SparseM</code> (or <code>igraph</code> for more specialized topics), and those objects - particularly the ones from <code>Matrix</code> - are accepted and handled efficiently by many other packages such as <a href="https://cran.r-project.org/package=rsparse">rsparse</a> or <a href="https://cran.r-project.org/package=glmnet">glmnet</a>.</p>
-<p>Typically, one encounters such sparse matrices when dealing with topics such as recommender systems (sparse matrices encoding interactions between users and items), natural language processing (counts of each word in each sentence or document), social networks or graph theory, or when doing dummy/one-got encodings of categorical covariates with many levels, among others. Oftentimes, it is not even feasible to create a dense matrix representation of these typical inputs in a computer’s memory due to the large number of elements, and there is no other choice but to use a sparse matrix format.</p>
+<p>Typically, one encounters such sparse matrices when dealing with topics such as recommender systems (sparse matrices encoding interactions between users and items), natural language processing (counts of each word in each sentence or document), social networks or graph theory, or when doing dummy/one-hot encodings of categorical covariates with many levels, among others. Oftentimes, it is not even feasible to create a dense matrix representation of these typical inputs in a computer’s memory due to the large number of elements, and there is no other choice but to use a sparse matrix format.</p>
 <p>As a general rule, if a given matrix has &lt;5% non-zero values, it is more efficient to do typical operations on it in a sparse representation, which typically comes in one of the following formats:</p>
 <div id="coo-coordinate-or-triplets-a.k.a.-tsparsematrix" class="section level4">
 <h4>1. COO (coordinate) or triplets, a.k.a. “TsparseMatrix”:</h4>
@@ -193,7 +193,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span></code></pre></div>
-<p>They can typically be converted to other formats throguh <code>methods::as</code> - example:</p>
+<p>They can typically be converted to other formats through <code>methods::as</code> - example:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(X, <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
@@ -210,7 +210,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="doesnt-matrix-provide-everything" class="section level1">
 <h1>Doesn’t Matrix provide everything?</h1>
-<p>The <code>Matrix</code> package provides most of the functions and methods from base R which one would expect, such as <code>+</code>, <code>-</code>, <code>*</code>, <code>%*%</code>, <code>sweep</code>, <code>rbind</code>, <code>cbind</code>, <code>[</code>, <code>[&lt;-</code>, <code>sqrt</code>, <code>norm</code>, among many others.</p>
+<p>The <code>Matrix</code> package provides most of the functions and methods from base R which one would expect, such as <code>+</code>, <code>-</code>, <code>*</code>, <code>%*%</code>, <code>rbind</code>, <code>cbind</code>, <code>[</code>, <code>[&lt;-</code>, <code>sqrt</code>, <code>norm</code>, among many others.</p>
 <p>However, the whole package is centered around the CSC format, with the provided functions oftentimes converting the input to CSC if it isn’t already, which is inefficient and loses many optimization potentials for operations like <code>CSR[1:100,]</code> or <code>rbind(COO, CSR)</code>, to name a few. Examples:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Xr <span class="ot">&lt;-</span> <span class="fu">as</span>(X, <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">### This will forcibly convert the matrix to triplets</span></span>
@@ -363,7 +363,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Syntactic sugar for CSR such as <code>sqrt(CSR)</code>, <code>norm(CSR)</code>, <code>diag(CSR)</code>, among others.</li>
 </ul>
 <p>Many of the operations with dense types in <code>MatrixExtra</code> allow inputs of <code>float32</code> type from the <a href="https://cran.r-project.org/package=float">float</a> package, which leads to faster operations; and many of the operations with vector types allow sparse vectors from the same <code>Matrix</code> package and dense vectors from <code>float</code>.</p>
-<p>In addition, it also provides utility functions which come in handy when sparse matrices are manually constructed out output by a different software, such as functions for sorting the indices or for removing zero-valued and <code>NA</code> elements.</p>
+<p>In addition, it also provides utility functions which come in handy when sparse matrices are manually constructed or output by a different software, such as functions for sorting the indices or for removing zero-valued and <code>NA</code> elements.</p>
 </div>
 <div id="modifying-sub-optimal-behaviors-from-matrix" class="section level1">
 <h1>Modifying sub-optimal behaviors from Matrix</h1>

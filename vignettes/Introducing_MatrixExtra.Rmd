@@ -36,7 +36,7 @@ such as [rsparse](https://cran.r-project.org/package=rsparse) or
 Typically, one encounters such sparse matrices when dealing with topics such as
 recommender systems (sparse matrices encoding interactions between users and items),
 natural language processing (counts of each word in each sentence or document),
-social networks or graph theory, or when doing dummy/one-got encodings of categorical
+social networks or graph theory, or when doing dummy/one-hot encodings of categorical
 covariates with many levels, among others. Oftentimes, it is not even feasible to create
 a dense matrix representation of these typical inputs in a computer's memory due to the
 large number of elements, and there is no other choice but to use a sparse matrix format.
@@ -123,7 +123,7 @@ X <- Matrix::sparseMatrix(
 )
 X
 ```
-They can typically be converted to other formats throguh `methods::as` - example:
+They can typically be converted to other formats through `methods::as` - example:
 ```{r}
 as(X, "RsparseMatrix")
 ```
@@ -137,7 +137,7 @@ X + X
 # Doesn't Matrix provide everything?
 
 The `Matrix` package provides most of the functions and methods from base R which one
-would expect, such as `+`, `-`, `*`, `%*%`, `sweep`, `rbind`, `cbind`, `[`, `[<-`,
+would expect, such as `+`, `-`, `*`, `%*%`, `rbind`, `cbind`, `[`, `[<-`,
 `sqrt`, `norm`, among many others.
 
 However, the whole package is centered around the CSC format, with the provided functions
@@ -281,7 +281,7 @@ from the [float](https://cran.r-project.org/package=float) package, which leads 
 same `Matrix` package and dense vectors from `float`.
 
 In addition, it also provides utility functions which come in handy when sparse matrices
-are manually constructed out output by a different software, such as functions for
+are manually constructed or output by a different software, such as functions for
 sorting the indices or for removing zero-valued and `NA` elements.
 
 # Modifying sub-optimal behaviors from Matrix
