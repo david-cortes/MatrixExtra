@@ -105,6 +105,18 @@ matmul_spcolvec_by_scolvecascsr_binary <- function(X_csr_indptr, X_csr_indices, 
     .Call(`_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary`, X_csr_indptr, X_csr_indices, X_csr_values, y_indices_base1, y_length)
 }
 
+contains_any_zero <- function(x) {
+    .Call(`_MatrixExtra_contains_any_zero`, x)
+}
+
+contains_any_inf <- function(x) {
+    .Call(`_MatrixExtra_contains_any_inf`, x)
+}
+
+contains_any_neg <- function(x) {
+    .Call(`_MatrixExtra_contains_any_neg`, x)
+}
+
 is_same_ngRMatrix <- function(indptr1, indptr2, indices1, indices2) {
     .Call(`_MatrixExtra_is_same_ngRMatrix`, indptr1, indptr2, indices1, indices2)
 }
@@ -335,6 +347,34 @@ multiply_csc_by_dense_keep_NAs_float32 <- function(indptr, indices_, values, den
 
 logicaland_csc_by_dense_keep_NAs <- function(indptr, indices_, values, dense_) {
     .Call(`_MatrixExtra_logicaland_csc_by_dense_keep_NAs`, indptr, indices_, values, dense_)
+}
+
+multiply_csr_by_dvec_no_NAs_numeric <- function(indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS) {
+    .Call(`_MatrixExtra_multiply_csr_by_dvec_no_NAs_numeric`, indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS)
+}
+
+logicaland_csr_by_dvec_internal <- function(indptr, indices, values, dvec, ncols) {
+    .Call(`_MatrixExtra_logicaland_csr_by_dvec_internal`, indptr, indices, values, dvec, ncols)
+}
+
+multiply_csr_by_dvec_with_NAs <- function(indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS) {
+    .Call(`_MatrixExtra_multiply_csr_by_dvec_with_NAs`, indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS)
+}
+
+multiply_coo_by_dense_ignore_NAs_numeric <- function(ii, jj, xx, dvec, nrows, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_ignore_NAs_numeric`, ii, jj, xx, dvec, nrows, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS)
+}
+
+multiply_coo_by_dense_ignore_NAs_logical <- function(ii, jj, xx, dvec, nrows, ncols) {
+    .Call(`_MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical`, ii, jj, xx, dvec, nrows, ncols)
+}
+
+multiply_csr_by_svec_no_NAs <- function(indptr, indices, values, ii_base1, xx, length) {
+    .Call(`_MatrixExtra_multiply_csr_by_svec_no_NAs`, indptr, indices, values, ii_base1, xx, length)
+}
+
+multiply_csr_by_svec_keep_NAs <- function(indptr, indices, values, ii_base1, xx, ncols, length) {
+    .Call(`_MatrixExtra_multiply_csr_by_svec_keep_NAs`, indptr, indices, values, ii_base1, xx, ncols, length)
 }
 
 concat_indptr2 <- function(ptr1, ptr2) {

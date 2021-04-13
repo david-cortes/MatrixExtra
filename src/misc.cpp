@@ -62,6 +62,41 @@ SEXP SafeRcppVector(void *args_)
 }
 
 // [[Rcpp::export(rng = false)]]
+bool contains_any_zero(Rcpp::NumericVector x)
+{
+    for (auto el : x)
+        if (el == 0)
+            return true;
+    return false;
+}
+
+// [[Rcpp::export(rng = false)]]
+bool contains_any_inf(Rcpp::NumericVector x)
+{
+    for (auto el : x)
+        if (isinf(el))
+            return true;
+    return false;
+}
+
+// [[Rcpp::export(rng = false)]]
+bool contains_any_neg(Rcpp::NumericVector x)
+{
+    for (auto el : x)
+        if (el < 0)
+            return true;
+    return false;
+}
+
+bool contains_any_nas_or_inf(Rcpp::NumericVector x)
+{
+    for (auto el : x)
+        if (ISNAN(el) || isinf(el))
+            return true;
+    return false;
+}
+
+// [[Rcpp::export(rng = false)]]
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
                        Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2)
 {
@@ -137,7 +172,7 @@ void sort_sparse_indices
         {
             if (!check_is_sorted(indices + ix1, n_this))
             {
-                if (argsorted.size() < n_this) {
+                if ((int)argsorted.size() < n_this) {
                     argsorted.resize(n_this);
                     temp_indices.resize(n_this);
                     temp_values.resize(n_this);

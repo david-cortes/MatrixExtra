@@ -92,34 +92,90 @@
 \alias{*,integer,RsparseMatrix-method}
 \alias{*,numeric,RsparseMatrix-method}
 \alias{*,logical,RsparseMatrix-method}
-\alias{/,RsparseMatrix,integer-method}
-\alias{/,TsparseMatrix,integer-method}
-\alias{/,RsparseMatrix,numeric-method}
-\alias{/,TsparseMatrix,numeric-method}
-\alias{/,RsparseMatrix,logical-method}
-\alias{/,TsparseMatrix,logical-method}
-\alias{\%/\%,RsparseMatrix,integer-method}
-\alias{\%/\%,TsparseMatrix,integer-method}
-\alias{\%/\%,RsparseMatrix,numeric-method}
-\alias{\%/\%,TsparseMatrix,numeric-method}
-\alias{\%/\%,RsparseMatrix,logical-method}
-\alias{\%/\%,TsparseMatrix,logical-method}
-\alias{\%\%,RsparseMatrix,integer-method}
-\alias{\%\%,TsparseMatrix,integer-method}
-\alias{\%\%,RsparseMatrix,numeric-method}
-\alias{\%\%,TsparseMatrix,numeric-method}
-\alias{\%\%,RsparseMatrix,logical-method}
-\alias{\%\%,TsparseMatrix,logical-method}
-\alias{^,RsparseMatrix,integer-method}
-\alias{^,TsparseMatrix,integer-method}
-\alias{^,RsparseMatrix,numeric-method}
-\alias{^,TsparseMatrix,numeric-method}
-\alias{^,RsparseMatrix,logical-method}
-\alias{^,TsparseMatrix,logical-method}
+\alias{&,RsparseMatrix,integer-method}
+\alias{&,RsparseMatrix,numeric-method}
 \alias{&,RsparseMatrix,logical-method}
+\alias{&,integer,RsparseMatrix-method}
+\alias{&,numeric,RsparseMatrix-method}
+\alias{&,logical,RsparseMatrix-method}
+\alias{/,RsparseMatrix,integer-method}
+\alias{/,RsparseMatrix,numeric-method}
+\alias{/,RsparseMatrix,logical-method}
+\alias{/,RsparseMatrix,matrix-method}
+\alias{/,integer,RsparseMatrix-method}
+\alias{/,numeric,RsparseMatrix-method}
+\alias{/,logical,RsparseMatrix-method}
+\alias{/,matrix,RsparseMatrix-method}
+\alias{\%\%,RsparseMatrix,integer-method}
+\alias{\%\%,RsparseMatrix,numeric-method}
+\alias{\%\%,RsparseMatrix,logical-method}
+\alias{\%\%,RsparseMatrix,matrix-method}
+\alias{\%\%,integer,RsparseMatrix-method}
+\alias{\%\%,numeric,RsparseMatrix-method}
+\alias{\%\%,logical,RsparseMatrix-method}
+\alias{\%\%,matrix,RsparseMatrix-method}
+\alias{\%/\%,RsparseMatrix,integer-method}
+\alias{\%/\%,RsparseMatrix,numeric-method}
+\alias{\%/\%,RsparseMatrix,logical-method}
+\alias{\%/\%,RsparseMatrix,matrix-method}
+\alias{\%/\%,integer,RsparseMatrix-method}
+\alias{\%/\%,numeric,RsparseMatrix-method}
+\alias{\%/\%,logical,RsparseMatrix-method}
+\alias{\%/\%,matrix,RsparseMatrix-method}
+\alias{^,RsparseMatrix,integer-method}
+\alias{^,RsparseMatrix,numeric-method}
+\alias{^,RsparseMatrix,logical-method}
+\alias{^,RsparseMatrix,matrix-method}
+\alias{^,integer,RsparseMatrix-method}
+\alias{^,numeric,RsparseMatrix-method}
+\alias{^,logical,RsparseMatrix-method}
+\alias{^,matrix,RsparseMatrix-method}
+\alias{*,TsparseMatrix,integer-method}
+\alias{*,TsparseMatrix,numeric-method}
+\alias{*,TsparseMatrix,logical-method}
+\alias{*,integer,TsparseMatrix-method}
+\alias{*,numeric,TsparseMatrix-method}
+\alias{*,logical,TsparseMatrix-method}
+\alias{&,TsparseMatrix,integer-method}
+\alias{&,TsparseMatrix,numeric-method}
 \alias{&,TsparseMatrix,logical-method}
-\alias{|,RsparseMatrix,logical-method}
-\alias{|,TsparseMatrix,logical-method}
+\alias{&,integer,TsparseMatrix-method}
+\alias{&,numeric,TsparseMatrix-method}
+\alias{&,logical,TsparseMatrix-method}
+\alias{/,TsparseMatrix,integer-method}
+\alias{/,TsparseMatrix,numeric-method}
+\alias{/,TsparseMatrix,logical-method}
+\alias{/,TsparseMatrix,matrix-method}
+\alias{/,integer,TsparseMatrix-method}
+\alias{/,numeric,TsparseMatrix-method}
+\alias{/,logical,TsparseMatrix-method}
+\alias{/,matrix,TsparseMatrix-method}
+\alias{\%\%,TsparseMatrix,integer-method}
+\alias{\%\%,TsparseMatrix,numeric-method}
+\alias{\%\%,TsparseMatrix,logical-method}
+\alias{\%\%,TsparseMatrix,matrix-method}
+\alias{\%\%,integer,TsparseMatrix-method}
+\alias{\%\%,numeric,TsparseMatrix-method}
+\alias{\%\%,logical,TsparseMatrix-method}
+\alias{\%\%,matrix,TsparseMatrix-method}
+\alias{\%/\%,TsparseMatrix,integer-method}
+\alias{\%/\%,TsparseMatrix,numeric-method}
+\alias{\%/\%,TsparseMatrix,logical-method}
+\alias{\%/\%,TsparseMatrix,matrix-method}
+\alias{\%/\%,integer,TsparseMatrix-method}
+\alias{\%/\%,numeric,TsparseMatrix-method}
+\alias{\%/\%,logical,TsparseMatrix-method}
+\alias{\%/\%,matrix,TsparseMatrix-method}
+\alias{^,TsparseMatrix,integer-method}
+\alias{^,TsparseMatrix,numeric-method}
+\alias{^,TsparseMatrix,logical-method}
+\alias{^,TsparseMatrix,matrix-method}
+\alias{^,integer,TsparseMatrix-method}
+\alias{^,numeric,TsparseMatrix-method}
+\alias{^,logical,TsparseMatrix-method}
+\alias{^,matrix,TsparseMatrix-method}
+\alias{*,RsparseMatrix,sparseVector-method}
+\alias{*,sparseVector,RsparseMatrix-method}
 \title{Mathematical operators on CSR and COO matrices}
 \usage{
 \S4method{*}{RsparseMatrix,sparseMatrix}(e1, e2)
@@ -302,61 +358,173 @@
 
 \S4method{*}{logical,RsparseMatrix}(e1, e2)
 
-\S4method{/}{RsparseMatrix,integer}(e1, e2)
+\S4method{&}{RsparseMatrix,integer}(e1, e2)
 
-\S4method{/}{TsparseMatrix,integer}(e1, e2)
-
-\S4method{/}{RsparseMatrix,numeric}(e1, e2)
-
-\S4method{/}{TsparseMatrix,numeric}(e1, e2)
-
-\S4method{/}{RsparseMatrix,logical}(e1, e2)
-
-\S4method{/}{TsparseMatrix,logical}(e1, e2)
-
-\S4method{\%/\%}{RsparseMatrix,integer}(e1, e2)
-
-\S4method{\%/\%}{TsparseMatrix,integer}(e1, e2)
-
-\S4method{\%/\%}{RsparseMatrix,numeric}(e1, e2)
-
-\S4method{\%/\%}{TsparseMatrix,numeric}(e1, e2)
-
-\S4method{\%/\%}{RsparseMatrix,logical}(e1, e2)
-
-\S4method{\%/\%}{TsparseMatrix,logical}(e1, e2)
-
-\S4method{\%\%}{RsparseMatrix,integer}(e1, e2)
-
-\S4method{\%\%}{TsparseMatrix,integer}(e1, e2)
-
-\S4method{\%\%}{RsparseMatrix,numeric}(e1, e2)
-
-\S4method{\%\%}{TsparseMatrix,numeric}(e1, e2)
-
-\S4method{\%\%}{RsparseMatrix,logical}(e1, e2)
-
-\S4method{\%\%}{TsparseMatrix,logical}(e1, e2)
-
-\S4method{^}{RsparseMatrix,integer}(e1, e2)
-
-\S4method{^}{TsparseMatrix,integer}(e1, e2)
-
-\S4method{^}{RsparseMatrix,numeric}(e1, e2)
-
-\S4method{^}{TsparseMatrix,numeric}(e1, e2)
-
-\S4method{^}{RsparseMatrix,logical}(e1, e2)
-
-\S4method{^}{TsparseMatrix,logical}(e1, e2)
+\S4method{&}{RsparseMatrix,numeric}(e1, e2)
 
 \S4method{&}{RsparseMatrix,logical}(e1, e2)
 
+\S4method{&}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{&}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{&}{logical,RsparseMatrix}(e1, e2)
+
+\S4method{/}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{/}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{/}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{/}{RsparseMatrix,matrix}(e1, e2)
+
+\S4method{/}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{/}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{/}{logical,RsparseMatrix}(e1, e2)
+
+\S4method{/}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{\%\%}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{\%\%}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{\%\%}{RsparseMatrix,matrix}(e1, e2)
+
+\S4method{\%\%}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{logical,RsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{\%/\%}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{\%/\%}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{\%/\%}{RsparseMatrix,matrix}(e1, e2)
+
+\S4method{\%/\%}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{logical,RsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{^}{RsparseMatrix,integer}(e1, e2)
+
+\S4method{^}{RsparseMatrix,numeric}(e1, e2)
+
+\S4method{^}{RsparseMatrix,logical}(e1, e2)
+
+\S4method{^}{RsparseMatrix,matrix}(e1, e2)
+
+\S4method{^}{integer,RsparseMatrix}(e1, e2)
+
+\S4method{^}{numeric,RsparseMatrix}(e1, e2)
+
+\S4method{^}{logical,RsparseMatrix}(e1, e2)
+
+\S4method{^}{matrix,RsparseMatrix}(e1, e2)
+
+\S4method{*}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{*}{TsparseMatrix,numeric}(e1, e2)
+
+\S4method{*}{TsparseMatrix,logical}(e1, e2)
+
+\S4method{*}{integer,TsparseMatrix}(e1, e2)
+
+\S4method{*}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{*}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{&}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{&}{TsparseMatrix,numeric}(e1, e2)
+
 \S4method{&}{TsparseMatrix,logical}(e1, e2)
 
-\S4method{|}{RsparseMatrix,logical}(e1, e2)
+\S4method{&}{integer,TsparseMatrix}(e1, e2)
 
-\S4method{|}{TsparseMatrix,logical}(e1, e2)
+\S4method{&}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{&}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{/}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{/}{TsparseMatrix,numeric}(e1, e2)
+
+\S4method{/}{TsparseMatrix,logical}(e1, e2)
+
+\S4method{/}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{/}{integer,TsparseMatrix}(e1, e2)
+
+\S4method{/}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{/}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{/}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,numeric}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,logical}(e1, e2)
+
+\S4method{\%\%}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{\%\%}{integer,TsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{\%\%}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{\%/\%}{TsparseMatrix,numeric}(e1, e2)
+
+\S4method{\%/\%}{TsparseMatrix,logical}(e1, e2)
+
+\S4method{\%/\%}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{\%/\%}{integer,TsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{\%/\%}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{^}{TsparseMatrix,integer}(e1, e2)
+
+\S4method{^}{TsparseMatrix,numeric}(e1, e2)
+
+\S4method{^}{TsparseMatrix,logical}(e1, e2)
+
+\S4method{^}{TsparseMatrix,matrix}(e1, e2)
+
+\S4method{^}{integer,TsparseMatrix}(e1, e2)
+
+\S4method{^}{numeric,TsparseMatrix}(e1, e2)
+
+\S4method{^}{logical,TsparseMatrix}(e1, e2)
+
+\S4method{^}{matrix,TsparseMatrix}(e1, e2)
+
+\S4method{*}{RsparseMatrix,sparseVector}(e1, e2)
+
+\S4method{*}{sparseVector,RsparseMatrix}(e1, e2)
 }
 \arguments{
 \item{e1}{A sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.}
@@ -376,8 +544,9 @@ By default, when doing elementwise multiplication (`*`) between a sparse and a d
 matrix or vice-versa, if the dense matrix has missing values (`NA` / `NaN`) at some coordinate in
 which the sparse matrix has no present entry, the resulting output will not have an entry there either,
 which differs from the behavior of `Matrix` and base R, but makes the operation much faster.
+The same applies to division by zero and exponentiation to zero.
 
-If such missing values are to be preserved, this behavior can be changed through the package
+If such missing values (or infinites and ones) are to be preserved, this behavior can be changed through the package
 options (i.e. `options("MatrixExtra.ignore_na" = FALSE)` - see \link{MatrixExtra-options}).
 
 The indices of the matrices might be sorted in-place for some operations

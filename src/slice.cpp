@@ -660,12 +660,14 @@ real_t extract_single_val_csr
     else {
         int *st_this = indices + indptr[row];
         int *end_this = indices + indptr[row+1];
-        size_t n_this = end_this - st_this;
-        if (!is_sorted)
-        {
+        if (!is_sorted) {
             for (int *ix = st_this; ix < end_this; ix++)
                 if (*ix == col)
                     return values? values[ix - indices] : 1;
+            return 0;
+        }
+
+        if (col < *st_this || col > *(end_this-1)) {
             return 0;
         }
 

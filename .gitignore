@@ -2,8 +2,16 @@
 src/*.o
 src/*.so
 src/*.dll
+src/Makevars
+autom4te.cache/*
+config.log
+config.status
 old/*
 deleteme/*
 .Rproj.user/*
 .Rproj.user
 .Rhistory
+inst/doc
+vignettes_/*
+real-sim
+vignettes/real-sim

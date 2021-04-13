@@ -175,15 +175,15 @@ deepcopy_before_sort <- function(X, logical=FALSE, binary=FALSE) {
     ) {
         if (inherits(X, "RsparseMatrix")) {
             X@j <- deepcopy_int(X@j)
-        } else if (inherits(X, "CsparseMatrix")) {
+        } else if (inherits(X, c("CsparseMatrix", "sparseVector"))) {
             X@i <- deepcopy_int(X@i)
         } else if (inherits(X, "TsparseMatrix")) {
             X@i <- deepcopy_int(X@i)
         }
 
-        if (inherits(X, "dsparseMatrix")) {
+        if (inherits(X, c("dsparseMatrix", "dsparseVector"))) {
             X@x <- deepcopy_num(X@x)
-        } else if (inherits(X, "lsparseMatrix")) {
+        } else if (inherits(X, c("lsparseMatrix", "lsparseVector"))) {
             X@x <- deepcopy_log(X@x)
         }
     }

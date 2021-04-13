@@ -334,6 +334,8 @@ as.sparse.vector <- function(x, binary=FALSE, logical=FALSE, integer=FALSE) {
     if (inherits(x, "float32"))
         x <- float::dbl(x)
 
+    x <- as(x, "sparseVector")
+
     if (!binary && !logical && !integer) {
         if (!inherits(x, "dsparseVector"))
             x <- as(x, "dsparseVector")

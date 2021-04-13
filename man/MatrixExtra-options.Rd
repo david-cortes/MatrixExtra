@@ -65,7 +65,9 @@ through `options("MatrixExtra.inplace_sort" = FALSE)`.
 \item When doing elementwise multiplication (`*`) of a sparse matrix by a
 dense matrix or vice-versa, if the dense matrix has a `NA` or `NaN` element
 in a coordinate at which the sparse matrix has no entry, `Matrix` will preserve
-the `NA` in the resulting output, as does base R.
+the `NA` in the resulting output, as does base R. This also applies with the
+propagation of 1s when using the `^` operator with zeros in the RHS, and with
+propagation of infinities in division by zero.
 
 `MatrixExtra` will instead ignore such `NA`s, which makes the operation much
 faster. The old `Matrix` behavior can be brought back through

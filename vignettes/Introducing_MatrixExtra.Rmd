@@ -1,0 +1,397 @@
+---
+title: "Introducing MatrixExtra"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introducing_MatrixExtra}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+"MatrixExtra" is an R package which extends the sparse matrix and sparse vector classes
+from the [Matrix](https://cran.r-project.org/package=Matrix) package, particularly the
+CSR formats, by providing optimized functions, methods, and operators which exploit the
+storage order (COO, CSC, CSR) of the inputs and work natively with different formats, such
+as slicing (e.g. `X[1:10,]`), concatenation (e.g. `rbind(X, Y)`, `cbind(X, Y)`),
+matrix multiplication with a dense matrix (`X %*% Y`), or elementwise
+multiplication (`X * Y`).
+
+# Sparse Matrix Formats
+
+Matrices in which most of the values are zero can be more efficiently handled in a sparse
+representation in which only the non-zero elements and the indices which are non-zero are
+kept track of. Such object classes in R are provided by packages like `Matrix` or
+`SparseM` (or `igraph` for more specialized topics), and those objects - particularly
+the ones from `Matrix` - are accepted and handled efficiently by many other packages
+such as [rsparse](https://cran.r-project.org/package=rsparse) or
+[glmnet](https://cran.r-project.org/package=glmnet).
+
+Typically, one encounters such sparse matrices when dealing with topics such as
+recommender systems (sparse matrices encoding interactions between users and items),
+natural language processing (counts of each word in each sentence or document),
+social networks or graph theory, or when doing dummy/one-got encodings of categorical
+covariates with many levels, among others. Oftentimes, it is not even feasible to create
+a dense matrix representation of these typical inputs in a computer's memory due to the
+large number of elements, and there is no other choice but to use a sparse matrix format.
+
+As a general rule, if a given matrix has <5% non-zero values, it is more efficient to do
+typical operations on it in a sparse representation, which typically comes in one of the
+following formats:
+
+#### 1. COO (coordinate) or triplets, a.k.a. "TsparseMatrix":
+
+The COO format is the simplest form, consisting of storing all the triplets
+`(row,column,value)` which are non-zero.
+
+The COO format is typically not optimal to operate with, but allows easy conversion
+to CSR and CSC formats (see below). Nevertheless, some operations such as concatenating
+inputs (`rbind`, `cbind`) or elementwise multiplication with a dense matrix (`X * Y`)
+are efficient with a COO representation.
+
+#### 2. CSR (compressed sparse row), a.k.a. "RsparseMatrix"
+
+The CSR format, instead of of storing triplets, stores the elements in a row-major format,
+keeping track only of the column indices and of the positions at which the column indices
+for a given row start and end. Typically the column indices are meant to be sorted within
+each row, but this is not strictly assumed by all software or all functions.
+
+The CSR format is optimal for doing row-based operations, such as selecting rows
+(`X[1:1000,]`), concatenating by rows (`rbind`), or matrix multiplication with
+a vector (`CSR %*% v`).
+
+#### 3. CSC (compressed sparse column), a.k.a. "CsparseMatrix"
+
+The CSC format is the same as the CSR format, but is column-major instead of row-major.
+
+The CSC format is optimal for doing column-based operations, such as selecting columns
+(`X[, 1:1000]`), concatenating by columns (`cbind`), and matrix multiplication
+with a dense matrix in column-major format (like all R's matrices) as the LHS
+(`Dense %*% CSC`). Typically, tree-based methods work with CSC format.
+
+#### 4. Sparse vectors
+
+A vector (single row or single column) can also be represented in a sparse format by
+keeping track of the indices which are non-zero and the values.
+
+Sparse vectors are typically not used but some operations involving them are fast, such
+as inner products or matrix multiplication with a CSR matrix as the LHS (`CSR %*% v`).
+
+# Sparse objects in Matrix
+
+The `Matrix` package provides S4 classes to represent all the formats above in R. These
+objects are handled in a rich hierarchy of different matrix types with multiple inheritance.
+In general, one should keep in mind the following points:
+
+* COO formats are called `TsparseMatrix`.
+* CSR formats are called `RsparseMatrix`.
+* CSC formats are called `CsparseMatrix`.
+* The actual matrices will not be of a class like `RsparseMatrix`, but will rather
+have a class which inherits from it (has `RsparseMatrix` as parent class), and be
+of a different type depending on the type of elements (`dsparseMatrix` for numeric values,
+`lsparseMatrix` for logical values, `nsparseMatrix` for binary values), and depending
+on whether they are symmetric, triangular-diagonal, or regular.
+* Typically, one deals with sparse matrices which are numeric and of general format.
+These are `dgTMatrix`, `dgRMatrix`, and `dgCMatrix`; but oftentimes when dealing with
+`Matrix` methods, one has to refer to the parent class - e.g. `as(X, "RsparseMatrix")`,
+but not `as(X, "dgRMatrix")` (which is what one usually wants to do).
+
+
+Sparse matrices can be created in any of the three formats in `Matrix` with the function
+`sparseMatrix` - example:
+```{r}
+library(Matrix)
+### Will construct this Matrix
+### [ 1, 0, 2 ]
+### [ 0, 0, 3 ]
+### [ 0, 4, 0 ]
+### Non-zero coordinates are:
+### [(1,1), (1,3), (2,3), (3,2)]
+### Row and column coordinates go separate
+row_ix <- c(1, 1, 2, 3)
+col_ix <- c(1, 3, 3, 2)
+values <- c(1, 2, 3, 4)
+X <- Matrix::sparseMatrix(
+    i=row_ix, j=col_ix, x=values,
+    index1=TRUE, repr="T"
+)
+X
+```
+They can typically be converted to other formats throguh `methods::as` - example:
+```{r}
+as(X, "RsparseMatrix")
+```
+
+Such `Matrix` objects have a lot of defined operators and functions so that they could
+be used as drop-in replacements of base R matrices - e.g.:
+```{r}
+X + X
+```
+
+# Doesn't Matrix provide everything?
+
+The `Matrix` package provides most of the functions and methods from base R which one
+would expect, such as `+`, `-`, `*`, `%*%`, `sweep`, `rbind`, `cbind`, `[`, `[<-`,
+`sqrt`, `norm`, among many others.
+
+However, the whole package is centered around the CSC format, with the provided functions
+oftentimes converting the input to CSC if it isn't already, which is inefficient and loses
+many optimization potentials for operations like `CSR[1:100,]` or `rbind(COO, CSR)`,
+to name a few. Examples:
+```{r}
+Xr <- as(X, "RsparseMatrix")
+### This will forcibly convert the matrix to triplets
+Xr[1:2, ]
+```
+```{r}
+### This will forcibly convert the matrix to CSC
+rbind(Xr, Xr)
+```
+```{r}
+### This will forcibly convert the matrix to CSC
+X * X
+```
+```{r, error=TRUE}
+### This should be a straighforward operation
+as(Xr, "ngRMatrix")
+```
+```{r}
+### This doesn't do what it should
+as(Xr, "nsparseMatrix")
+```
+
+Many of these methods can be woefully inefficient when dealing with real, large datasets,
+particularly when dealing with the CSR format:
+```{r}
+library(microbenchmark)
+set.seed(1)
+X_big_csc <- Matrix::rsparsematrix(1e4, 1e4, .05, repr="C")
+X_big_csr <- as(t(X_big_csc), "RsparseMatrix")
+microbenchmark({X_slice <- X_big_csr[1:10, ]}, times=10L)
+```
+
+Compare against what should be the mirror operation in CSC format:
+```{r}
+microbenchmark({X_slice <- X_big_csc[, 1:10]}, times=10L)
+```
+
+Some operations in `Matrix`, even if done natively in CSC format with a CSC input,
+can still be slower than one would expect and than what could in theory be achieved with
+different algorithms, oftentimes due to making copies of the data:
+```{r}
+microbenchmark({X_col <- X_big_csc[, 100, drop=FALSE]}, times=10L)
+```
+
+It should also be kept in mind that `Matrix` does not exploit multi-threading in
+dense-sparse matrix multiplications, which have substantial potential for acceleration:
+```{r}
+set.seed(1)
+Y_dense <- matrix(rnorm(1e2*nrow(X_big_csc)), nrow=1e2)
+microbenchmark({Z <- Y_dense %*% X_big_csc}, times=10L)
+```
+
+# Why is CSR needed?
+
+The CSR sparse format is particularly useful when dealing with machine learning
+applications - e.g. splitting between a train and test set, tokenizing text features,
+multiplying a matrix by a vector of coefficients, calculating a gradient
+observation-by-observation, among others. Many stochastic optimization techniques and
+libraries (e.g. LibSVM, VowpalWabbit) require the inputs to be in CSR format or
+alike (see also [readsparse](https://cran.r-project.org/package=readsparse)), which does
+not play well with the column-centric methods of Matrix.
+
+In principle, one could stick with just the CSC format from Matrix and keep a mental map of
+the matrix as being transposed. This however gets complicated rather soon and is very prone
+to errors. Additionally, one might want to pass sparse matrices to another package whose code
+is outside of one's control, for which the storage format can make a large difference in
+performance.
+
+# MatrixExtra to the rescue
+
+`MatrixExtra` is a package which extends the same classes from `Matrix` for COO, CSR, CSC,
+and sparse vectors, by providing optimized replacements for typical methods which will work
+without changing the storage format of the matrices when not necessary; and providing
+some faster replacements of many methods.
+
+```{r}
+library(MatrixExtra)
+```
+
+The earlier examples would now become:
+```{r}
+### This will not change the format
+Xr[1:2, ]
+```
+```{r}
+### This will not change the format
+rbind(Xr, Xr)
+```
+```{r}
+### This will not change the format
+Xr * Xr
+```
+
+Some of these operations now become much more efficient when the inputs are large:
+```{r}
+microbenchmark({X_slice <- X_big_csr[1:10, ]}, times=10L)
+```
+
+Other methods, despite having been fast before in `Matrix`, will still be replaced with
+faster versions:
+```{r}
+microbenchmark({X_col <- X_big_csc[, 100, drop=FALSE]}, times=10L)
+```
+
+```{r}
+microbenchmark({Z <- Y_dense %*% X_big_csc}, times=10L)
+```
+
+Conversions between sparse matrix classes also become easier:
+```{r}
+as(Xr, "ngRMatrix")
+```
+```{r}
+MatrixExtra::as.csr.matrix(Xr, binary=TRUE)
+```
+
+# What else does it do?
+
+Here's a non-comprehensive list of operations which are accelerated by `MatrixExtra`:
+
+* `CSR %*% dense`, `dense %*% CSC`, `tcrossprod(CSR, dense)`, `tcrossprod(dense, CSR)`,
+`crossprod(dense, CSC)`, `CSR %*% vector`.
+* `rbind(CSR, CSR)`, `rbind(CSR, COO)`, `rbind(CSR, vector)`, `rbind(COO, vector)`.
+* `cbind(CSR, CSR)`, `cbind(CSR, vector)`, `cbind(CSR, COO)`.
+* `CSR * dense`, `CSR * vector`, `COO * dense`, `COO * vector`,
+`CSR * scalar`, `COO * scalar` (and other similarly-working operators like
+`&`, `^`, `%`, `%%`, `%/%`).
+* `CSR + CSR`, `CSR + COO`, `CSC + CSC`, `CSC + COO`, `CSR + CSC` (and `|`).
+* `t(CSR)`, `t(CSC)`.
+* `CSR[i,j]`, `CSC[i,j]`, `COO[i,j]`.
+* Syntactic sugar for CSR such as `sqrt(CSR)`, `norm(CSR)`, `diag(CSR)`, among others.
+
+Many of the operations with dense types in `MatrixExtra` allow inputs of `float32` type
+from the [float](https://cran.r-project.org/package=float) package, which leads to faster operations; and many of the operations with vector types allow sparse vectors from the
+same `Matrix` package and dense vectors from `float`.
+
+In addition, it also provides utility functions which come in handy when sparse matrices
+are manually constructed out output by a different software, such as functions for
+sorting the indices or for removing zero-valued and `NA` elements.
+
+# Modifying sub-optimal behaviors from Matrix
+
+When one loads `MatrixExtra` through `library(MatrixExtra)`, it will modify some
+behaviors from `Matrix` in important ways which make them more efficient, but which
+can cause breakage in code or in packages which make certain assumptions about
+`Matrix` methods. Among others:
+
+* Transposing a CSC or CSR matrix returns an object in the opposite format:
+```{r}
+### Here Matrix would return a 'dgRMatrix'
+t(Xr)
+```
+* Dropping a slice of a sparse matrix returns a sparse vector:
+```{r}
+### Here Matrix would return a dense vector
+Xr[1,]
+```
+
+These behaviors can be changed to their less-optimal versions as would be done by `Matrix`,
+either individually (see `?MatrixExtra-options`) or all at once:
+```{r}
+restore_old_matrix_behavior()
+set_new_matrix_behavior()
+```
+
+# A real-world example
+
+One would wonder what kind of workflows specifically does `MatrixExtra` improve upon,
+and one obvious example would be fitting a logistic regression with gradient-based
+procedures.
+
+This example here will fit a binary logistic regression with L2 regularization using the
+L-BFGS-B optimizer in R. For simplicity purposes, the intercept will be calculated
+by concatenating a column of 1s to the data, but note that this is not the most efficient
+way of doing it.
+
+The dataset used is the "Real-Simulated" data, downloaded from [LibSVM datasets](https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html#real-sim). This is an artificially-generated toy dataset for which it's easy to achieve almost-perfect accuracy, but it's nevertheless a large-ish dataset in which the improved methods and
+operators here become noticeable.
+
+Loading the data:
+```{r}
+library(readsparse)
+data <- readsparse::read.sparse("real-sim")
+X <- data$X
+y <- as.numeric(factor(data$y))-1 ### convert to 0/1
+dim(X)
+```
+
+Adding the intercept and creating a 50-50 train-test split:
+```{r}
+X <- cbind(rep(1, nrow(X)), X) ### Accelerated by 'MatrixExtra'
+set.seed(1)
+ix_train <- sample(nrow(X), floor(.5*nrow(X)), replace=FALSE)
+ix_test <- setdiff(seq_len(nrow(X)), ix_train)
+X_train <- X[ix_train,] ### Accelerated by 'MatrixExtra'
+y_train <- y[ix_train]
+X_test <- X[ix_test,] ### Accelerated by 'MatrixExtra'
+y_test <- y[ix_test]
+```
+
+Now fitting the model:
+```{r}
+logistic_fun <- function(coefs, X, y, lambda) {
+    pred <- 1 / (1 + exp(-as.numeric(X %*% coefs))) ### Accelerated by 'MatrixExtra'
+    llh <- mean(-(y * log(pred) + (1 - y) * log(1 - pred)))
+    reg <- lambda * as.numeric(coefs %*% coefs)
+    ### Don't regularize the intercept
+    reg <- reg - lambda * (coefs[1]^2)
+    return(llh + reg)
+}
+
+logistic_grad <- function(coefs, X, y, lambda) {
+    pred <- 1 / (1 + exp(-(X %*% coefs))) ### Accelerated by 'MatrixExtra'
+    grad <- colMeans(X * as.numeric(pred - y)) ### Accelerated by 'MatrixExtra'
+    grad <- grad + 2 * lambda * as.numeric(coefs)
+    ### Don't regularize the intercept
+    grad[1] <- grad[1] - 2 * lambda * coefs[1]
+    return(as.numeric(grad))
+}
+
+lambda <- 1e-5 ### <- Regularization parameter
+res <- optim(numeric(ncol(X_train)),
+             logistic_fun,
+             logistic_grad,
+             method="L-BFGS-B",
+             X_train, y_train, lambda)
+fitted_coefs <- res$par
+```
+
+Verify that the model has good performance:
+```{r}
+y_hat_test <- as.numeric(X_test %*% fitted_coefs)
+MLmetrics::AUC(y_hat_test, y_test)
+```
+
+Timing the optimizer:
+```{r}
+x0 <- numeric(ncol(X_train))
+microbenchmark::microbenchmark({
+  res <- optim(x0,
+               logistic_fun,
+               logistic_grad,
+               method="L-BFGS-B",
+               X_train, y_train, lambda)
+}, times=10L)
+```
+
+The same routine using `Matrix` would usually take above 3 seconds (60-70% slower)
+in this same setup, plus some extra time in the data preparation. The only thing that
+was needed to accelerate it was to load `library(MatrixExtra)`, with everything
+else remaining the same as it would have been in base R or `Matrix`.

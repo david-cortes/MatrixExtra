@@ -30,6 +30,9 @@
 
 ### TODO: try to make the multiplications preserve the names the same way as base R
 
+### TODO: put these methods in their own functions so thay they wouldn't create circular
+### references in 'Matrix' when 'MatrixExtra' is forcibly de-attached.
+
 #' @title Multithreaded Sparse-Dense Matrix and Vector Multiplications
 #' @description Multithreaded <matrix, matrix> multiplications
 #' (`\%*\%`, `crossprod`, and `tcrossprod`)
@@ -560,7 +563,6 @@ gemv_csr_vec <- function(x, y) {
             x <- deepcopy_before_sort(x)
         x <- as.csr.matrix(x)
         x <- sort_sparse_indices(x, copy=!inplace_sort)
-        
         y <- sort_sparse_indices(y, copy=!inplace_sort)
 
         if (inherits(y, "dsparseVector")) {
@@ -630,7 +632,8 @@ outerprod_csrsinglecol_by_dvec <- function(x, y) {
     check_valid_matrix(x)
 
     if (inherits(y, "sparseVector")) {
-        y <- sort_sparse_indices(y, copy=!getOption("MatrixExtra.inplace_sort", default=FALSE))
+        inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+        y <- sort_sparse_indices(y, copy=!inplace_sort)
 
         if (inherits(y, "dsparseVector")) {
             res <- matmul_spcolvec_by_scolvecascsr_numeric(

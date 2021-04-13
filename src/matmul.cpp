@@ -499,7 +499,7 @@ Rcpp::NumericVector matmul_csr_svec(Rcpp::IntegerVector X_csr_indptr,
         ptr1 = ptr_X_indices + X_csr_indptr[row];
         end1 = ptr_X_indices + X_csr_indptr[row+1];
         ptr2 = ptr_y_indices;
-
+        
         while (true)
         {
             if (ptr1 >= end1 || ptr2 >= end_y) {

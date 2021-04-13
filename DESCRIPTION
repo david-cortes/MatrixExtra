@@ -21,8 +21,16 @@ License: GPL (>= 2)
 Depends: Matrix (>= 1.3), methods
 Imports: Rcpp, RhpcBLASctl, float
 LinkingTo: Rcpp
-Suggests: testthat, data.table
+Suggests: 
+    testthat,
+    data.table,
+    knitr,
+    rmarkdown,
+    microbenchmark,
+    MLmetrics,
+    readsparse
 URL: https://www.github.com/david-cortes/MatrixExtra
 BugReports: https://www.github.com/david-cortes/MatrixExtra/issues
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
+VignetteBuilder: knitr

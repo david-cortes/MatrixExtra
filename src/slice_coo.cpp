@@ -101,7 +101,7 @@ void process_i_arbitrary
     {
         for (int ix = 0; ix < rows_take_base1.size(); ix++)
             i_mapping[rows_take_base1[ix]-1] = ix;
-        i_has_duplicates = i_mapping.size() != rows_take_base1.size();
+        i_has_duplicates = i_mapping.size() != (size_t)rows_take_base1.size();
 
         if (i_has_duplicates)
         {

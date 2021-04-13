@@ -374,6 +374,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// contains_any_zero
+bool contains_any_zero(Rcpp::NumericVector x);
+RcppExport SEXP _MatrixExtra_contains_any_zero(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(contains_any_zero(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// contains_any_inf
+bool contains_any_inf(Rcpp::NumericVector x);
+RcppExport SEXP _MatrixExtra_contains_any_inf(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(contains_any_inf(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// contains_any_neg
+bool contains_any_neg(Rcpp::NumericVector x);
+RcppExport SEXP _MatrixExtra_contains_any_neg(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(contains_any_neg(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // is_same_ngRMatrix
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2);
 RcppExport SEXP _MatrixExtra_is_same_ngRMatrix(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP) {
@@ -1094,6 +1124,127 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// multiply_csr_by_dvec_no_NAs_numeric
+Rcpp::NumericVector multiply_csr_by_dvec_no_NAs_numeric(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::NumericVector dvec, const int ncols, const bool multiply, const bool powerto, const bool divide, const bool divrest, const bool intdiv, const bool X_is_LHS);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_dvec_no_NAs_numeric(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dvecSEXP, SEXP ncolsSEXP, SEXP multiplySEXP, SEXP powertoSEXP, SEXP divideSEXP, SEXP divrestSEXP, SEXP intdivSEXP, SEXP X_is_LHSSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dvec(dvecSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type multiply(multiplySEXP);
+    Rcpp::traits::input_parameter< const bool >::type powerto(powertoSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divide(divideSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divrest(divrestSEXP);
+    Rcpp::traits::input_parameter< const bool >::type intdiv(intdivSEXP);
+    Rcpp::traits::input_parameter< const bool >::type X_is_LHS(X_is_LHSSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_dvec_no_NAs_numeric(indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logicaland_csr_by_dvec_internal
+Rcpp::LogicalVector logicaland_csr_by_dvec_internal(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::LogicalVector values, Rcpp::LogicalVector dvec, const int ncols);
+RcppExport SEXP _MatrixExtra_logicaland_csr_by_dvec_internal(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dvecSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type dvec(dvecSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(logicaland_csr_by_dvec_internal(indptr, indices, values, dvec, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_csr_by_dvec_with_NAs
+Rcpp::List multiply_csr_by_dvec_with_NAs(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::NumericVector dvec, const int ncols, const bool multiply, const bool powerto, const bool divide, const bool divrest, const bool intdiv, const bool X_is_LHS);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_dvec_with_NAs(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP dvecSEXP, SEXP ncolsSEXP, SEXP multiplySEXP, SEXP powertoSEXP, SEXP divideSEXP, SEXP divrestSEXP, SEXP intdivSEXP, SEXP X_is_LHSSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dvec(dvecSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type multiply(multiplySEXP);
+    Rcpp::traits::input_parameter< const bool >::type powerto(powertoSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divide(divideSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divrest(divrestSEXP);
+    Rcpp::traits::input_parameter< const bool >::type intdiv(intdivSEXP);
+    Rcpp::traits::input_parameter< const bool >::type X_is_LHS(X_is_LHSSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_dvec_with_NAs(indptr, indices, values, dvec, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_ignore_NAs_numeric
+Rcpp::NumericVector multiply_coo_by_dense_ignore_NAs_numeric(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::NumericVector xx, Rcpp::NumericVector dvec, const int nrows, const int ncols, const bool multiply, const bool powerto, const bool divide, const bool divrest, const bool intdiv, const bool X_is_LHS);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_ignore_NAs_numeric(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP dvecSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP, SEXP multiplySEXP, SEXP powertoSEXP, SEXP divideSEXP, SEXP divrestSEXP, SEXP intdivSEXP, SEXP X_is_LHSSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dvec(dvecSEXP);
+    Rcpp::traits::input_parameter< const int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type multiply(multiplySEXP);
+    Rcpp::traits::input_parameter< const bool >::type powerto(powertoSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divide(divideSEXP);
+    Rcpp::traits::input_parameter< const bool >::type divrest(divrestSEXP);
+    Rcpp::traits::input_parameter< const bool >::type intdiv(intdivSEXP);
+    Rcpp::traits::input_parameter< const bool >::type X_is_LHS(X_is_LHSSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_ignore_NAs_numeric(ii, jj, xx, dvec, nrows, ncols, multiply, powerto, divide, divrest, intdiv, X_is_LHS));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_coo_by_dense_ignore_NAs_logical
+Rcpp::LogicalVector multiply_coo_by_dense_ignore_NAs_logical(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::LogicalVector xx, Rcpp::LogicalVector dvec, const int nrows, const int ncols);
+RcppExport SEXP _MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP dvecSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type dvec(dvecSEXP);
+    Rcpp::traits::input_parameter< const int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_coo_by_dense_ignore_NAs_logical(ii, jj, xx, dvec, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_csr_by_svec_no_NAs
+Rcpp::List multiply_csr_by_svec_no_NAs(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector ii_base1, Rcpp::NumericVector xx, const int length);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_svec_no_NAs(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ii_base1SEXP, SEXP xxSEXP, SEXP lengthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii_base1(ii_base1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_svec_no_NAs(indptr, indices, values, ii_base1, xx, length));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_csr_by_svec_keep_NAs
+Rcpp::List multiply_csr_by_svec_keep_NAs(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector ii_base1, Rcpp::NumericVector xx, const int ncols, const int length);
+RcppExport SEXP _MatrixExtra_multiply_csr_by_svec_keep_NAs(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ii_base1SEXP, SEXP xxSEXP, SEXP ncolsSEXP, SEXP lengthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii_base1(ii_base1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_csr_by_svec_keep_NAs(indptr, indices, values, ii_base1, xx, ncols, length));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concat_indptr2
 Rcpp::IntegerVector concat_indptr2(Rcpp::IntegerVector ptr1, Rcpp::IntegerVector ptr2);
 RcppExport SEXP _MatrixExtra_concat_indptr2(SEXP ptr1SEXP, SEXP ptr2SEXP) {
@@ -1518,6 +1669,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_integer", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_integer, 6},
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_logical", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_logical, 6},
     {"_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary", (DL_FUNC) &_MatrixExtra_matmul_spcolvec_by_scolvecascsr_binary, 5},
+    {"_MatrixExtra_contains_any_zero", (DL_FUNC) &_MatrixExtra_contains_any_zero, 1},
+    {"_MatrixExtra_contains_any_inf", (DL_FUNC) &_MatrixExtra_contains_any_inf, 1},
+    {"_MatrixExtra_contains_any_neg", (DL_FUNC) &_MatrixExtra_contains_any_neg, 1},
     {"_MatrixExtra_is_same_ngRMatrix", (DL_FUNC) &_MatrixExtra_is_same_ngRMatrix, 4},
     {"_MatrixExtra_check_indices_are_unsorted", (DL_FUNC) &_MatrixExtra_check_indices_are_unsorted, 2},
     {"_MatrixExtra_sort_sparse_indices_numeric", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_numeric, 3},
@@ -1576,6 +1730,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_multiply_csc_by_dense_keep_NAs_logical", (DL_FUNC) &_MatrixExtra_multiply_csc_by_dense_keep_NAs_logical, 4},
     {"_MatrixExtra_multiply_csc_by_dense_keep_NAs_float32", (DL_FUNC) &_MatrixExtra_multiply_csc_by_dense_keep_NAs_float32, 4},
     {"_MatrixExtra_logicaland_csc_by_dense_keep_NAs", (DL_FUNC) &_MatrixExtra_logicaland_csc_by_dense_keep_NAs, 4},
+    {"_MatrixExtra_multiply_csr_by_dvec_no_NAs_numeric", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dvec_no_NAs_numeric, 11},
+    {"_MatrixExtra_logicaland_csr_by_dvec_internal", (DL_FUNC) &_MatrixExtra_logicaland_csr_by_dvec_internal, 5},
+    {"_MatrixExtra_multiply_csr_by_dvec_with_NAs", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dvec_with_NAs, 11},
+    {"_MatrixExtra_multiply_coo_by_dense_ignore_NAs_numeric", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_ignore_NAs_numeric, 12},
+    {"_MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical, 6},
+    {"_MatrixExtra_multiply_csr_by_svec_no_NAs", (DL_FUNC) &_MatrixExtra_multiply_csr_by_svec_no_NAs, 6},
+    {"_MatrixExtra_multiply_csr_by_svec_keep_NAs", (DL_FUNC) &_MatrixExtra_multiply_csr_by_svec_keep_NAs, 7},
     {"_MatrixExtra_concat_indptr2", (DL_FUNC) &_MatrixExtra_concat_indptr2, 2},
     {"_MatrixExtra_concat_csr_batch", (DL_FUNC) &_MatrixExtra_concat_csr_batch, 2},
     {"_MatrixExtra_check_is_seq", (DL_FUNC) &_MatrixExtra_check_is_seq, 1},

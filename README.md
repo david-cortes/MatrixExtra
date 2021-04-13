@@ -10,6 +10,8 @@ This package is based on code originally written for the [rsparse](https://githu
 
 The `Matrix` package provides a rich set of sparse matrix and sparse vector classes with many methods and operators so that they could be used as drop-in replacements of base R's matrices. Unfortunately, the whole package is centered around the CSC format (`CsparseMatrix`, column-major), and calling methods and operators which in principle should be efficient in CSR or COO formats will imply first converting the whole matrix to CSC format (a slow and inefficient operation which duplicates the data), on which the operation might be less efficient due to the storage order.
 
+*(longer introduction in the [vignette](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/vignettes/Introducing_MatrixExtra.html))*
+
 Examples:
 
 ```r
@@ -96,6 +98,8 @@ remotes::install_github("david-cortes/MatrixExtra")
 
 Documentation is internally available in the installed package (e.g. `?MatrixExtra::<tab>` or `?MatrixExtra::slice`).
 
+A package vignette is available [here](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/vignettes/Introducing_MatrixExtra.html).
+
 # Features
 
 * Multi-threaded matrix multiplications (`%*%`), `crossprod` and `tcrossprod` for many `<sparse,dense>` and `<dense,sparse>` types, including those from the [float](https://github.com/wrathematics/float) package.
@@ -110,11 +114,11 @@ Documentation is internally available in the installed package (e.g. `?MatrixExt
 # TODO
 
 * Matrix multiplications between `float32` and `sparseVector`.
+* Elementwise multiplication between `COO`/`matrix` and `sparseVector`.
 * Assignment operator (`[<-`).
 * Some `sweep` routes with sparse vectors.
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
-* Create vignette.
 * Try to port some parts to `Matrix`.
 * Submit to CRAN.
 * Add timings against the methods from `Matrix`.

@@ -55,6 +55,7 @@ bool check_is_seq(Rcpp::IntegerVector indices);
 SEXP SafeRcppVector(void *args_);
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
                        Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2);
+bool contains_any_nas_or_inf(Rcpp::NumericVector x);
 
 /* rbind.cpp */
 enum RbindedType {dgRMatrix, lgRMatrix, ngRMatrix};
@@ -77,3 +78,9 @@ int extract_single_val_csr
     const int row, const int col,
     const bool is_sorted
 );
+
+#if SIZE_MAX < MAX_UINT64
+#   define size_large uint64_t
+#else
+#   define size_large size_t
+#endif

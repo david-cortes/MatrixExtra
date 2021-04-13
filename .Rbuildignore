@@ -3,3 +3,7 @@
 LICENSE
 old/*
 .Rhistory
+vignettes_/*
+src/Makevars$
+real-sim
+vignettes/real-sim
