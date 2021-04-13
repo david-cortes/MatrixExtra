@@ -176,7 +176,7 @@
 \alias{^,matrix,TsparseMatrix-method}
 \alias{*,RsparseMatrix,sparseVector-method}
 \alias{*,sparseVector,RsparseMatrix-method}
-\title{Mathematical operators on CSR and COO matrices}
+\title{Mathematical operators on sparse matrices and sparse vectors}
 \usage{
 \S4method{*}{RsparseMatrix,sparseMatrix}(e1, e2)
 
@@ -527,17 +527,18 @@
 \S4method{*}{sparseVector,RsparseMatrix}(e1, e2)
 }
 \arguments{
-\item{e1}{A sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.}
+\item{e1}{A sparse or dense matrix or vector/}
 
-\item{e2}{Another sparse matrix in CSR or COO format, or a scalar or vector, depeding on the operation.}
+\item{e2}{Another sparse or dense matrix or vector.}
 }
 \value{
-A CSR or COO matrix depending on the input type and operation.
+A CSR or COO matrix depending on the input type and operation. Some operations
+(blocked by default) will produce dense matrices as outputs.
 }
 \description{
-Implements some mathematical operators between CSR
-(a.k.a. RsparseMatrix), COO (a.k.a. TsparseMatrix), and dense matrices, such as addition and multiplication,
- and between CSR/COO matrices and numeric constants, such as division and multiplication.
+Implements some mathematical operators between sparse-sparse and sparse-dense
+matrices and vectors, such as `CSR + CSR`, `CSR + COO`, `CSR * vector`, `CSR * dense`, among
+others, which typically work natively in the storage order of the inputs without data duplication.
 }
 \details{
 By default, when doing elementwise multiplication (`*`) between a sparse and a dense
@@ -546,8 +547,9 @@ which the sparse matrix has no present entry, the resulting output will not have
 which differs from the behavior of `Matrix` and base R, but makes the operation much faster.
 The same applies to division by zero and exponentiation to zero.
 
-If such missing values (or infinites and ones) are to be preserved, this behavior can be changed through the package
-options (i.e. `options("MatrixExtra.ignore_na" = FALSE)` - see \link{MatrixExtra-options}).
+If such missing values (or infinites and ones) are to be preserved, this behavior can be
+changed through the package options (i.e. `options("MatrixExtra.ignore_na" = FALSE)` - see
+\link{MatrixExtra-options}).
 
 The indices of the matrices might be sorted in-place for some operations
 (see \link{sort_sparse_indices}).
@@ -558,6 +560,16 @@ library(MatrixExtra)
 set.seed(1)
 X <- rsparsematrix(4, 3, .5, repr="R")
 X + X
+X * X
+X * as.coo.matrix(X)
 X * 2
+X * 1:4
 X ^ 2
+X ^ (1:4)
+
+### Beware
+set_new_matrix_behavior()
+suppressWarnings(X / 0)
+restore_old_matrix_behavior()
+suppressWarnings(X / 0)
 }
