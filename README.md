@@ -107,6 +107,7 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 * Efficient rbinding (concatenating by rows) and cbinding (concatenating by columns) for different sparse matrices and sparse vector types (e.g. `rbind(CSR, CSR)` and `cbind(CSR, CSR)`).
 * Overloaded operators for `<RsparseMatrix, RsparseMatrix>`  and some `<RsparseMatrix, TsparseMatrix>` and `<sparse, dense>` types, such as `+`, `-`, `*`, `&`, `|`.
 * Overloaded mathematical functions and operators which act only on the non-zero entries for CSR and COO matrices, such as `sqrt(CSR)` or `CSR * scalar`.
+* Overloaded operators for `CSR`/`COO` and vectors, such as `CSR * vector`, `CSR ^ vector`, etc., which can mimick all the quirks of base R if needed.
 * Convenience conversion functions between different sparse formats, and registered coercion methods between pairs which are not in `Matrix` (e.g. `matrix` -> `ngRMatrix` or `dgRMatrix` -> `lgCMatrix`).
 * Fast transposes which work by outputting in the opposite format (CSR -> CSC and CSC -> CSR).
 * Utility functions for sorting sparse indices and removing zero-valued entries.
@@ -116,7 +117,6 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 * Matrix multiplications between `float32` and `sparseVector`.
 * Elementwise multiplication between `COO`/`matrix` and `sparseVector`.
 * Assignment operator (`[<-`).
-* Some `sweep` routes with sparse vectors.
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
 * Try to port some parts to `Matrix`.
