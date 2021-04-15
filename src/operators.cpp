@@ -1542,6 +1542,8 @@ RcppVector multiply_csr_by_dvec_no_NAs
     const size_t dvec_size = dvec.size();
     double val; int vall;
 
+    /* TODO: some of these can be changed to daxpy */
+
     if (dvec_size == (size_t)nrows)
     {
         if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
@@ -3458,4 +3460,677 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
     args.as_integer = false; args.num_vec_from = &values_out;
     out["values"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
     return out;
+}
+
+template <class RcppMatrix, class InputDType>
+Rcpp::List multiply_elemwise_dense_by_svec_template
+(
+    RcppMatrix X_,
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const int length,
+    const bool keep_NAs
+)
+{
+    const size_t nnz = ii.size();
+    const int nrows = X_.nrow();
+    const int ncols = X_.ncol();
+    const auto* restrict X = (InputDType*)X_.begin();
+    const size_t nrows_ = nrows;
+    const size_t ncols_ = ncols;
+    size_t row, col;
+
+    const bool simple_mult = std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value ||
+                             std::is_same<InputDType, float>::value;
+
+    if ((size_t)length == (size_t)nrows * (size_t)ncols)
+    {
+        Rcpp::NumericMatrix out_(nrows, ncols);
+        auto out = out_.begin();
+
+        if (keep_NAs)
+        {
+            size_t tot = (size_t)nrows * (size_t)ncols;
+            
+            if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value) {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = ISNAN(X[ix])? X[ix] : (isinf(X[ix])? NAN : 0);
+            }
+
+            else if (std::is_same<InputDType, float>::value) {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = (isnan(X[ix]) || isinf(X[ix])? NAN : 0);
+            }
+
+            else {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = (X[ix] == NA_INTEGER)? NA_REAL : 0;
+            }
+        }
+
+        if (simple_mult)
+        {
+            for (size_t ix = 0; ix < nnz; ix++) {
+                row = (ii[ix]-1) % nrows;
+                col = (ii[ix]-1) / nrows;
+                out[row + col*nrows_] = X[row + col*nrows_] * xx[ix];
+            }
+        }
+
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++) {
+                row = (ii[ix]-1) % nrows;
+                col = (ii[ix]-1) / nrows;
+                out[row + col*nrows_] = (X[row + col*nrows_] == NA_INTEGER)? NAN : (X[row + col*nrows_] * xx[ix]);
+            }
+        }
+        return Rcpp::List::create(Rcpp::_["X_dense"] = out_);
+    }
+
+    else if (length == nrows)
+    {
+        Rcpp::IntegerVector indptr(nrows+1);
+        Rcpp::IntegerVector indices;
+        Rcpp::NumericVector values;
+        size_t curr = 0;
+
+        if (!keep_NAs)
+        {
+            indices = Rcpp::IntegerVector(nnz * (size_t)ncols);
+            values = Rcpp::NumericVector(nnz * (size_t)ncols);
+
+            if (simple_mult)
+            {
+                for (size_t ix = 0; ix < nnz; ix++)
+                {
+                    row = ii[ix] - 1;
+                    indptr[row+1] = ncols;
+                    std::iota(indices.begin() + curr, indices.begin() + curr + (size_t)ncols, 0);
+                    #pragma omp simd
+                    for (int col = 0; col < ncols; col++)
+                        values[curr++] = X[row + col*nrows_] * xx[ix];
+                }
+            }
+
+            else
+            {
+                for (size_t ix = 0; ix < nnz; ix++)
+                {
+                    row = ii[ix] - 1;
+                    indptr[row+1] = ncols;
+                    std::iota(indices.begin() + curr, indices.begin() + curr + (size_t)ncols, 0);
+                    #pragma omp simd
+                    for (int col = 0; col < ncols; col++)
+                        values[curr++] = (X[row + col*nrows_] == NA_INTEGER)? NA_REAL : (X[row + col*nrows_] * xx[ix]);
+                }
+            }
+
+            for (int row = 0; row < nrows; row++)
+                indptr[row+1] += indptr[row];
+        }
+
+        else
+        {
+            std::vector<int> indices_;
+            std::vector<double> values_;
+            indices_.reserve(nnz * (size_t)ncols);
+            values_.reserve(nnz * (size_t)ncols);
+
+            const auto ii_begin = ii.begin();
+            auto curr_i = ii_begin;
+            const auto end_i = ii.end();
+            int row = 0;
+
+            while (true)
+            {
+                if (curr_i >= end_i || row >= nrows) {
+
+                    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+                    {
+                        for (; row < nrows; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (ISNAN(X[(size_t)row + col*nrows_]) ||
+                                    isinf(X[(size_t)row + col*nrows_])
+                                ) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        isinf(X[(size_t)row + col*nrows_])?
+                                            NAN : X[(size_t)row + col*nrows_]
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                    else if (std::is_same<InputDType, float>::value)
+                    {
+                        for (; row < nrows; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (isnan(X[(size_t)row + col*nrows_]) ||
+                                    isinf(X[(size_t)row + col*nrows_])
+                                ) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        NAN
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                    else
+                    {
+                        for (; row < nrows; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (X[(size_t)row + col*nrows_] == NA_INTEGER
+                                ) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        NA_REAL
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                    break;
+
+                }
+
+                else if (row == *curr_i-1) {
+
+                    if (simple_mult)
+                    {
+                        for (size_t col = 0; col < ncols_; col++) {
+                            indices_.push_back(col);
+                            values_.push_back(X[(size_t)row + col*nrows_] * xx[curr_i - ii_begin]);
+                        }
+                    }
+
+                    else
+                    {
+                        for (size_t col = 0; col < ncols_; col++) {
+                            indices_.push_back(col);
+                            values_.push_back(
+                                (X[(size_t)row + col*nrows_] == NA_INTEGER)? NAN :
+                                (X[(size_t)row + col*nrows_] * xx[curr_i - ii_begin])
+                            );
+                        }
+                    }
+                    indptr[row+1] = indices_.size();
+                    row++;
+                    curr_i++;
+
+                }
+
+                else if (row > *curr_i-1) {
+
+                    curr_i = std::lower_bound(curr_i, end_i, row+1);
+
+                }
+
+                else {
+
+                    if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+                    {
+                        for (; row < *curr_i-1; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (ISNAN(X[(size_t)row + col*nrows_]) || isinf(X[(size_t)row + col*nrows_])) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        isinf(X[(size_t)row + col*nrows_])?
+                                            NAN : X[(size_t)row + col*nrows_]
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                    else if (std::is_same<InputDType, float>::value)
+                    {
+                        for (; row < *curr_i-1; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (isnan(X[(size_t)row + col*nrows_]) || isinf(X[(size_t)row + col*nrows_])) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        NAN
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                    else
+                    {
+                        for (; row < *curr_i-1; row++) {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                if (X[(size_t)row + col*nrows_] == NA_INTEGER) {
+                                    indices_.push_back(col);
+                                    values_.push_back(
+                                        NA_REAL
+                                    );
+                                }
+                            }
+                            indptr[row+1] = indices_.size();
+                        }
+                    }
+
+                }
+            }
+
+            VectorConstructorArgs args;
+            args.from_cpp_vec = true; args.as_integer = true; args.int_vec_from = &indices_;
+            indices = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+            indices_.clear(); indices_.shrink_to_fit();
+            args.as_integer = false; args.num_vec_from = &values_;
+            values = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        }
+
+        return Rcpp::List::create(
+            Rcpp::_["indptr"] = indptr,
+            Rcpp::_["indices"] = indices,
+            Rcpp::_["values"] = values
+        );
+    }
+
+    else if (length < nrows && (nrows % length) == 0)
+    {
+        size_t curr = 0;
+        int n_recycles = nrows / length;
+        const int one = 1;
+        double *restrict xx_ = REAL(xx);
+
+        Rcpp::IntegerVector indptr(nrows+1);
+        Rcpp::IntegerVector indices;
+        Rcpp::NumericVector values;
+
+        if (!keep_NAs)
+        {
+            indices = Rcpp::IntegerVector((size_t)n_recycles * nnz * ncols_);
+            values = Rcpp::NumericVector((size_t)n_recycles * nnz * ncols_);
+            double *restrict values_ = REAL(values);
+            double *restrict X__ = (double*)X;
+            double val;
+
+            for (int recycle = 0; recycle < n_recycles; recycle++)
+            {
+                if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+                {
+                    for (size_t ix = 0; ix < nnz; ix++)
+                    {
+                        row = ii[ix] - 1 + recycle*length;
+                        indptr[row+1] = ncols;
+                        std::iota(indices.begin() + curr, indices.begin() + curr + ncols_, 0);
+                        daxpy_(&ncols, xx_ + ix, X__ + row, &nrows, values_ + curr, &one);
+                        curr += ncols;
+                    }
+                }
+
+                else if (std::is_same<InputDType, float>::value)
+                {
+                    for (size_t ix = 0; ix < nnz; ix++)
+                    {
+                        row = ii[ix] - 1 + recycle*length;
+                        val = xx_[ix];
+                        indptr[row+1] = ncols;
+                        std::iota(indices.begin() + curr, indices.begin() + curr + ncols_, 0);
+                        for (size_t col = 0; col < ncols_; col++)
+                            values[curr++] = X[(size_t)row + col*nrows_] * val;
+                    }
+                }
+
+                else
+                {
+                    for (size_t ix = 0; ix < nnz; ix++)
+                    {
+                        row = ii[ix] - 1 + recycle*length;
+                        val = xx_[ix];
+                        indptr[row+1] = ncols;
+                        std::iota(indices.begin() + curr, indices.begin() + curr + ncols_, 0);
+                        for (size_t col = 0; col < ncols_; col++)
+                            values[curr++] = (X[(size_t)row + col*nrows_] == NA_INTEGER)? NAN : (X[(size_t)row + col*nrows_] * val);
+                    }
+                }
+            }
+
+            for (int row = 0; row < nrows; row++)
+                indptr[row+1] += indptr[row];
+        }
+
+        else
+        {
+            std::vector<int> indices_;
+            std::vector<double> values_;
+            indices_.reserve((size_t)n_recycles * nnz * ncols_);
+            values_.reserve((size_t)n_recycles * nnz * ncols_);
+
+            int row = 0;
+            int row_end;
+            int offset;
+
+            const auto ii_begin = ii.begin();
+            auto curr_i = ii_begin;
+            const auto end_i = ii.end();
+
+            for (int recycle = 0; recycle < n_recycles; recycle++)
+            {
+                offset = recycle * length;
+                row = offset;
+                row_end = row + length;
+                
+                while (true)
+                {
+                    if (curr_i >= end_i || row >= row_end) {
+
+                        if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+                        {
+                            for (; row < row_end; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (ISNAN(X[(size_t)row + col*nrows_]) ||
+                                        isinf(X[(size_t)row + col*nrows_])
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            isinf(X[(size_t)row + col*nrows_])?
+                                                NAN : X[(size_t)row + col*nrows_]
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                        else if (std::is_same<InputDType, float>::value)
+                        {
+                            for (; row < row_end; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (isnan(X[(size_t)row + col*nrows_]) ||
+                                        isinf(X[(size_t)row + col*nrows_])
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            NAN
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                        else
+                        {
+                            for (; row < row_end; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (X[(size_t)row + col*nrows_] == NA_INTEGER
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            isinf(X[(size_t)row + col*nrows_])?
+                                                NAN : X[(size_t)row + col*nrows_]
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                        break;
+
+                    }
+
+                    else if (row == *curr_i-1 + offset) {
+
+                        if (simple_mult)
+                        {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                indices_.push_back(col);
+                                values_.push_back(X[(size_t)row + col*nrows_] * xx[curr_i - ii_begin]);
+                            }
+                        }
+
+                        else
+                        {
+                            for (size_t col = 0; col < ncols_; col++) {
+                                indices_.push_back(col);
+                                values_.push_back(
+                                    (X[(size_t)row + col*nrows_] == NA_INTEGER)? NAN : 
+                                    (X[(size_t)row + col*nrows_] * xx[curr_i - ii_begin])
+                                );
+                            }
+                        }
+                        indptr[row+1] = indices_.size();
+                        row++;
+                        curr_i++;
+
+                    }
+
+                    else if (row > *curr_i-1 + offset) {
+
+                        curr_i = std::lower_bound(curr_i, end_i, row+1 - offset);
+
+                    }
+
+                    else {
+
+                        if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
+                        {
+                            for (; row < *curr_i-1 + offset; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (ISNAN(X[(size_t)row + col*nrows_]) ||
+                                        isinf(X[(size_t)row + col*nrows_])
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            isinf(X[(size_t)row + col*nrows_])?
+                                                NAN : X[(size_t)row + col*nrows_]
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                        else if (std::is_same<InputDType, float>::value)
+                        {
+                            for (; row < *curr_i-1 + offset; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (isnan(X[(size_t)row + col*nrows_]) ||
+                                        isinf(X[(size_t)row + col*nrows_])
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            NAN
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                        else
+                        {
+                            for (; row < *curr_i-1 + offset; row++) {
+                                for (size_t col = 0; col < ncols_; col++) {
+                                    if (X[(size_t)row + col*nrows_] == NA_INTEGER
+                                    ) {
+                                        indices_.push_back(col);
+                                        values_.push_back(
+                                            NA_REAL
+                                        );
+                                    }
+                                }
+                                indptr[row+1] = indices_.size();
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+            VectorConstructorArgs args;
+            args.from_cpp_vec = true; args.as_integer = true; args.int_vec_from = &indices_;
+            indices = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+            indices_.clear(); indices_.shrink_to_fit();
+            args.as_integer = false; args.num_vec_from = &values_;
+            values = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+        }
+
+        return Rcpp::List::create(
+            Rcpp::_["indptr"] = indptr,
+            Rcpp::_["indices"] = indices,
+            Rcpp::_["values"] = values
+        );
+    }
+
+    else
+    {
+        size_t ix_max = (size_t)nrows * (size_t)ncols;
+        size_t n_recycles = ix_max / length + ((ix_max % length) != 0);
+
+        size_t ix_curr;
+        Rcpp::NumericMatrix out_(nrows, ncols);
+        auto out = out_.begin();
+        double val;
+
+        if (keep_NAs)
+        {
+            size_t tot = (size_t)nrows * (size_t)ncols;
+
+            if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value) {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = ISNAN(X[ix])? X[ix] : (isinf(X[ix])? NAN : 0);
+            }
+
+            else if (std::is_same<InputDType, float>::value) {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = (isnan(X[ix]) || isinf(X[ix])? NAN : 0);
+            }
+
+            else {
+                for (size_t ix = 0; ix < tot; ix++)
+                    out[ix] = (X[ix] == NA_INTEGER)? NA_REAL : 0;
+            }
+        }
+
+        if (simple_mult)
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+            {
+                val = xx[ix];
+                for (size_t recycle = 0; recycle < n_recycles; recycle++)
+                {
+                    ix_curr = ii[ix] - 1 + recycle*length;
+                    if (ix_curr > ix_max)
+                        break;
+                    row = ix_curr % nrows_;
+                    col = ix_curr / nrows_;
+                    out[row + col*nrows_] = X[row + col*nrows_] * val;
+                }
+            }
+        }
+
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+            {
+                val = xx[ix];
+                for (size_t recycle = 0; recycle < n_recycles; recycle++)
+                {
+                    ix_curr = ii[ix] - 1 + recycle*length;
+                    if (ix_curr > ix_max)
+                        break;
+                    row = ix_curr % nrows_;
+                    col = ix_curr / nrows_;
+                    out[row + col*nrows_] = (X[row + col*nrows_] == NA_INTEGER)? NAN : (X[row + col*nrows_] * val);
+                }
+            }
+        }
+
+        return Rcpp::List::create(Rcpp::_["X_dense"] = out_);
+    }
+
+    return Rcpp::List(); /* <- won't be reached, but CRAN may complain otherwise */
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_elemwise_dense_by_svec_numeric
+(
+    Rcpp::NumericMatrix X_,
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const int length,
+    const int keep_NAs
+)
+{
+    return multiply_elemwise_dense_by_svec_template<Rcpp::NumericMatrix, double>(
+        X_,
+        ii,
+        xx,
+        length,
+        keep_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_elemwise_dense_by_svec_integer
+(
+    Rcpp::IntegerMatrix X_,
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const int length,
+    const int keep_NAs
+)
+{
+    return multiply_elemwise_dense_by_svec_template<Rcpp::IntegerMatrix, int>(
+        X_,
+        ii,
+        xx,
+        length,
+        keep_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_elemwise_dense_by_svec_logical
+(
+    Rcpp::LogicalMatrix X_,
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const int length,
+    const int keep_NAs
+)
+{
+    return multiply_elemwise_dense_by_svec_template<Rcpp::LogicalMatrix, int>(
+        X_,
+        ii,
+        xx,
+        length,
+        keep_NAs
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List multiply_elemwise_dense_by_svec_float32
+(
+    Rcpp::IntegerMatrix X_,
+    Rcpp::IntegerVector ii,
+    Rcpp::NumericVector xx,
+    const int length,
+    const int keep_NAs
+)
+{
+    return multiply_elemwise_dense_by_svec_template<Rcpp::IntegerMatrix, float>(
+        X_,
+        ii,
+        xx,
+        length,
+        keep_NAs
+    );
 }

@@ -377,6 +377,22 @@ multiply_csr_by_svec_keep_NAs <- function(indptr, indices, values, ii_base1, xx,
     .Call(`_MatrixExtra_multiply_csr_by_svec_keep_NAs`, indptr, indices, values, ii_base1, xx, ncols, length)
 }
 
+multiply_elemwise_dense_by_svec_numeric <- function(X_, ii, xx, length, keep_NAs) {
+    .Call(`_MatrixExtra_multiply_elemwise_dense_by_svec_numeric`, X_, ii, xx, length, keep_NAs)
+}
+
+multiply_elemwise_dense_by_svec_integer <- function(X_, ii, xx, length, keep_NAs) {
+    .Call(`_MatrixExtra_multiply_elemwise_dense_by_svec_integer`, X_, ii, xx, length, keep_NAs)
+}
+
+multiply_elemwise_dense_by_svec_logical <- function(X_, ii, xx, length, keep_NAs) {
+    .Call(`_MatrixExtra_multiply_elemwise_dense_by_svec_logical`, X_, ii, xx, length, keep_NAs)
+}
+
+multiply_elemwise_dense_by_svec_float32 <- function(X_, ii, xx, length, keep_NAs) {
+    .Call(`_MatrixExtra_multiply_elemwise_dense_by_svec_float32`, X_, ii, xx, length, keep_NAs)
+}
+
 concat_indptr2 <- function(ptr1, ptr2) {
     .Call(`_MatrixExtra_concat_indptr2`, ptr1, ptr2)
 }

@@ -114,9 +114,9 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 
 # TODO
 
-* Matrix multiplications between `float32` and `sparseVector`.
-* Elementwise multiplication between `COO`/`matrix` and `sparseVector`.
 * Assignment operator (`[<-`).
+* Accepting `NA`s in subsetting operator (`[`).
+* Matrix multiplications between `float32` and `sparseVector`.
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
 * Try to port some parts to `Matrix`.
@@ -135,10 +135,12 @@ X = as(X, "RsparseMatrix")
 X[1:2, ]
 X + X
 X * X
+X %*% 1:4
+X * 1:3
 rbind(X, X)
 cbind(X, X)
 sqrt(X)
-X %*% 1:4
+diag(X)
 
 as(as.matrix(X), "dgRMatrix")
 as.csc.matrix(X)

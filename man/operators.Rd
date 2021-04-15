@@ -176,6 +176,10 @@
 \alias{^,matrix,TsparseMatrix-method}
 \alias{*,RsparseMatrix,sparseVector-method}
 \alias{*,sparseVector,RsparseMatrix-method}
+\alias{*,matrix,sparseVector-method}
+\alias{*,sparseVector,matrix-method}
+\alias{*,float32,sparseVector-method}
+\alias{*,sparseVector,float32-method}
 \title{Mathematical operators on sparse matrices and sparse vectors}
 \usage{
 \S4method{*}{RsparseMatrix,sparseMatrix}(e1, e2)
@@ -525,6 +529,14 @@
 \S4method{*}{RsparseMatrix,sparseVector}(e1, e2)
 
 \S4method{*}{sparseVector,RsparseMatrix}(e1, e2)
+
+\S4method{*}{matrix,sparseVector}(e1, e2)
+
+\S4method{*}{sparseVector,matrix}(e1, e2)
+
+\S4method{*}{float32,sparseVector}(e1, e2)
+
+\S4method{*}{sparseVector,float32}(e1, e2)
 }
 \arguments{
 \item{e1}{A sparse or dense matrix or vector/}

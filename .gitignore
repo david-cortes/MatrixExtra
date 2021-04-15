@@ -6,6 +6,8 @@ src/Makevars
 autom4te.cache/*
 config.log
 config.status
+configure_
+configure.ac_
 old/*
 deleteme/*
 .Rproj.user/*

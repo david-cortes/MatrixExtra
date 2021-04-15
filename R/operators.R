@@ -1636,3 +1636,70 @@ setMethod("*", signature(e1="RsparseMatrix", e2="sparseVector"), multiply_csr_by
 #' @export
 setMethod("*", signature(e1="sparseVector", e2="RsparseMatrix"), multiply_csr_by_svec_elemwise)
 
+
+multiply_elemwise_dense_by_svec_internal <- function(e1, e2) {
+    if (!NROW(e1) || !NCOL(e2) || !length(e2))
+        return(matrix())
+
+    keep_NAs <- !getOption("MatrixExtra.ignore_na", default=FALSE)
+    inplace_sort <- getOption("MatrixExtra.inplace_sort", default=FALSE)
+    if (keep_NAs && inplace_sort)
+        e2 <- deepcopy_before_sort(e2)
+    e2 <- as.sparse.vector(e2)
+    if (keep_NAs)
+        e2 <- sort_sparse_indices(e2, copy=!inplace_sort)
+
+    if (typeof(e1) == "double") {
+        res <- multiply_elemwise_dense_by_svec_numeric(e1, e2@i, e2@x, length(e2), keep_NAs)
+    } else if (typeof(e1) == "integer") {
+        res <- multiply_elemwise_dense_by_svec_integer(e1, e2@i, e2@x, length(e2), keep_NAs)
+    } else if (typeof(e1) == "logical") {
+        res <- multiply_elemwise_dense_by_svec_logical(e1, e2@i, e2@x, length(e2), keep_NAs)
+    } else if (inherits(e1, "float32")) {
+        ### TODO: revisit this
+        if (is.vector(e1@Data))
+            e1@Data <- as.matrix(e1@Data)
+        res <- multiply_elemwise_dense_by_svec_float32(e1@Data, e2@i, e2@x, length(e2), keep_NAs)
+    } else {
+        mode(e1) <- "double"
+        return(multiply_elemwise_dense_by_svec_internal(e1, e2))
+    }
+
+    if ("X_dense" %in% names(res))
+        return(res$X_dense)
+
+    out <- new("dgRMatrix")
+    out@Dim <- dim(e1)
+    if (!is.null(rownames(e1)))
+        rownames(out) <- rownames(e1)
+    if (!is.null(colnames(e1)))
+        colnames(out) <- colnames(e1)
+    out@p <- res$indptr
+    out@j <- res$indices
+    out@x <- res$values
+    return(out)
+}
+
+multiply_elemwise_dense_by_svec <- function(e1, e2) {
+    if (is.matrix(e1))
+        return(multiply_elemwise_dense_by_svec_internal(e1, e2))
+    else
+        return(multiply_elemwise_dense_by_svec_internal(e2, e1))
+}
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="matrix", e2="sparseVector"), multiply_elemwise_dense_by_svec)
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="sparseVector", e2="matrix"), multiply_elemwise_dense_by_svec)
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="float32", e2="sparseVector"), multiply_elemwise_dense_by_svec)
+
+#' @rdname operators
+#' @export
+setMethod("*", signature(e1="sparseVector", e2="float32"), multiply_elemwise_dense_by_svec)
+

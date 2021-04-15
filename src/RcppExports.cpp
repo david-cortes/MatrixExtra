@@ -1245,6 +1245,62 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// multiply_elemwise_dense_by_svec_numeric
+Rcpp::List multiply_elemwise_dense_by_svec_numeric(Rcpp::NumericMatrix X_, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length, const int keep_NAs);
+RcppExport SEXP _MatrixExtra_multiply_elemwise_dense_by_svec_numeric(SEXP X_SEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP, SEXP keep_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< const int >::type keep_NAs(keep_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_elemwise_dense_by_svec_numeric(X_, ii, xx, length, keep_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_elemwise_dense_by_svec_integer
+Rcpp::List multiply_elemwise_dense_by_svec_integer(Rcpp::IntegerMatrix X_, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length, const int keep_NAs);
+RcppExport SEXP _MatrixExtra_multiply_elemwise_dense_by_svec_integer(SEXP X_SEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP, SEXP keep_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< const int >::type keep_NAs(keep_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_elemwise_dense_by_svec_integer(X_, ii, xx, length, keep_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_elemwise_dense_by_svec_logical
+Rcpp::List multiply_elemwise_dense_by_svec_logical(Rcpp::LogicalMatrix X_, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length, const int keep_NAs);
+RcppExport SEXP _MatrixExtra_multiply_elemwise_dense_by_svec_logical(SEXP X_SEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP, SEXP keep_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< const int >::type keep_NAs(keep_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_elemwise_dense_by_svec_logical(X_, ii, xx, length, keep_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// multiply_elemwise_dense_by_svec_float32
+Rcpp::List multiply_elemwise_dense_by_svec_float32(Rcpp::IntegerMatrix X_, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length, const int keep_NAs);
+RcppExport SEXP _MatrixExtra_multiply_elemwise_dense_by_svec_float32(SEXP X_SEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP, SEXP keep_NAsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type X_(X_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< const int >::type keep_NAs(keep_NAsSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_elemwise_dense_by_svec_float32(X_, ii, xx, length, keep_NAs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concat_indptr2
 Rcpp::IntegerVector concat_indptr2(Rcpp::IntegerVector ptr1, Rcpp::IntegerVector ptr2);
 RcppExport SEXP _MatrixExtra_concat_indptr2(SEXP ptr1SEXP, SEXP ptr2SEXP) {
@@ -1737,6 +1793,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical", (DL_FUNC) &_MatrixExtra_multiply_coo_by_dense_ignore_NAs_logical, 6},
     {"_MatrixExtra_multiply_csr_by_svec_no_NAs", (DL_FUNC) &_MatrixExtra_multiply_csr_by_svec_no_NAs, 6},
     {"_MatrixExtra_multiply_csr_by_svec_keep_NAs", (DL_FUNC) &_MatrixExtra_multiply_csr_by_svec_keep_NAs, 7},
+    {"_MatrixExtra_multiply_elemwise_dense_by_svec_numeric", (DL_FUNC) &_MatrixExtra_multiply_elemwise_dense_by_svec_numeric, 5},
+    {"_MatrixExtra_multiply_elemwise_dense_by_svec_integer", (DL_FUNC) &_MatrixExtra_multiply_elemwise_dense_by_svec_integer, 5},
+    {"_MatrixExtra_multiply_elemwise_dense_by_svec_logical", (DL_FUNC) &_MatrixExtra_multiply_elemwise_dense_by_svec_logical, 5},
+    {"_MatrixExtra_multiply_elemwise_dense_by_svec_float32", (DL_FUNC) &_MatrixExtra_multiply_elemwise_dense_by_svec_float32, 5},
     {"_MatrixExtra_concat_indptr2", (DL_FUNC) &_MatrixExtra_concat_indptr2, 2},
     {"_MatrixExtra_concat_csr_batch", (DL_FUNC) &_MatrixExtra_concat_csr_batch, 2},
     {"_MatrixExtra_check_is_seq", (DL_FUNC) &_MatrixExtra_check_is_seq, 1},
