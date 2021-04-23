@@ -76,7 +76,10 @@ numerical precision, especially when using objects of type `float32`
 
 Internally, these functions use BLAS level-1 routines, so their speed might depend on
 the BLAS backend being used (e.g. MKL, OpenBLAS) - that means: they might be quite slow
-on a default install of R for Windows. For the `float32` types, it doesn't use BLAS,
+on a default install of R for Windows (see
+\href{https://github.com/david-cortes/R-openblas-in-windows}{this link} for
+a tutorial about getting OpenBLAS in R for Windows).
+For the `float32` types, it doesn't use BLAS,
 but will rather ship with some BLAS replacements, which might run faster when compiling
 this library from source (`install.packages("MatrixExtra", type="source")`) rather
 than downloading a pre-compiled binary from CRAN (Windows and macOS), due to

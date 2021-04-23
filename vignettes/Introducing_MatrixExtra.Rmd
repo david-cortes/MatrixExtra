@@ -424,11 +424,10 @@ Adding the intercept and creating a 50-50 train-test split:
 X <- cbind(rep(1, nrow(X)), X) ### Accelerated by 'MatrixExtra'
 set.seed(1)
 ix_train <- sample(nrow(X), floor(.5*nrow(X)), replace=FALSE)
-ix_test <- setdiff(seq_len(nrow(X)), ix_train)
 X_train <- X[ix_train,] ### Accelerated by 'MatrixExtra'
 y_train <- y[ix_train]
-X_test <- X[ix_test,] ### Accelerated by 'MatrixExtra'
-y_test <- y[ix_test]
+X_test <- X[-ix_train,] ### Accelerated by 'MatrixExtra'
+y_test <- y[-ix_train]
 ```
 
 Now fitting the model:
