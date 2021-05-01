@@ -5,6 +5,400 @@
 
 using namespace Rcpp;
 
+// set_single_row_to_zero
+Rcpp::List set_single_row_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set);
+RcppExport SEXP _MatrixExtra_set_single_row_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_to_zero(indptr, indices, values, row_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_col_to_zero
+Rcpp::List set_single_col_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int col_set);
+RcppExport SEXP _MatrixExtra_set_single_col_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP col_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_col_to_zero(indptr, indices, values, col_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_row_to_const
+Rcpp::List set_single_row_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int row_set, const double val_set);
+RcppExport SEXP _MatrixExtra_set_single_row_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP row_setSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_to_const(indptr, indices, values, ncols, row_set, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_col_to_const
+Rcpp::List set_single_col_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int col_set, const double val_set);
+RcppExport SEXP _MatrixExtra_set_single_col_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP col_setSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_col_to_const(indptr, indices, values, ncols, col_set, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_val_to_zero
+Rcpp::List set_single_val_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set, const int col_set);
+RcppExport SEXP _MatrixExtra_set_single_val_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_setSEXP, SEXP col_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_val_to_zero(indptr, indices, values, row_set, col_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_val_to_const
+Rcpp::List set_single_val_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int row_set, const int col_set, const double val_set);
+RcppExport SEXP _MatrixExtra_set_single_val_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP row_setSEXP, SEXP col_setSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_val_to_const(indptr, indices, values, ncols, row_set, col_set, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_row_to_rowvec
+Rcpp::List set_single_row_to_rowvec(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int row_set, Rcpp::NumericVector vec_set);
+RcppExport SEXP _MatrixExtra_set_single_row_to_rowvec(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP row_setSEXP, SEXP vec_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type vec_set(vec_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_to_rowvec(indptr, indices, values, ncols, row_set, vec_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_col_to_colvec
+Rcpp::List set_single_col_to_colvec(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int col_set, Rcpp::NumericVector vec_set);
+RcppExport SEXP _MatrixExtra_set_single_col_to_colvec(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP col_setSEXP, SEXP vec_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type vec_set(vec_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_col_to_colvec(indptr, indices, values, ncols, col_set, vec_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_row_to_svec
+Rcpp::List set_single_row_to_svec(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int row_set, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length);
+RcppExport SEXP _MatrixExtra_set_single_row_to_svec(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP row_setSEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_to_svec(indptr, indices, values, ncols, row_set, ii, xx, length));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_col_to_svec
+Rcpp::List set_single_col_to_svec(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int ncols, const int col_set, Rcpp::IntegerVector ii, Rcpp::NumericVector xx, const int length);
+RcppExport SEXP _MatrixExtra_set_single_col_to_svec(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP ncolsSEXP, SEXP col_setSEXP, SEXP iiSEXP, SEXP xxSEXP, SEXP lengthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< const int >::type length(lengthSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_col_to_svec(indptr, indices, values, ncols, col_set, ii, xx, length));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_rowseq_to_zero
+Rcpp::List set_rowseq_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set_st, const int row_set_end);
+RcppExport SEXP _MatrixExtra_set_rowseq_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_set_stSEXP, SEXP row_set_endSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_st(row_set_stSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_end(row_set_endSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_rowseq_to_zero(indptr, indices, values, row_set_st, row_set_end));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_rowseq_to_const
+Rcpp::List set_rowseq_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set_st, const int row_set_end, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_rowseq_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_set_stSEXP, SEXP row_set_endSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_st(row_set_stSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_end(row_set_endSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_rowseq_to_const(indptr, indices, values, row_set_st, row_set_end, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_colseq_to_zero
+Rcpp::List set_colseq_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int col_set_st, const int col_set_end, const int ncols);
+RcppExport SEXP _MatrixExtra_set_colseq_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP col_set_stSEXP, SEXP col_set_endSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set_st(col_set_stSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set_end(col_set_endSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_colseq_to_zero(indptr, indices, values, col_set_st, col_set_end, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_colseq_to_const
+Rcpp::List set_colseq_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int col_set_st, const int col_set_end, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_colseq_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP col_set_stSEXP, SEXP col_set_endSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set_st(col_set_stSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set_end(col_set_endSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_colseq_to_const(indptr, indices, values, col_set_st, col_set_end, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_to_zero
+Rcpp::List set_arbitrary_rows_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_to_zero(indptr, indices, values, rows_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_to_const
+Rcpp::List set_arbitrary_rows_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_to_const(indptr, indices, values, rows_set, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_cols_to_zero
+Rcpp::List set_arbitrary_cols_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector cols_set, const int ncols);
+RcppExport SEXP _MatrixExtra_set_arbitrary_cols_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_cols_to_zero(indptr, indices, values, cols_set, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_cols_to_const
+Rcpp::List set_arbitrary_cols_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector cols_set, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_arbitrary_cols_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_cols_to_const(indptr, indices, values, cols_set, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_single_col_to_zero
+Rcpp::List set_arbitrary_rows_single_col_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, const int col_set, const int ncols);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_single_col_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP col_setSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_single_col_to_zero(indptr, indices, values, rows_set, col_set, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_single_col_to_const
+Rcpp::List set_arbitrary_rows_single_col_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, const int col_set, const double val_set, const int ncols);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_single_col_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP col_setSEXP, SEXP val_setSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type col_set(col_setSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_single_col_to_const(indptr, indices, values, rows_set, col_set, val_set, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_row_arbitrary_cols_to_zero
+Rcpp::List set_single_row_arbitrary_cols_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set, Rcpp::IntegerVector cols_set, const int ncols);
+RcppExport SEXP _MatrixExtra_set_single_row_arbitrary_cols_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_setSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_arbitrary_cols_to_zero(indptr, indices, values, row_set, cols_set, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_single_row_arbitrary_cols_to_const
+Rcpp::List set_single_row_arbitrary_cols_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set, Rcpp::IntegerVector cols_set, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_single_row_arbitrary_cols_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_setSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set(row_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_single_row_arbitrary_cols_to_const(indptr, indices, values, row_set, cols_set, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_arbitrary_cols_to_zero
+Rcpp::List set_arbitrary_rows_arbitrary_cols_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, Rcpp::IntegerVector cols_set, const int ncols);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_arbitrary_cols_to_zero(indptr, indices, values, rows_set, cols_set, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_arbitrary_cols_to_const
+Rcpp::List set_arbitrary_rows_arbitrary_cols_to_const(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, Rcpp::IntegerVector cols_set, const int ncols, const double val_set);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_const(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP cols_setSEXP, SEXP ncolsSEXP, SEXP val_setSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_set(cols_setSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    Rcpp::traits::input_parameter< const double >::type val_set(val_setSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_arbitrary_cols_to_const(indptr, indices, values, rows_set, cols_set, ncols, val_set));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_rowseq_to_smat
+Rcpp::List set_rowseq_to_smat(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set_st, const int row_set_end, Rcpp::IntegerVector indptr_other, Rcpp::IntegerVector indices_other, Rcpp::NumericVector values_other);
+RcppExport SEXP _MatrixExtra_set_rowseq_to_smat(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_set_stSEXP, SEXP row_set_endSEXP, SEXP indptr_otherSEXP, SEXP indices_otherSEXP, SEXP values_otherSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_st(row_set_stSEXP);
+    Rcpp::traits::input_parameter< const int >::type row_set_end(row_set_endSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr_other(indptr_otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_other(indices_otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_other(values_otherSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_rowseq_to_smat(indptr, indices, values, row_set_st, row_set_end, indptr_other, indices_other, values_other));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_arbitrary_rows_to_smat
+Rcpp::List set_arbitrary_rows_to_smat(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, Rcpp::IntegerVector rows_set, Rcpp::IntegerVector indptr_other, Rcpp::IntegerVector indices_other, Rcpp::NumericVector values_other);
+RcppExport SEXP _MatrixExtra_set_arbitrary_rows_to_smat(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP rows_setSEXP, SEXP indptr_otherSEXP, SEXP indices_otherSEXP, SEXP values_otherSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_set(rows_setSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr_other(indptr_otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices_other(indices_otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type values_other(values_otherSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_arbitrary_rows_to_smat(indptr, indices, values, rows_set, indptr_other, indices_other, values_other));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cbind_csr_numeric
 Rcpp::List cbind_csr_numeric(Rcpp::IntegerVector X_csr_indptr, Rcpp::IntegerVector X_csr_indices, Rcpp::NumericVector X_csr_values, Rcpp::IntegerVector Y_csr_indptr, Rcpp::IntegerVector Y_csr_indices_plus_ncol, Rcpp::NumericVector Y_csr_values);
 RcppExport SEXP _MatrixExtra_cbind_csr_numeric(SEXP X_csr_indptrSEXP, SEXP X_csr_indicesSEXP, SEXP X_csr_valuesSEXP, SEXP Y_csr_indptrSEXP, SEXP Y_csr_indices_plus_ncolSEXP, SEXP Y_csr_valuesSEXP) {
@@ -414,6 +808,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices1(indices1SEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indices2(indices2SEXP);
     rcpp_result_gen = Rcpp::wrap(is_same_ngRMatrix(indptr1, indptr2, indices1, indices2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_is_sorted
+bool check_is_sorted(Rcpp::IntegerVector x);
+RcppExport SEXP _MatrixExtra_check_is_sorted(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_is_sorted(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1699,6 +2103,32 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_MatrixExtra_set_single_row_to_zero", (DL_FUNC) &_MatrixExtra_set_single_row_to_zero, 4},
+    {"_MatrixExtra_set_single_col_to_zero", (DL_FUNC) &_MatrixExtra_set_single_col_to_zero, 4},
+    {"_MatrixExtra_set_single_row_to_const", (DL_FUNC) &_MatrixExtra_set_single_row_to_const, 6},
+    {"_MatrixExtra_set_single_col_to_const", (DL_FUNC) &_MatrixExtra_set_single_col_to_const, 6},
+    {"_MatrixExtra_set_single_val_to_zero", (DL_FUNC) &_MatrixExtra_set_single_val_to_zero, 5},
+    {"_MatrixExtra_set_single_val_to_const", (DL_FUNC) &_MatrixExtra_set_single_val_to_const, 7},
+    {"_MatrixExtra_set_single_row_to_rowvec", (DL_FUNC) &_MatrixExtra_set_single_row_to_rowvec, 6},
+    {"_MatrixExtra_set_single_col_to_colvec", (DL_FUNC) &_MatrixExtra_set_single_col_to_colvec, 6},
+    {"_MatrixExtra_set_single_row_to_svec", (DL_FUNC) &_MatrixExtra_set_single_row_to_svec, 8},
+    {"_MatrixExtra_set_single_col_to_svec", (DL_FUNC) &_MatrixExtra_set_single_col_to_svec, 8},
+    {"_MatrixExtra_set_rowseq_to_zero", (DL_FUNC) &_MatrixExtra_set_rowseq_to_zero, 5},
+    {"_MatrixExtra_set_rowseq_to_const", (DL_FUNC) &_MatrixExtra_set_rowseq_to_const, 7},
+    {"_MatrixExtra_set_colseq_to_zero", (DL_FUNC) &_MatrixExtra_set_colseq_to_zero, 6},
+    {"_MatrixExtra_set_colseq_to_const", (DL_FUNC) &_MatrixExtra_set_colseq_to_const, 7},
+    {"_MatrixExtra_set_arbitrary_rows_to_zero", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_to_zero, 4},
+    {"_MatrixExtra_set_arbitrary_rows_to_const", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_to_const, 6},
+    {"_MatrixExtra_set_arbitrary_cols_to_zero", (DL_FUNC) &_MatrixExtra_set_arbitrary_cols_to_zero, 5},
+    {"_MatrixExtra_set_arbitrary_cols_to_const", (DL_FUNC) &_MatrixExtra_set_arbitrary_cols_to_const, 6},
+    {"_MatrixExtra_set_arbitrary_rows_single_col_to_zero", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_single_col_to_zero, 6},
+    {"_MatrixExtra_set_arbitrary_rows_single_col_to_const", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_single_col_to_const, 7},
+    {"_MatrixExtra_set_single_row_arbitrary_cols_to_zero", (DL_FUNC) &_MatrixExtra_set_single_row_arbitrary_cols_to_zero, 6},
+    {"_MatrixExtra_set_single_row_arbitrary_cols_to_const", (DL_FUNC) &_MatrixExtra_set_single_row_arbitrary_cols_to_const, 7},
+    {"_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_zero", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_zero, 6},
+    {"_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_const", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_const, 7},
+    {"_MatrixExtra_set_rowseq_to_smat", (DL_FUNC) &_MatrixExtra_set_rowseq_to_smat, 8},
+    {"_MatrixExtra_set_arbitrary_rows_to_smat", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_to_smat, 7},
     {"_MatrixExtra_cbind_csr_numeric", (DL_FUNC) &_MatrixExtra_cbind_csr_numeric, 6},
     {"_MatrixExtra_cbind_csr_logical", (DL_FUNC) &_MatrixExtra_cbind_csr_logical, 6},
     {"_MatrixExtra_cbind_csr_binary", (DL_FUNC) &_MatrixExtra_cbind_csr_binary, 4},
@@ -1729,6 +2159,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_contains_any_inf", (DL_FUNC) &_MatrixExtra_contains_any_inf, 1},
     {"_MatrixExtra_contains_any_neg", (DL_FUNC) &_MatrixExtra_contains_any_neg, 1},
     {"_MatrixExtra_is_same_ngRMatrix", (DL_FUNC) &_MatrixExtra_is_same_ngRMatrix, 4},
+    {"_MatrixExtra_check_is_sorted", (DL_FUNC) &_MatrixExtra_check_is_sorted, 1},
     {"_MatrixExtra_check_indices_are_unsorted", (DL_FUNC) &_MatrixExtra_check_indices_are_unsorted, 2},
     {"_MatrixExtra_sort_sparse_indices_numeric", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_numeric, 3},
     {"_MatrixExtra_sort_sparse_indices_logical", (DL_FUNC) &_MatrixExtra_sort_sparse_indices_logical, 3},

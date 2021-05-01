@@ -118,6 +118,38 @@ bool check_is_sorted(int* vec, size_t n)
     return true;
 }
 
+// [[Rcpp::export(rng = false)]]
+bool check_is_sorted(Rcpp::IntegerVector x)
+{
+    return check_is_sorted(x.begin(), x.size());
+}
+
+void check_and_sort_single_row_inplace
+(
+    int *restrict indices,
+    double *restrict values,
+    int *restrict argsorted,
+    int *restrict buffer,
+    const int n,
+    const bool pre_check
+)
+{
+    if (!pre_check || !check_is_sorted(indices, n))
+    {
+        std::iota(argsorted, argsorted + n, 0);
+        std::sort(argsorted, argsorted + n,
+                  [&indices](const int a, const int b)
+                  {return indices[a] < indices[b];});
+        for (int ix = 0; ix < n; ix++)
+            buffer[ix] = indices[argsorted[ix]];
+        memcpy(indices, buffer, (size_t)n*sizeof(int));
+        double *buffer_ = (double*)buffer;
+        for (int ix = 0; ix < n; ix++)
+            buffer_[ix] = values[argsorted[ix]];
+        memcpy(values, buffer_, (size_t)n*sizeof(double));
+    }
+}
+
 bool check_indices_are_unsorted
 (
     int *restrict indptr,

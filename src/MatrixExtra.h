@@ -52,6 +52,15 @@ struct VectorConstructorArgs {
 
 bool check_is_sorted(int* vec, size_t n);
 bool check_is_seq(Rcpp::IntegerVector indices);
+void check_and_sort_single_row_inplace
+(
+    int *restrict indices,
+    double *restrict values,
+    int *restrict argsorted,
+    int *restrict buffer,
+    const int n,
+    const bool pre_check
+);
 SEXP SafeRcppVector(void *args_);
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
                        Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2);
@@ -84,3 +93,11 @@ int extract_single_val_csr
 #else
 #   define size_large size_t
 #endif
+
+#define size_times_ratio_dbl(x) ((size_t)ceill(\
+    (long double)(x) * \
+    (   (long double)std::max(sizeof(double), sizeof(int)) \
+            / \
+        (long double)std::min(sizeof(double), sizeof(int)) \
+    ) \
+))

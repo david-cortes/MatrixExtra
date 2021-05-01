@@ -2516,11 +2516,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
         values_out.reserve(indices.size());
         size_t size_buffer = max5(rows_na.size(), rows_nan.size(), rows_ones.size(), rows_inf.size(), (size_t)ncols);
         std::unique_ptr<int[]> argsorted(new int[size_buffer]);
-        std::unique_ptr<int[]> temp(new int[(size_t)ceill(
-            (long double)size_buffer
-                *
-            (long double)sizeof(double)/(long double)sizeof(int)
-        )]);
+        std::unique_ptr<int[]> temp(new int[size_times_ratio_dbl(size_buffer)]);
         double *temp_dbl = (double*)temp.get();
 
         argsort_buffer_NAs(rows_na, cols_na, argsorted.get(), temp.get());

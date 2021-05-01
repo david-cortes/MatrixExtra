@@ -147,6 +147,11 @@ drop_slice <- function(x, drop) {
 #' through \link{restore_old_matrix_behavior} or through the package options
 #' (e.g. `options("MatrixExtra.drop_sparse" = FALSE)` - see \link{MatrixExtra-options}).
 #' 
+#' \bold{Note:} Trying to slice a sparse matrix without supplying any parameter for the
+#' second axis (e.g. `X[1:10]`) will \bold{select whole rows} (as if it were `X[1:10,]`)
+#' instead of selecting entries as if the input were a flattened array (which is what
+#' `Matrix` and base R do).
+#' 
 #' This package will override the subsetting methods from `Matrix` for all
 #' sparse matrix types. It is usually much faster for all three storage orders (especially
 #' CSR) but in some situations could end up being slightly slower. Be aware that, in the

@@ -114,7 +114,7 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 
 # TODO
 
-* Assignment operator (`[<-`).
+* Cover more cases in assignment operator (`[<-`).
 * Accepting `NA`s in subsetting operator (`[`).
 * Matrix multiplications between `float32` and `sparseVector`.
 * Better handling of dimension names of the output matrices.

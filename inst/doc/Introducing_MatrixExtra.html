@@ -139,7 +139,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Sparse Matrix Formats</h1>
 <p>A typical matrix is a 2D array which has a given number of rows and columns, and stores tabular data inside - e.g. measures of different variables (columns) for many observations (rows). Behind the scenes, matrices in R are represented as a 1D array with a column-major storage, where element <code>(i,j)</code> is at position <code>i + (j-1)*nrows</code>. This is a straightforward concept - performing operations on such matrices is trivial, and allows easy exploitation of modern CPU capabilities such as SIMD and multi-threading.</p>
 <p>In many applications, one finds some matrices in which most of the values are exactly zero with only a few different entries - so called “sparse” matrices. For example, in recommender systems, one might construct a matrix of user-item interactions, in which users are rows, items are columns, and values denote e.g. movie ratings or hours spent playing something. Typically, each user interacts with only a handful items, so such a matrix will typically have &gt;99% of the entries set to zero. In such cases, using a typical matrix is wasteful, since it requires creating an array which contains mostly zeros, and doing operations on them is inefficient, since the output of e.g. <code>X * 2</code> only needs to look at the non-zero entries rather than the full <code>nrows*ncols</code> entries. Similar situations are encountered in natural language processing (e.g. word counts by documents), social networks (e.g. connections between users), and classification/regression with one-hot/dummy encoded features, among others.</p>
-<p>In such cases, it’s more efficient to use a matrix representation that stores only the non-zero values and the indices which are non-zero. In many cases it might even be impossible to represent the full matrix in a computer’s memory due it’s size (e.g. 1,000,000 users and 10,000 movies = 74.5GB, but if only 1% of the entries are non-zero, can be put down to ~1.5GB or less), and to perform operations in this sparse representation instead.</p>
+<p>In such cases, it’s more efficient to use a matrix representation that stores only the non-zero values and the indices which are non-zero. In many cases it might even be impossible to represent the full matrix in a computer’s memory due it’s size (e.g. 1,000,000 users and 10,000 movies = 74.5GB, but if only 1% of the entries are non-zero, can be put down to ~1.5GB or less), and it’s thus necessary to perform operations in this sparse representation instead.</p>
 <p>Object classes for sparse matrix representations in R are provided by packages like <code>Matrix</code> or <code>SparseM</code> (or <code>igraph</code> for more specialized topics), and those objects - particularly the ones from <code>Matrix</code> - are accepted and handled efficiently by many other packages such as <a href="https://cran.r-project.org/package=rsparse">rsparse</a> or <a href="https://cran.r-project.org/package=glmnet">glmnet</a>.</p>
 <p>As a general rule, if a given matrix has &lt;5% non-zero values, it is more efficient to do common operations on it in a sparse representation, which typically comes in one of the following formats:</p>
 <div id="coo-coordinate-or-triplets-a.k.a.-tsparsematrix" class="section level4">
@@ -255,33 +255,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>X_big_csr <span class="ot">&lt;-</span> <span class="fu">as</span>(<span class="fu">t</span>(X_big_csc), <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean   median</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 143.4568 146.9597 203.6154 226.4674</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean  median</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 143.1563 147.0879 201.1674 222.218</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  229.6511 233.2758    10</span></span></code></pre></div>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  224.9173 231.0815    10</span></span></code></pre></div>
 <p>Compare against what should be the mirror operation in CSC format:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]}, <span class="at">times=</span>10L)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean   median</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csc[, 1:10] } 4.205115 4.242054 4.719621 4.273848</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min      lq     mean   median</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csc[, 1:10] } 4.296458 4.65488 5.019217 4.724692</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.458921 7.910443    10</span></span></code></pre></div>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.736765 8.442185    10</span></span></code></pre></div>
 <p>Some operations in <code>Matrix</code>, even if done natively in CSC format with a CSC input, can still be slower than one would expect and than what could in theory be achieved with different algorithms, oftentimes due to making copies of the data:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr      min       lq     mean</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 4.181591 4.206087 4.436836</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    median       uq      max neval</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.218485 4.250651 6.320251    10</span></span></code></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 4.214214 4.218472 4.451221</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   median       uq      max neval</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.23094 4.241956 6.449066    10</span></span></code></pre></div>
 <p>It should also be kept in mind that <code>Matrix</code> does not exploit multi-threading in dense-sparse matrix multiplications, which have substantial potential for acceleration:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>Y_dense <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fl">1e2</span><span class="sc">*</span><span class="fu">nrow</span>(X_big_csc)), <span class="at">nrow=</span><span class="fl">1e2</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min       lq     mean   median</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 348.4187 349.0546 351.8436 350.6834</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 338.9545 343.6268 367.2063 374.1423</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  354.1087 361.0789    10</span></span></code></pre></div>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  382.8844 398.5774    10</span></span></code></pre></div>
 </div>
 <div id="why-is-csr-needed" class="section level1">
 <h1>Why is CSR needed?</h1>
@@ -320,23 +320,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Some of these operations now become much more efficient when the inputs are large:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr    min      lq     mean  median      uq</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 315.01 315.762 20203.33 325.901 342.743</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr     min      lq     mean   median      uq</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 318.377 324.829 20248.18 326.7325 351.549</span></span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       max neval</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  199091.9    10</span></span></code></pre></div>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  199492.1    10</span></span></code></pre></div>
 <p>Other methods, despite having been fast before in <code>Matrix</code>, will still be replaced with faster versions:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr     min      lq     mean</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 340.529 348.323 925.9922</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   median      uq      max neval</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  354.179 358.422 6085.551    10</span></span></code></pre></div>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 349.636 353.193 938.3509</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    median      uq      max neval</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  356.3335 367.439 6162.799    10</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min       lq     mean  median       uq</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 50.79894 50.95537 51.47574 51.3307 51.62951</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr     min       lq     mean   median       uq</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 70.5405 70.89167 73.84058 72.84829 75.61985</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       max neval</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  53.54326    10</span></span></code></pre></div>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  80.25813    10</span></span></code></pre></div>
 <p>Conversions between sparse matrix classes also become easier:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(Xr, <span class="st">&quot;ngRMatrix&quot;</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngRMatrix&quot;</span></span>
@@ -453,9 +453,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: seconds</span></span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                                                           expr</span></span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     res &lt;- optim(x0, logistic_fun, logistic_grad, method = &quot;L-BFGS-B&quot;,          X_train, y_train, lambda) }</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       min       lq   mean  median       uq      max neval</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1.684676 1.697822 1.7237 1.70661 1.716288 1.858674    10</span></span></code></pre></div>
-<p>The same routine using <code>Matrix</code> would usually take above 3 seconds (60-70% slower) in this same setup, plus some extra time in the data preparation. The only thing that was needed to accelerate it was to load <code>library(MatrixExtra)</code>, with everything else remaining the same as it would have been in base R or <code>Matrix</code>.</p>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       min       lq     mean   median       uq      max neval</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1.625666 1.656553 1.680978 1.663851 1.676421 1.854614    10</span></span></code></pre></div>
+<p>The same routine using <code>Matrix</code> would usually take above 3 seconds (~70% slower) in this same setup, plus some extra time in the data preparation. The only thing that was needed to accelerate it was to load <code>library(MatrixExtra)</code>, with everything else remaining the same as it would have been in base R or <code>Matrix</code>.</p>
 </div>
 
 
