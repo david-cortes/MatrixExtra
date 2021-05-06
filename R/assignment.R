@@ -537,106 +537,67 @@ setMethod("[<-", signature(x="dgRMatrix", i="index", j="missing", value="sparseV
 setMethod("[<-", signature(x="dgRMatrix", i="missing", j="missing", value="sparseVector"), assign_csr)
 
 
+assign_generic_with_vector <- function(x, i, j, ..., value) {
+    if (inherits(x, "dgRMatrix"))
+        return(assign_csr(x, i, j, value))
 
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="index", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="missing", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="index", j="nsparseVector", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="missing", j="nsparseVector", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="nsparseVector", value="replValue"), assign_csr)
+    if (!missing(i))
+        i <- get_indices_integer(i, NROW(x), rownames(x))
+    if (!missing(j))
+        j <- get_indices_integer(j, NCOL(x), colnames(x))
+    return(`[<-`(x, i, j, value))
+}
 
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="index", value="sparseVector"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="nsparseVector", j="nsparseVector", value="replValue"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="missing", value="sparseVector"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="missing", j="nsparseVector", value="replValue"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="index", j="nsparseVector", value="sparseVector"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="missing", j="nsparseVector", value="sparseVector"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="nsparseVector", j="nsparseVector", value="sparseVector"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="index", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="missing", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="index", j="lsparseVector", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="missing", j="lsparseVector", value="replValue"), assign_csr)
-
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="lsparseVector", value="replValue"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="nsparseVector", j="missing", value="replValue"), assign_generic_with_vector)
 
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="index", value="sparseVector"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="lsparseVector", j="lsparseVector", value="replValue"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="missing", value="sparseVector"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="missing", j="lsparseVector", value="replValue"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="index", j="lsparseVector", value="sparseVector"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="lsparseVector", j="missing", value="replValue"), assign_generic_with_vector)
 
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="missing", j="lsparseVector", value="sparseVector"), assign_csr)
 
-#' @rdname assignment
-#' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseVector", j="lsparseVector", value="sparseVector"), assign_csr)
 
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseMatrix", j="index", value="sparseMatrix"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="nsparseVector", j="nsparseVector", value="ANY"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseMatrix", j="missing", value="sparseMatrix"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="missing", j="nsparseVector", value="ANY"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="index", j="lsparseMatrix", value="sparseMatrix"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="nsparseVector", j="missing", value="ANY"), assign_generic_with_vector)
+
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="missing", j="lsparseMatrix", value="sparseMatrix"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="lsparseVector", j="lsparseVector", value="ANY"), assign_generic_with_vector)
 
 #' @rdname assignment
 #' @export
-setMethod("[<-", signature(x="dgRMatrix", i="lsparseMatrix", j="lsparseMatrix", value="sparseMatrix"), assign_csr)
+setMethod("[<-", signature(x="ANY", i="missing", j="lsparseVector", value="ANY"), assign_generic_with_vector)
+
+#' @rdname assignment
+#' @export
+setMethod("[<-", signature(x="ANY", i="lsparseVector", j="missing", value="ANY"), assign_generic_with_vector)

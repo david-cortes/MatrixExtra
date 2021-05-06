@@ -10,31 +10,18 @@
 \alias{[<-,dgRMatrix,missing,index,sparseVector-method}
 \alias{[<-,dgRMatrix,index,missing,sparseVector-method}
 \alias{[<-,dgRMatrix,missing,missing,sparseVector-method}
-\alias{[<-,dgRMatrix,nsparseVector,index,replValue-method}
-\alias{[<-,dgRMatrix,nsparseVector,missing,replValue-method}
-\alias{[<-,dgRMatrix,index,nsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,missing,nsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,nsparseVector,nsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,nsparseVector,index,sparseVector-method}
-\alias{[<-,dgRMatrix,nsparseVector,missing,sparseVector-method}
-\alias{[<-,dgRMatrix,index,nsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,missing,nsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,nsparseVector,nsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,lsparseVector,index,replValue-method}
-\alias{[<-,dgRMatrix,lsparseVector,missing,replValue-method}
-\alias{[<-,dgRMatrix,index,lsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,missing,lsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,lsparseVector,lsparseVector,replValue-method}
-\alias{[<-,dgRMatrix,lsparseVector,index,sparseVector-method}
-\alias{[<-,dgRMatrix,lsparseVector,missing,sparseVector-method}
-\alias{[<-,dgRMatrix,index,lsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,missing,lsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,lsparseVector,lsparseVector,sparseVector-method}
-\alias{[<-,dgRMatrix,lsparseMatrix,index,sparseMatrix-method}
-\alias{[<-,dgRMatrix,lsparseMatrix,missing,sparseMatrix-method}
-\alias{[<-,dgRMatrix,index,lsparseMatrix,sparseMatrix-method}
-\alias{[<-,dgRMatrix,missing,lsparseMatrix,sparseMatrix-method}
-\alias{[<-,dgRMatrix,lsparseMatrix,lsparseMatrix,sparseMatrix-method}
+\alias{[<-,ANY,nsparseVector,nsparseVector,replValue-method}
+\alias{[<-,ANY,missing,nsparseVector,replValue-method}
+\alias{[<-,ANY,nsparseVector,missing,replValue-method}
+\alias{[<-,ANY,lsparseVector,lsparseVector,replValue-method}
+\alias{[<-,ANY,missing,lsparseVector,replValue-method}
+\alias{[<-,ANY,lsparseVector,missing,replValue-method}
+\alias{[<-,ANY,nsparseVector,nsparseVector,ANY-method}
+\alias{[<-,ANY,missing,nsparseVector,ANY-method}
+\alias{[<-,ANY,nsparseVector,missing,ANY-method}
+\alias{[<-,ANY,lsparseVector,lsparseVector,ANY-method}
+\alias{[<-,ANY,missing,lsparseVector,ANY-method}
+\alias{[<-,ANY,lsparseVector,missing,ANY-method}
 \title{Assignment operator for CSR matrices}
 \usage{
 \S4method{[}{dgRMatrix,index,index,replValue}(x, i, j, ...) <- value
@@ -53,55 +40,29 @@
 
 \S4method{[}{dgRMatrix,missing,missing,sparseVector}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,index,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,nsparseVector,nsparseVector,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,missing,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,missing,nsparseVector,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,index,nsparseVector,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,nsparseVector,missing,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,missing,nsparseVector,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,lsparseVector,lsparseVector,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,nsparseVector,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,missing,lsparseVector,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,index,sparseVector}(x, i, j, ...) <- value
+\S4method{[}{ANY,lsparseVector,missing,replValue}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,missing,sparseVector}(x, i, j, ...) <- value
+\S4method{[}{ANY,nsparseVector,nsparseVector,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,index,nsparseVector,sparseVector}(x, i, j, ...) <- value
+\S4method{[}{ANY,missing,nsparseVector,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,missing,nsparseVector,sparseVector}(x, i, j, ...) <- value
+\S4method{[}{ANY,nsparseVector,missing,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,nsparseVector,nsparseVector,sparseVector}(x, i, j, ...) <- value
+\S4method{[}{ANY,lsparseVector,lsparseVector,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,lsparseVector,index,replValue}(x, i, j, ...) <- value
+\S4method{[}{ANY,missing,lsparseVector,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{dgRMatrix,lsparseVector,missing,replValue}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,index,lsparseVector,replValue}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,missing,lsparseVector,replValue}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseVector,lsparseVector,replValue}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseVector,index,sparseVector}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseVector,missing,sparseVector}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,index,lsparseVector,sparseVector}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,missing,lsparseVector,sparseVector}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseVector,lsparseVector,sparseVector}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseMatrix,index,sparseMatrix}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseMatrix,missing,sparseMatrix}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,index,lsparseMatrix,sparseMatrix}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,missing,lsparseMatrix,sparseMatrix}(x, i, j, ...) <- value
-
-\S4method{[}{dgRMatrix,lsparseMatrix,lsparseMatrix,sparseMatrix}(x, i, j, ...) <- value
+\S4method{[}{ANY,lsparseVector,missing,ANY}(x, i, j, ...) <- value
 }
 \arguments{
 \item{x}{A CSR matrix whose values are to be replaced.}
