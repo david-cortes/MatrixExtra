@@ -1,13 +1,13 @@
 Package: MatrixExtra
 Type: Package
 Title: Extra Methods for Sparse Matrices
-Version: 0.1
+Version: 0.1.1
 Author: David Cortes [aut, cre, cph], Dmitry Selivanov [cph]
 Maintainer: David Cortes <david.cortes.rivera@gmail.com>
 Description: Extends sparse matrix and vector classes from the 'Matrix' package by providing: 
   (a) Methods and operators that work natively on CSR formats (compressed sparse row, 
-  a.k.a. 'RsparseMatrix') such as slicing/sub-setting, assignment, rbind, 
-  mathematical operators for CSR and COO such as addition ("+") or "sqrt", and methods such as "diag"; 
+  a.k.a. 'RsparseMatrix') such as slicing/sub-setting, assignment, rbind(), 
+  mathematical operators for CSR and COO such as addition ("+") or sqrt(), and methods such as diag(); 
   (b) Multi-threaded matrix multiplication and cross-product for many <sparse, dense> types, 
   including the 'float32' type from 'float'; 
   (c) Coercion methods between pairs of classes which are not present in 'Matrix', 
@@ -22,7 +22,7 @@ Depends: Matrix (>= 1.3), methods
 Imports: Rcpp, RhpcBLASctl, float
 LinkingTo: Rcpp
 Suggests: testthat, data.table
-URL: https://www.github.com/david-cortes/MatrixExtra
-BugReports: https://www.github.com/david-cortes/MatrixExtra/issues
+URL: https://github.com/david-cortes/MatrixExtra
+BugReports: https://github.com/david-cortes/MatrixExtra/issues
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
