@@ -278,3 +278,27 @@ test_that("Reverse sequences", {
     expect_equal(as.matrix(m[4:50,rev(1:ncol(m))]),
                  m_base[4:50,rev(1:ncol(m))])
 })
+
+test_that("Potential problem cases", {
+    expect_equal(unname(as.matrix(m[c(seq(1, nrow(m)), 1), ])),
+                 unname(m_base[c(seq(1, nrow(m_coo)), 1), ]))
+    expect_equal(unname(as.matrix(m[, c(seq(1, ncol(m)), 1)])),
+                 unname(m_base[, c(seq(1, ncol(m_coo)), 1)]))
+    
+    expect_equal(unname(as.matrix(m[c(seq(1, nrow(m)), 1), seq(2, ncol(m)-1)])),
+                 unname(m_base[c(seq(1, nrow(m_base)), 1), seq(2, ncol(m_base)-1)]))
+    expect_equal(unname(as.matrix(m[c(seq(1, nrow(m)), 1), c(seq(1, ncol(m)), 1)])),
+                 unname(m_base[c(seq(1, nrow(m_base)), 1), c(seq(1, ncol(m_base)), 1)]))
+})
+
+test_that("Slicing with NAs", {
+    expect_equal(unname(as.matrix(m[NA, NA])), unname(m_base[NA, NA]))
+    expect_equal(unname(as.matrix(m[NA, ])), unname(m_base[NA, ]))
+    expect_equal(unname(as.matrix(m[, NA])), unname(m_base[, NA]))
+    expect_equal(unname(as.matrix(m[c(1,NA), ])), unname(m_base[c(1,NA), ]))
+    expect_equal(unname(as.matrix(m[, c(1,NA,NA)])), unname(m_base[, c(1,NA,NA)]))
+    expect_equal(unname(as.matrix(m[c(5,2,NA,3,NA), c(1,3,NA)])),
+                 unname(m_base[c(5,2,NA,3,NA), c(1,3,NA)]))
+    expect_equal(unname(as.matrix(m[c(seq(1, nrow(m)), NA), ])),
+                 unname(m_base[c(seq(1, nrow(m)), NA), ]))
+})

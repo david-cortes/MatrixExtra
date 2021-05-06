@@ -97,6 +97,15 @@ bool contains_any_nas_or_inf(Rcpp::NumericVector x)
 }
 
 // [[Rcpp::export(rng = false)]]
+int find_first_non_na(Rcpp::IntegerVector x)
+{
+    for (auto el : x)
+        if (el != NA_INTEGER)
+            return el;
+    return NA_INTEGER;
+}
+
+// [[Rcpp::export(rng = false)]]
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2,
                        Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2)
 {

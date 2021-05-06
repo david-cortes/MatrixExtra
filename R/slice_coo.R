@@ -93,6 +93,12 @@ subset_coo <- function(x, i, j, drop) {
     j_is_seq <- temp$j_is_seq
     i_is_rev_seq <- temp$i_is_rev_seq
     j_is_rev_seq <- temp$j_is_rev_seq
+    i_has_NA <- temp$i_has_NA
+    j_has_NA <- temp$j_has_NA
+    i_all_NA <- temp$i_all_NA
+    j_all_NA <- temp$j_all_NA
+    i_NAs <- temp$i_NAs
+    j_NAs <- temp$j_NAs
     n_row <- temp$n_row
     n_col <- temp$n_col
     row_names <- temp$row_names
@@ -122,6 +128,17 @@ subset_coo <- function(x, i, j, drop) {
         return(drop_slice(x, drop))
     }
 
+    if ((i_all_NA || all_i) && (j_all_NA || all_j)) {
+        output_logical <- inherits(x, c("nsparseMatrix", "lsparseMatrix"))
+        out <- matrix(NA_real_, nrow=NROW(i), ncol=NROW(j))
+        out <- as.coo.matrix(out, logical=output_logical)
+        if (!i_all_NA && !is.null(rownames(x)))
+            rownames(out) <- rownames(x)[i]
+        if (!j_all_NA && !is.null(colnames(x)))
+            colnames(out) <- colnames(x)[j]
+        return(drop_slice(out, drop, i_NAs, j_NAs))
+    }
+
     if (i_is_rev_seq && j_is_rev_seq && length(i) == nrow(x) && length(j) == ncol(x)) {
         X_attr <- attributes(x)
         X_attr$i <- (nrow(x) - 1L) - X_attr$i
@@ -131,9 +148,9 @@ subset_coo <- function(x, i, j, drop) {
         if (!is.null(X_attr$Dimnames[[2L]]))
             X_attr$Dimnames[[2L]] <- rev(X_attr$Dimnames[[2L]])
         if ("uplo" %in% names(X_attr))
-            X_attr$uplo = ifelse(X_attr$uplo == "U", "L", "U")
+            X_attr$uplo <- ifelse(X_attr$uplo == "U", "L", "U")
         attributes(x) <- X_attr
-        return(drop_slice(x, drop))
+        return(drop_slice(x, drop, i_NAs, j_NAs))
     }
 
     if (inherits(x, c("symmetricMatrix", "triangularMatrix")))
@@ -183,7 +200,7 @@ subset_coo <- function(x, i, j, drop) {
     col_names <- if (is.null(col_names) || !NCOL(col_names)) NULL else col_names[j]
     res@Dimnames <- list(row_names, col_names)
 
-    res <- drop_slice(res, drop)
+    res <- drop_slice(res, drop, i_NAs, j_NAs)
     return(res)
 } 
 

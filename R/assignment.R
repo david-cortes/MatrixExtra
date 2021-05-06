@@ -55,6 +55,9 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
     if (is.null(ij_properties))
         ij_properties <- get_ij_properties(x, i ,j)
 
+    if (ij_properties$i_has_NA || ij_properties$j_has_NA)
+        stop("Indices contain NAs.")
+
     i <- ij_properties$i
     j <- ij_properties$j
     all_i <- ij_properties$all_i

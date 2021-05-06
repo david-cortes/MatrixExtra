@@ -7,8 +7,9 @@ get_indices_integer <- function(i, max_i, index_names) {
 
     if (inherits(i, "lsparseVector")) {
         if (anyNA(i@x))
-            stop("Subsetting with NA indices not supported.")
-        i <- as(i, "nsparseVector")
+            i <- seq(1L, max_i)[as.logical(i)]
+        else
+            i <- as(i, "nsparseVector")
     }
 
     if (inherits(i, "nsparseVector")) {
@@ -41,12 +42,10 @@ get_indices_integer <- function(i, max_i, index_names) {
             i <- which(i)
         }
     }
-    ### TODO: maybe allow slicing with NAs
-    if (anyNA(i))
-        stop("Cannot slice matrix with NA indices.")
+
     if (typeof(i) != "integer")
         i <- as.integer(i)
-    if (any(i <= 0))
+    if (any(!is.na(i) & i <= 0))
         i <- seq(1L, max_i)[i]
     if(NROW(i) && any(i > max_i, na.rm=TRUE))
         stop("some of row subset indices are not present in matrix")
@@ -67,17 +66,22 @@ get_ij_properties <- function(x, i, j) {
     j_is_seq <- FALSE
     i_is_rev_seq <- FALSE
     j_is_rev_seq <- FALSE
+    i_has_NA <- FALSE
+    j_has_NA <- FALSE
     if (missing(j)) {
         all_j <- TRUE
         j <- seq_len(ncol(x))
         n_col <- ncol(x)
     } else {
         j <- get_indices_integer(j, ncol(x), col_names)
-        if (length(j) == ncol(x) && j[1L] == 1L && j[length(j)] == ncol(x)) {
-            if (check_is_seq(j))
-                all_j <- TRUE
-        } else {
-            j_is_seq <- check_is_seq(j)
+        j_has_NA <- anyNA(j)
+        if (!j_has_NA) {
+            if (length(j) == ncol(x) && j[1L] == 1L && j[length(j)] == ncol(x)) {
+                if (check_is_seq(j))
+                    all_j <- TRUE
+            } else {
+                j_is_seq <- check_is_seq(j)
+            }
         }
         n_col <- length(j)
     }
@@ -88,7 +92,9 @@ get_ij_properties <- function(x, i, j) {
         n_row <- nrow(x)
     } else {
         i <- get_indices_integer(i, nrow(x), row_names)
-        i_is_seq <- check_is_seq(i)
+        i_has_NA <- anyNA(i)
+        if (!i_has_NA) 
+            i_is_seq <- check_is_seq(i)
         n_row <- length(i)
 
         if (i_is_seq && length(i) == nrow(x) && i[1L] == 1L && i[length(i)] == nrow(x)) {
@@ -97,20 +103,113 @@ get_ij_properties <- function(x, i, j) {
         }
     }
 
-    if (!all_i && !i_is_seq)
+    if (!all_i && !i_is_seq && !i_has_NA)
         i_is_rev_seq <- check_is_rev_seq(i)
-    if (!all_j && !j_is_seq)
+    if (!all_j && !j_is_seq && !j_has_NA)
         j_is_rev_seq <- check_is_rev_seq(j)
+
+    i_all_NA <- FALSE
+    j_all_NA <- FALSE
+    i_NAs <- NULL
+    j_NAs <- NULL
+    if (i_has_NA) {
+        i_temp <- find_first_non_na(i)
+        if (is.na(i_temp)) {
+            i_all_NA <- TRUE
+        } else {
+            i_NAs <- which(is.na(i))
+            i[i_NAs] <- i_temp
+        }
+    }
+    if (j_has_NA) {
+        j_temp <- find_first_non_na(j)
+        if (is.na(j_temp)) {
+            j_all_NA <- TRUE
+        } else {
+            j_NAs <- which(is.na(j))
+            j[j_NAs] <- j_temp
+        }
+    }
+
 
     return(list(
         i = i, all_i = all_i, i_is_seq = i_is_seq, i_is_rev_seq = i_is_rev_seq,
         j = j, all_j = all_j, j_is_seq = j_is_seq, j_is_rev_seq = j_is_rev_seq,
+        i_has_NA = i_has_NA, i_all_NA = i_all_NA, i_NAs = i_NAs,
+        j_has_NA = j_has_NA, j_all_NA = j_all_NA, j_NAs = j_NAs,
         row_names = row_names, col_names = col_names,
         n_row = n_row, n_col = n_col
     ))
 }
 
-drop_slice <- function(x, drop) {
+inject_NAs <- function(x, i_NAs, j_NAs) {
+    if (NROW(i_NAs) || NROW(j_NAs)) {
+
+        if (inherits(x, "sparseMatrix")) {
+            if (NROW(i_NAs) && !is.null(x@Dimnames[[1L]]))
+                x@Dimnames[[1L]][i_NAs] <- NA_character_
+            if (NROW(j_NAs) && !is.null(x@Dimnames[[2L]]))
+                x@Dimnames[[2L]][j_NAs] <- NA_character_
+        } else {
+            if (NROW(i_NAs) && !is.null(rownames(x)))
+                rownames(x)[i_NAs] <- NA
+            if (NROW(j_NAs) && !is.null(rownames(x)))
+                rownames(x)[j_NAs] <- NA
+        }
+
+        output_logical <- inherits(x, c("nsparseMatrix", "lsparseMatrix"))
+        if (inherits(x, "RsparseMatrix")) {
+            x <- as.csr.matrix(x, logical=output_logical)
+        } else if (inherits(x, "TsparseMatrix")) {
+            x <- as.coo.matrix(x, logical=output_logical)
+        }
+
+        if (inherits(x, "RsparseMatrix")) {
+            x <- as.csr.matrix(x)
+            if (NROW(i_NAs))
+                x <- assign_csr_internal(x, i_NAs, seq(1L, NCOL(x)), NA_real_)
+            if (NROW(j_NAs))
+                x <- assign_csr_internal(x, seq(1L, NROW(x)), j_NAs, NA_real_)
+            if (output_logical)
+                x <- as.csr.matrix(x, logical=TRUE)
+        }
+        
+        else if (inherits(x, "TsparseMatrix")) {
+            if (!NROW(i_NAs))
+                i_NAs <- integer()
+            if (!NROW(j_NAs))
+                j_NAs <- integer()
+            if (output_logical) {
+                out <- new("lgTMatrix")
+                res <- inject_NAs_inplace_coo_logical(x@i, x@j, x@x, i_NAs-1L, j_NAs-1L, nrow(x), ncol(x))
+            } else {
+                out <- new("dgTMatrix")
+                res <- inject_NAs_inplace_coo_numeric(x@i, x@j, x@x, i_NAs-1L, j_NAs-1L, nrow(x), ncol(x))
+            }
+            out@i <- res$ii
+            out@j <- res$jj
+            out@x <- res$xx
+            out@Dim <- x@Dim
+            x <- out
+        }
+
+        else if (inherits(x, "float32")) {
+            x[i_NAs, ] <- float::fl(NA_real_)
+            x[, j_NAs] <- float::fl(NA_real_)
+        }
+        
+        else {
+            x[i_NAs, ] <- NA
+            x[, j_NAs] <- NA
+        }
+    }
+    
+    return(x)
+}
+
+drop_slice <- function(x, drop, i_NAs=NULL, j_NAs=NULL) {
+
+    x <- inject_NAs(x, i_NAs, j_NAs)
     
     if ((missing(drop) || isTRUE(drop)) && inherits(x, c("sparseMatrix", "float32"))) {
         if (nrow(x) == 1L || ncol(x) == 1L) {
@@ -291,6 +390,12 @@ subset_csr <- function(x, i, j, drop) {
     j_is_seq <- temp$j_is_seq
     i_is_rev_seq <- temp$i_is_rev_seq
     j_is_rev_seq <- temp$j_is_rev_seq
+    i_has_NA <- temp$i_has_NA
+    j_has_NA <- temp$j_has_NA
+    i_all_NA <- temp$i_all_NA
+    j_all_NA <- temp$j_all_NA
+    i_NAs <- temp$i_NAs
+    j_NAs <- temp$j_NAs
     n_row <- temp$n_row
     n_col <- temp$n_col
     row_names <- temp$row_names
@@ -318,6 +423,17 @@ subset_csr <- function(x, i, j, drop) {
 
     if (all_i && all_j) {
         return(drop_slice(x, drop))
+    }
+
+    if ((i_all_NA || all_i) && (j_all_NA || all_j)) {
+        output_logical <- inherits(x, c("nsparseMatrix", "lsparseMatrix"))
+        out <- matrix(NA_real_, nrow=NROW(i), ncol=NROW(j))
+        out <- as.csr.matrix(out, logical=output_logical)
+        if (!i_all_NA && !is.null(rownames(x)))
+            rownames(out) <- rownames(x)[i]
+        if (!j_all_NA && !is.null(colnames(x)))
+            colnames(out) <- colnames(x)[j]
+        return(drop_slice(out, drop))
     }
 
     if (!all_i && !i_is_seq)
@@ -351,7 +467,7 @@ subset_csr <- function(x, i, j, drop) {
         if ("uplo" %in% names(X_attr))
             X_attr$uplo = ifelse(X_attr$uplo == "U", "L", "U")
         attributes(x) <- X_attr
-        return(drop_slice(x, drop))
+        return(drop_slice(x, drop, i_NAs, j_NAs))
     }
 
     if (inherits(x, c("symmetricMatrix", "triangularMatrix")) && !(length(x@j) == 0L))
@@ -464,7 +580,7 @@ subset_csr <- function(x, i, j, drop) {
     col_names <- if (is.null(col_names) || !NCOL(col_names)) NULL else col_names[j]
     res@Dimnames <- list(row_names, col_names)
 
-    res <- drop_slice(res, drop)
+    res <- drop_slice(res, drop, i_NAs, j_NAs)
     return(res)
 }
 
@@ -594,8 +710,11 @@ setMethod(`[`, signature(x="ANY", i="lsparseVector", j="index", drop="missing"),
 
 subset_csc_masked <- function(x, i, j, drop) {
     x <- subset_csr(t_shallow(x), j, i, drop)
-    if (inherits(x, "sparseMatrix"))
+    if (inherits(x, "sparseMatrix")) {
         x <- t_shallow(x)
+    } else if (is.matrix(x)) {
+        x <- t(x)
+    }
     return(x)
 }
 

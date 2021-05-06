@@ -322,11 +322,6 @@ Rcpp::List slice_coo_arbitrary_template
     bool use_vectors = false;
 
     if (!i_has_duplicates && !j_has_duplicates) {
-        ii_out = std::vector<int>(size_reserve);
-        jj_out = std::vector<int>(size_reserve);
-        if (std::is_same<CompileFlag, bool>::value)
-        xx_out = std::vector<InputDType>(size_reserve);
-
         use_vectors = false;
         ii_out_ = std::unique_ptr<int[]>(new int[size_reserve]);
         jj_out_ = std::unique_ptr<int[]>(new int[size_reserve]);
@@ -416,19 +411,19 @@ Rcpp::List slice_coo_arbitrary_template
 
     else if (!i_has_duplicates) {
 
-        for (size_t ix = 0; ix < nnz; ix++)
+        if (all_i || i_is_seq || i_is_rev_seq)
         {
-            if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
+            post_process = true;
+            for (size_t ix = 0; ix < nnz; ix++)
             {
-                res_i = i_mapping.find(ii[ix]);
-                if (res_i != i_mapping.end())
+                if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
                 {
                     res_jn = j_indices_rep.find(jj[ix]);
                     if (res_jn != j_indices_rep.end())
                     {
                         for (auto el : res_jn->second)
                         {
-                            ii_out.push_back(res_i->second);
+                            ii_out.push_back(ii[ix]);
                             jj_out.push_back(el);
                             if (std::is_same<CompileFlag, bool>::value)
                             xx_out.push_back(xx[ix]);
@@ -438,16 +433,40 @@ Rcpp::List slice_coo_arbitrary_template
             }
         }
 
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+            {
+                if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
+                {
+                    res_i = i_mapping.find(ii[ix]);
+                    if (res_i != i_mapping.end())
+                    {
+                        res_jn = j_indices_rep.find(jj[ix]);
+                        if (res_jn != j_indices_rep.end())
+                        {
+                            for (auto el : res_jn->second)
+                            {
+                                ii_out.push_back(res_i->second);
+                                jj_out.push_back(el);
+                                if (std::is_same<CompileFlag, bool>::value)
+                                xx_out.push_back(xx[ix]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     else if (!j_has_duplicates) {
 
-        for (size_t ix = 0; ix < nnz; ix++)
+        if (all_j || j_is_seq || j_is_rev_seq)
         {
-            if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
+            post_process = true;
+            for (size_t ix = 0; ix < nnz; ix++)
             {
-                res_j = j_mapping.find(jj[ix]);
-                if (res_j != j_mapping.end())
+                if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
                 {
                     res_in = i_indices_rep.find(ii[ix]);
                     if (res_in != i_indices_rep.end())
@@ -455,7 +474,7 @@ Rcpp::List slice_coo_arbitrary_template
                         for (auto el : res_in->second)
                         {
                             ii_out.push_back(el);
-                            jj_out.push_back(res_j->second);
+                            jj_out.push_back(jj[ix]);
                             if (std::is_same<CompileFlag, bool>::value)
                             xx_out.push_back(xx[ix]);
                         }
@@ -464,9 +483,34 @@ Rcpp::List slice_coo_arbitrary_template
             }
         }
 
+        else
+        {
+            for (size_t ix = 0; ix < nnz; ix++)
+            {
+                if (ii[ix] >= min_i && ii[ix] <= max_i && jj[ix] >= min_j && jj[ix] <= max_j)
+                {
+                    res_j = j_mapping.find(jj[ix]);
+                    if (res_j != j_mapping.end())
+                    {
+                        res_in = i_indices_rep.find(ii[ix]);
+                        if (res_in != i_indices_rep.end())
+                        {
+                            for (auto el : res_in->second)
+                            {
+                                ii_out.push_back(el);
+                                jj_out.push_back(res_j->second);
+                                if (std::is_same<CompileFlag, bool>::value)
+                                xx_out.push_back(xx[ix]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
-    else {
+    else { /* both have duplicates */
 
         for (size_t ix = 0; ix < nnz; ix++)
         {
@@ -496,22 +540,26 @@ Rcpp::List slice_coo_arbitrary_template
     }
 
 
-    if (post_process)
-    {
-        post_process_seq(
-            use_vectors? ii_out.data() : ii_out_.get(), curr,
-            all_i, i_is_seq, i_is_rev_seq,
-            first_i, last_i
-        );
-        post_process_seq(
-            use_vectors? jj_out.data() : jj_out_.get(), curr,
-            all_j, j_is_seq, j_is_rev_seq,
-            first_j, last_j
-        );
-    }
-
     if (i_has_duplicates || j_has_duplicates)
         curr = ii_out.size();
+
+
+    if (post_process)
+    {
+        if (!i_has_duplicates)
+            post_process_seq(
+                use_vectors? ii_out.data() : ii_out_.get(), curr,
+                all_i, i_is_seq, i_is_rev_seq,
+                first_i, last_i
+            );
+
+        if (!j_has_duplicates)
+            post_process_seq(
+                use_vectors? jj_out.data() : jj_out_.get(), curr,
+                all_j, j_is_seq, j_is_rev_seq,
+                first_j, last_j
+            );
+    }
 
     VectorConstructorArgs args;
     args.as_integer = true; args.as_logical = false;
@@ -642,5 +690,245 @@ Rcpp::List slice_coo_arbitrary_binary
         i_is_seq, j_is_seq,
         i_is_rev_seq, j_is_rev_seq,
         nrows, ncols
+    );
+}
+
+void add_rows_cols_NA
+(
+    Rcpp::IntegerVector rows_na_,
+    Rcpp::IntegerVector cols_na_,
+    int *restrict ii_out,
+    int *restrict jj_out,
+    const size_t nrows_,
+    const size_t ncols_,
+    size_t &curr
+)
+{
+    for (int row : rows_na_)
+    {
+        std::fill_n(ii_out + curr, ncols_, row);
+        std::iota(jj_out + curr, jj_out + curr + ncols_, 0);
+        curr += ncols_;
+    }
+
+    if (cols_na_.size())
+    {
+        const int n_remainder = nrows_ - rows_na_.size();
+        std::unique_ptr<int[]> rows_remainder(new int[nrows_]);
+        std::iota(rows_remainder.get(), rows_remainder.get() + nrows_, 0);
+        int temp;
+        int move_to = nrows_ - 1;
+        for (int ix = rows_na_.size()-1; ix >= 0; ix--)
+        {
+            temp = rows_remainder[move_to];
+            rows_remainder[move_to] = rows_na_[ix];
+            rows_remainder[rows_na_[ix]] = temp;
+            move_to--;
+        }
+
+        const int *remainder_begin = rows_remainder.get();
+        const int *remainder_end = remainder_begin + n_remainder;
+        for (int col : cols_na_)
+        {
+            std::copy(remainder_begin, remainder_end, ii_out + curr);
+            std::fill_n(jj_out + curr, n_remainder, col);
+            curr += n_remainder;
+        }
+    }
+}
+
+template <class RcppVector, class InputDType>
+Rcpp::List inject_NAs_inplace_coo_template
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    RcppVector xx,
+    Rcpp::IntegerVector rows_na_,
+    Rcpp::IntegerVector cols_na_,
+    const int nrows,
+    const int ncols
+)
+{
+    const size_t nnz = ii.size();
+    const size_large size_na
+        =
+    (size_large)rows_na_.size() * (size_large)ncols +
+    (size_large)cols_na_.size() * (size_large)(nrows - rows_na_.size());
+
+    std::unique_ptr<int[]> ii_out(new int[(size_large)nnz + size_na]);
+    std::unique_ptr<int[]> jj_out(new int[(size_large)nnz + size_na]);
+    std::unique_ptr<InputDType[]> xx_out(new InputDType[(size_large)nnz + size_na]);
+
+    std::unordered_set<int> rows_na(rows_na_.begin(), rows_na_.end());
+    std::unordered_set<int> cols_na(cols_na_.begin(), cols_na_.end());
+
+    const int min_row = rows_na_.size()? rows_na_[0] : -1;;
+    const int max_row = rows_na_.size()? rows_na_[rows_na_.size()] : (nrows+1);
+    const int min_col = cols_na_.size()? cols_na_[0] : -1;;
+    const int max_col = cols_na_.size()? cols_na_[cols_na_.size()] : (ncols+1);
+
+    size_t curr = 0;
+    const size_t nrows_ = nrows;
+    const size_t ncols_ = ncols;
+
+    InputDType fill_with = std::is_same<RcppVector, Rcpp::NumericVector>::value? NA_REAL : NA_LOGICAL;
+
+
+    if (rows_na_.size() && cols_na_.size())
+    {
+        for (size_t ix = 0; ix < nnz; ix++)
+        {
+            if (ii[ix] >= min_row && ii[ix] <= max_row &&
+                jj[ix] >= min_col && jj[ix] <= max_col &&
+                rows_na.find(ii[ix]) != rows_na.end() &&
+                cols_na.find(jj[ix]) != cols_na.end())
+            {
+                continue;
+            }
+
+            else
+            {
+                ii_out[curr] = ii[ix];
+                jj_out[curr] = jj[ix];
+                xx_out[curr] = xx[ix];
+                curr++;
+            }
+        }
+    }
+
+    else if (rows_na_.size())
+    {
+        for (size_t ix = 0; ix < nnz; ix++)
+        {
+            if (ii[ix] >= min_row && ii[ix] <= max_row &&
+                rows_na.find(ii[ix]) != rows_na.end())
+            {
+                continue;
+            }
+
+            else
+            {
+                ii_out[curr] = ii[ix];
+                jj_out[curr] = jj[ix];
+                xx_out[curr] = xx[ix];
+                curr++;
+            }
+        }
+    }
+
+    else
+    {
+        for (size_t ix = 0; ix < nnz; ix++)
+        {
+            if (jj[ix] >= min_col && jj[ix] <= max_col &&
+                cols_na.find(jj[ix]) != cols_na.end())
+            {
+                continue;
+            }
+
+            else
+            {
+                ii_out[curr] = ii[ix];
+                jj_out[curr] = jj[ix];
+                xx_out[curr] = xx[ix];
+                curr++;
+            }
+        }
+    }
+
+    rows_na.clear();
+    cols_na.clear();
+
+    std::fill_n(xx_out.get() + curr,
+                (size_large)nnz + (size_large)size_na - (size_large)curr,
+                fill_with);
+
+    if (rows_na_.size() > cols_na_.size())
+    {
+        add_rows_cols_NA(
+            rows_na_,
+            cols_na_,
+            ii_out.get(),
+            jj_out.get(),
+            nrows_,
+            ncols_,
+            curr
+        );
+    }
+
+    else
+    {
+        add_rows_cols_NA(
+            cols_na_,
+            rows_na_,
+            jj_out.get(),
+            ii_out.get(),
+            ncols_,
+            nrows_,
+            curr
+        );
+    }
+
+    Rcpp::List out;
+    VectorConstructorArgs args;
+    args.from_pointer = true; args.as_integer = true; args.cpp_lim_size = true;
+    args.size = curr; args.int_pointer_from = ii_out.get();
+    out["ii"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    ii_out.reset();
+    args.int_pointer_from = jj_out.get();
+    out["jj"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    jj_out.reset();
+    if (std::is_same<RcppVector, Rcpp::NumericVector>::value) {
+        args.as_integer = false; args.num_pointer_from = xx_out.get();
+    } else {
+        args.as_integer = true; args.as_logical = true; args.int_pointer_from = xx_out.get();
+    }
+    out["xx"] = Rcpp::unwindProtect(SafeRcppVector, (void*)&args);
+    return out;
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List inject_NAs_inplace_coo_numeric
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::NumericVector xx,
+    Rcpp::IntegerVector rows_na_,
+    Rcpp::IntegerVector cols_na_,
+    const int nrows,
+    const int ncols
+)
+{
+    return inject_NAs_inplace_coo_template<Rcpp::NumericVector, double>(
+        ii,
+        jj,
+        xx,
+        rows_na_,
+        cols_na_,
+        nrows,
+        ncols
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List inject_NAs_inplace_coo_logical
+(
+    Rcpp::IntegerVector ii,
+    Rcpp::IntegerVector jj,
+    Rcpp::LogicalVector xx,
+    Rcpp::IntegerVector rows_na_,
+    Rcpp::IntegerVector cols_na_,
+    const int nrows,
+    const int ncols
+)
+{
+    return inject_NAs_inplace_coo_template<Rcpp::LogicalVector, int>(
+        ii,
+        jj,
+        xx,
+        rows_na_,
+        cols_na_,
+        nrows,
+        ncols
     );
 }

@@ -798,6 +798,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// find_first_non_na
+int find_first_non_na(Rcpp::IntegerVector x);
+RcppExport SEXP _MatrixExtra_find_first_non_na(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_first_non_na(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // is_same_ngRMatrix
 bool is_same_ngRMatrix(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2);
 RcppExport SEXP _MatrixExtra_is_same_ngRMatrix(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP) {
@@ -2101,6 +2111,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// inject_NAs_inplace_coo_numeric
+Rcpp::List inject_NAs_inplace_coo_numeric(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::NumericVector xx, Rcpp::IntegerVector rows_na_, Rcpp::IntegerVector cols_na_, const int nrows, const int ncols);
+RcppExport SEXP _MatrixExtra_inject_NAs_inplace_coo_numeric(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP rows_na_SEXP, SEXP cols_na_SEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_na_(rows_na_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_na_(cols_na_SEXP);
+    Rcpp::traits::input_parameter< const int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(inject_NAs_inplace_coo_numeric(ii, jj, xx, rows_na_, cols_na_, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// inject_NAs_inplace_coo_logical
+Rcpp::List inject_NAs_inplace_coo_logical(Rcpp::IntegerVector ii, Rcpp::IntegerVector jj, Rcpp::LogicalVector xx, Rcpp::IntegerVector rows_na_, Rcpp::IntegerVector cols_na_, const int nrows, const int ncols);
+RcppExport SEXP _MatrixExtra_inject_NAs_inplace_coo_logical(SEXP iiSEXP, SEXP jjSEXP, SEXP xxSEXP, SEXP rows_na_SEXP, SEXP cols_na_SEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type ii(iiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type jj(jjSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type xx(xxSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type rows_na_(rows_na_SEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cols_na_(cols_na_SEXP);
+    Rcpp::traits::input_parameter< const int >::type nrows(nrowsSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(inject_NAs_inplace_coo_logical(ii, jj, xx, rows_na_, cols_na_, nrows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_set_single_row_to_zero", (DL_FUNC) &_MatrixExtra_set_single_row_to_zero, 4},
@@ -2158,6 +2200,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_contains_any_zero", (DL_FUNC) &_MatrixExtra_contains_any_zero, 1},
     {"_MatrixExtra_contains_any_inf", (DL_FUNC) &_MatrixExtra_contains_any_inf, 1},
     {"_MatrixExtra_contains_any_neg", (DL_FUNC) &_MatrixExtra_contains_any_neg, 1},
+    {"_MatrixExtra_find_first_non_na", (DL_FUNC) &_MatrixExtra_find_first_non_na, 1},
     {"_MatrixExtra_is_same_ngRMatrix", (DL_FUNC) &_MatrixExtra_is_same_ngRMatrix, 4},
     {"_MatrixExtra_check_is_sorted", (DL_FUNC) &_MatrixExtra_check_is_sorted, 1},
     {"_MatrixExtra_check_indices_are_unsorted", (DL_FUNC) &_MatrixExtra_check_indices_are_unsorted, 2},
@@ -2257,6 +2300,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_slice_coo_arbitrary_numeric", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_numeric, 13},
     {"_MatrixExtra_slice_coo_arbitrary_logical", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_logical, 13},
     {"_MatrixExtra_slice_coo_arbitrary_binary", (DL_FUNC) &_MatrixExtra_slice_coo_arbitrary_binary, 12},
+    {"_MatrixExtra_inject_NAs_inplace_coo_numeric", (DL_FUNC) &_MatrixExtra_inject_NAs_inplace_coo_numeric, 7},
+    {"_MatrixExtra_inject_NAs_inplace_coo_logical", (DL_FUNC) &_MatrixExtra_inject_NAs_inplace_coo_logical, 7},
     {NULL, NULL, 0}
 };
 

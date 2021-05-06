@@ -7,3 +7,4 @@ vignettes_/*
 src/Makevars$
 real-sim
 vignettes/real-sim
+vignettes/*

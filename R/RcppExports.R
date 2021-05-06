@@ -221,6 +221,10 @@ contains_any_neg <- function(x) {
     .Call(`_MatrixExtra_contains_any_neg`, x)
 }
 
+find_first_non_na <- function(x) {
+    .Call(`_MatrixExtra_find_first_non_na`, x)
+}
+
 is_same_ngRMatrix <- function(indptr1, indptr2, indices1, indices2) {
     .Call(`_MatrixExtra_is_same_ngRMatrix`, indptr1, indptr2, indices1, indices2)
 }
@@ -615,5 +619,13 @@ slice_coo_arbitrary_logical <- function(ii, jj, xx, rows_take_base1, cols_take_b
 
 slice_coo_arbitrary_binary <- function(ii, jj, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols) {
     .Call(`_MatrixExtra_slice_coo_arbitrary_binary`, ii, jj, rows_take_base1, cols_take_base1, all_i, all_j, i_is_seq, j_is_seq, i_is_rev_seq, j_is_rev_seq, nrows, ncols)
+}
+
+inject_NAs_inplace_coo_numeric <- function(ii, jj, xx, rows_na_, cols_na_, nrows, ncols) {
+    .Call(`_MatrixExtra_inject_NAs_inplace_coo_numeric`, ii, jj, xx, rows_na_, cols_na_, nrows, ncols)
+}
+
+inject_NAs_inplace_coo_logical <- function(ii, jj, xx, rows_na_, cols_na_, nrows, ncols) {
+    .Call(`_MatrixExtra_inject_NAs_inplace_coo_logical`, ii, jj, xx, rows_na_, cols_na_, nrows, ncols)
 }
 
