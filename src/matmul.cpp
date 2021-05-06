@@ -77,7 +77,7 @@ void dgemm_csr_drm_as_drm
     const int one = 1;
     double *restrict row_ptr;
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values, one) \
+            shared(OutputMat, DenseMat, indptr, indices, values) \
             private(row_ptr)
     for (int row = 0; row < m; row++)
     {
@@ -100,7 +100,7 @@ void dgemm_csr_drm_as_drm
         return;
     float *restrict row_ptr;
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values) \
+            shared(OutputMat, DenseMat, indptr, indices, values) \
             private(row_ptr)
     for (int row = 0; row < m; row++)
     {
@@ -132,7 +132,7 @@ void dgemm_csr_drm_as_dcm
     nthreads = std::min(nthreads, m);
     std::unique_ptr<double[]> temp_arr(new double[(size_t)ldc*(size_t)nthreads]);
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values, one) \
+            shared(OutputMat, DenseMat, indptr, indices, values) \
             private(write_ptr)
     for (int row = 0; row < m; row++)
     {
@@ -163,7 +163,7 @@ void dgemm_csr_drm_as_dcm
     nthreads = std::min(nthreads, m);
     std::unique_ptr<float[]> temp_arr(new float[(size_t)ldc*(size_t)nthreads]);
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(m, n, ldb, ldc, OutputMat, DenseMat, indptr, indices, values) \
+            shared(OutputMat, DenseMat, indptr, indices, values) \
             private(write_ptr)
     for (int row = 0; row < m; row++)
     {
@@ -386,11 +386,10 @@ OutputVector matmul_csr_dvec(Rcpp::IntegerVector X_csr_indptr,
         out = (OutputDType*)INTEGER(out_);
     else
         out = (OutputDType*)REAL(out_);
-    // const int nrows = out.size();
     const int nrows = out_.size();
 
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(X_csr_indptr, X_csr_indices, X_csr_values, y_dense, nrows)
+            shared(X_csr_indptr, X_csr_indices, X_csr_values, y_dense)
     for (int row = 0; row < nrows; row++)
         for (int ix = X_csr_indptr[row]; ix < X_csr_indptr[row+1]; ix++)
         {
@@ -491,7 +490,7 @@ Rcpp::NumericVector matmul_csr_svec(Rcpp::IntegerVector X_csr_indptr,
     int *ptr1, *ptr2, *end1;
 
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(nrows, X_csr_indptr, X_csr_indices, X_csr_values, \
+            shared(X_csr_indptr, X_csr_indices, X_csr_values, \
                    ptr_X_indices, ptr_y_indices, end_y, out) \
             private(ptr1, ptr2, end1)
     for (int row = 0; row < nrows; row++)
