@@ -106,7 +106,7 @@
 #' \item `options("MatrixExtra.nthreads" = 1L)` :
 #' Number of parallel threads to use in sparse-dense matrix
 #' }
-#' 
+#' @return No return value, called for side effects.
 NULL
 
 #' @importFrom parallel detectCores

@@ -1,8 +1,12 @@
 Package: MatrixExtra
 Type: Package
 Title: Extra Methods for Sparse Matrices
-Version: 0.1.1
-Author: David Cortes [aut, cre, cph], Dmitry Selivanov [cph]
+Version: 0.1.2
+Authors@R: c(
+  person(given="David", family="Cortes", role=c("aut", "cre", "cph"),
+         email="david.cortes.rivera@gmail.com"),
+  person(given="Dmitry", family="Selivanov", role="cph")
+  )
 Maintainer: David Cortes <david.cortes.rivera@gmail.com>
 Description: Extends sparse matrix and vector classes from the 'Matrix' package by providing: 
   (a) Methods and operators that work natively on CSR formats (compressed sparse row, 

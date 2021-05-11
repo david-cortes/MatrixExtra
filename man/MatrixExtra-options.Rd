@@ -10,6 +10,9 @@ set_new_matrix_behavior()
 
 restore_old_matrix_behavior()
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Controls some of the behaviors when calling methods from
 `MatrixExtra` which differ very significantly from the same methods in
