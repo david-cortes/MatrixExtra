@@ -767,9 +767,9 @@ Rcpp::List inject_NAs_inplace_coo_template
     std::unordered_set<int> cols_na(cols_na_.begin(), cols_na_.end());
 
     const int min_row = rows_na_.size()? rows_na_[0] : -1;;
-    const int max_row = rows_na_.size()? rows_na_[rows_na_.size()] : (nrows+1);
+    const int max_row = rows_na_.size()? rows_na_[rows_na_.size()-1] : (nrows+1);
     const int min_col = cols_na_.size()? cols_na_[0] : -1;;
-    const int max_col = cols_na_.size()? cols_na_[cols_na_.size()] : (ncols+1);
+    const int max_col = cols_na_.size()? cols_na_[cols_na_.size()-1] : (ncols+1);
 
     size_t curr = 0;
     const size_t nrows_ = nrows;

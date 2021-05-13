@@ -830,7 +830,7 @@ Rcpp::List add_NAs_from_dense_after_elemenwise_mult_template
         {
             for (size_t row = 0; row < nrows; row++)
             {
-                if (std::isnan(dense[row + col * nrows]))
+                if (std::isnan((float)dense[row + col * nrows]))
                 {
                     add_el = indptr[row] == indptr[row+1] ||
                              (int)col < indices_begin[indptr[row]] ||
@@ -1580,21 +1580,27 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     if (X_is_LHS)
                     {
                         for (int row = 0; row < nrows; row++)
+                        {
+                            val = dvec[row];
                             #ifdef _OPENMP
                             #pragma omp simd
                             #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-                                values_out[ix] = values[ix] / dvec[row];
+                                values_out[ix] = values[ix] / val;
+                        }
                     }
 
                     else
                     {
                         for (int row = 0; row < nrows; row++)
+                        {
+                            val = dvec[row];
                             #ifdef _OPENMP
                             #pragma omp simd
                             #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-                                values_out[ix] = dvec[row] / values[ix];
+                                values_out[ix] = val / values[ix];
+                        }
                     }
                     break;
                 }
@@ -2242,7 +2248,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                 for (int row = 0; row < nrows; row++)
                 {
                     val = dvec[row % dvec_size_];
-                    if (!ISNAN(val) && !isinf(val))
+                    if (!ISNAN(val) && !std::isinf(val))
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
@@ -2258,7 +2264,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                         for (int col = 0; col < ncols; col++) indices_out.push_back(col);
                         std::fill_n(std::back_inserter(values_out), ncols, ISNA(val)? NA_REAL : NAN);
 
-                        if (isinf(val)) {
+                        if (std::isinf(val)) {
                             row_val = values_out.data() + indptr_out[row];
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 row_val[indices[ix]] = values[ix] * val;
@@ -2289,9 +2295,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
-                        #ifdef _OPENMP
-                        #pragma omp simd
-                        #endif
+                        // #ifdef _OPENMP
+                        // #pragma omp simd
+                        // #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(values[ix] / val);
                     }
@@ -2326,9 +2332,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
-                        #ifdef _OPENMP
-                        #pragma omp simd
-                        #endif
+                        // #ifdef _OPENMP
+                        // #pragma omp simd
+                        // #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_modulus(values[ix], val));
                     }
@@ -2369,9 +2375,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
-                        #ifdef _OPENMP
-                        #pragma omp simd
-                        #endif
+                        // #ifdef _OPENMP
+                        // #pragma omp simd
+                        // #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_intdiv(values[ix], val));
                     }
@@ -2410,9 +2416,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
-                        #ifdef _OPENMP
-                        #pragma omp simd
-                        #endif
+                        // #ifdef _OPENMP
+                        // #pragma omp simd
+                        // #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_pow(values[ix], val));
                     }
@@ -2444,7 +2450,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                 if (ISNAN(dvec[row + col*nrows_]) ||
                     ((is_div || powerto) && dvec[row + col*nrows_] == 0) ||
                     (powerto && dvec[row + col*nrows_] < 0) ||
-                    (multiply && isinf(dvec[row + col*nrows_])))
+                    (multiply && std::isinf(dvec[row + col*nrows_])))
                 {
                     add_el = indptr[row] == indptr[row+1] ||
                              (int)col < indices_begin[indptr[row]] ||
@@ -2509,7 +2515,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                 if (ISNAN(dvec[ix]) ||
                     ((is_div || powerto) && dvec[ix] == 0) ||
                     (powerto && dvec[ix] < 0) ||
-                    (multiply && isinf(dvec[ix])))
+                    (multiply && std::isinf(dvec[ix])))
                 {
                     for (size_t rep = 0; rep < n_repeats; rep++)
                     {
@@ -2833,18 +2839,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] / dvec[ii[ix]];
                 }
 
                 else
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = dvec[ii[ix]] / xx[ix];
                 }
@@ -3468,8 +3474,8 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
 
                     for (; row < row_end; row++) {
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++) {
-                            if (ISNAN(values[ix]) || isinf(values[ix])) {
-                                values_out.push_back(isinf(values[ix])? NAN : values[ix]);
+                            if (ISNAN(values[ix]) || std::isinf(values[ix])) {
+                                values_out.push_back(std::isinf(values[ix])? NAN : values[ix]);
                                 indices_out.push_back(indices[ix]);
                                 indptr_out[row+1] = indptr_out[row+1] + 1;
                             }
@@ -3484,13 +3490,13 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
 
                     val = is_binary? 1 : xx[curr_i - ii_begin];
 
-                    if (!is_binary && (ISNAN(val) || isinf(val)))
+                    if (!is_binary && (ISNAN(val) || std::isinf(val)))
                     {
                         indptr_out[row+1] = ncols;
                         for (int col = 0; col < ncols; col++)
                             indices_out.push_back(col);
                         std::fill_n(std::back_inserter(values_out), ncols, ISNAN(val)? val : NAN);
-                        if (isinf(val)) {
+                        if (std::isinf(val)) {
                             this_row = values_out.end() - ncols;
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 this_row[indices[ix]] = val * values[ix];
@@ -3505,9 +3511,9 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
                                   std::back_inserter(indices_out));
 
                         if (!is_binary) {
-                            #ifdef _OPENMP
-                            #pragma omp simd
-                            #endif
+                            // #ifdef _OPENMP
+                            // #pragma omp simd
+                            // #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out.push_back(values[ix] * val);
                         }
@@ -3534,8 +3540,8 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
 
                     for (; row < *curr_i - 1 + offset; row++) {
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++) {
-                            if (ISNAN(values[ix]) || isinf(values[ix])) {
-                                values_out.push_back(isinf(values[ix])? NAN : values[ix]);
+                            if (ISNAN(values[ix]) || std::isinf(values[ix])) {
+                                values_out.push_back(std::isinf(values[ix])? NAN : values[ix]);
                                 indices_out.push_back(indices[ix]);
                                 indptr_out[row+1] = indptr_out[row+1] + 1;
                             }
@@ -3552,14 +3558,14 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
             {
                 row = ii_base1[el] - 1 + (recycle * length);
                 
-                if (!is_binary && (ISNAN(xx[el]) || isinf(xx[el])))
+                if (!is_binary && (ISNAN(xx[el]) || std::isinf(xx[el])))
                 {
                     val = xx[el];
                     indptr_out[row+1] = ncols;
                     for (int col = 0; col < ncols; col++)
                         indices_out.push_back(col);
                     std::fill_n(std::back_inserter(values_out), ncols, ISNAN(val)? val : NAN);
-                    if (isinf(val)) {
+                    if (std::isinf(val)) {
                         this_row = values_out.end() - ncols;
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             this_row[indices[ix]] = val * values[ix];
@@ -3575,9 +3581,9 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
 
                 if (!is_binary) {
                     val = xx[el];
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                         values_out.push_back(values[ix] * val);
                 }
@@ -3640,12 +3646,12 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
             
             if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value) {
                 for (size_t ix = 0; ix < tot; ix++)
-                    out[ix] = ISNAN(X[ix])? X[ix] : (isinf(X[ix])? NAN : 0);
+                    out[ix] = ISNAN(X[ix])? X[ix] : (std::isinf((double)X[ix])? NAN : 0);
             }
 
             else if (std::is_same<InputDType, float>::value) {
                 for (size_t ix = 0; ix < tot; ix++)
-                    out[ix] = (isnan(X[ix]) || isinf(X[ix])? NAN : 0);
+                    out[ix] = (std::isnan((float)X[ix]) || std::isinf((float)X[ix])? NAN : 0);
             }
 
             else {
@@ -3741,11 +3747,11 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                         for (; row < nrows; row++) {
                             for (size_t col = 0; col < ncols_; col++) {
                                 if (ISNAN(X[(size_t)row + col*nrows_]) ||
-                                    isinf(X[(size_t)row + col*nrows_])
+                                    std::isinf((double)X[(size_t)row + col*nrows_])
                                 ) {
                                     indices_.push_back(col);
                                     values_.push_back(
-                                        isinf(X[(size_t)row + col*nrows_])?
+                                        std::isinf((double)X[(size_t)row + col*nrows_])?
                                             NAN : X[(size_t)row + col*nrows_]
                                     );
                                 }
@@ -3758,8 +3764,8 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                     {
                         for (; row < nrows; row++) {
                             for (size_t col = 0; col < ncols_; col++) {
-                                if (isnan(X[(size_t)row + col*nrows_]) ||
-                                    isinf(X[(size_t)row + col*nrows_])
+                                if (std::isnan((float)X[(size_t)row + col*nrows_]) ||
+                                    std::isinf((float)X[(size_t)row + col*nrows_])
                                 ) {
                                     indices_.push_back(col);
                                     values_.push_back(
@@ -3829,10 +3835,12 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                     {
                         for (; row < *curr_i-1; row++) {
                             for (size_t col = 0; col < ncols_; col++) {
-                                if (ISNAN(X[(size_t)row + col*nrows_]) || isinf(X[(size_t)row + col*nrows_])) {
+                                if (ISNAN(X[(size_t)row + col*nrows_]) ||
+                                    std::isinf((double)X[(size_t)row + col*nrows_])
+                                ) {
                                     indices_.push_back(col);
                                     values_.push_back(
-                                        isinf(X[(size_t)row + col*nrows_])?
+                                        std::isinf((double)X[(size_t)row + col*nrows_])?
                                             NAN : X[(size_t)row + col*nrows_]
                                     );
                                 }
@@ -3845,7 +3853,9 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                     {
                         for (; row < *curr_i-1; row++) {
                             for (size_t col = 0; col < ncols_; col++) {
-                                if (isnan(X[(size_t)row + col*nrows_]) || isinf(X[(size_t)row + col*nrows_])) {
+                                if (std::isnan((float)X[(size_t)row + col*nrows_]) ||
+                                    std::isinf((float)X[(size_t)row + col*nrows_])
+                                ) {
                                     indices_.push_back(col);
                                     values_.push_back(
                                         NAN
@@ -3983,11 +3993,11 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                             for (; row < row_end; row++) {
                                 for (size_t col = 0; col < ncols_; col++) {
                                     if (ISNAN(X[(size_t)row + col*nrows_]) ||
-                                        isinf(X[(size_t)row + col*nrows_])
+                                        std::isinf((double)X[(size_t)row + col*nrows_])
                                     ) {
                                         indices_.push_back(col);
                                         values_.push_back(
-                                            isinf(X[(size_t)row + col*nrows_])?
+                                            std::isinf((double)X[(size_t)row + col*nrows_])?
                                                 NAN : X[(size_t)row + col*nrows_]
                                         );
                                     }
@@ -4000,8 +4010,8 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                         {
                             for (; row < row_end; row++) {
                                 for (size_t col = 0; col < ncols_; col++) {
-                                    if (isnan(X[(size_t)row + col*nrows_]) ||
-                                        isinf(X[(size_t)row + col*nrows_])
+                                    if (std::isnan((float)X[(size_t)row + col*nrows_]) ||
+                                        std::isinf((float)X[(size_t)row + col*nrows_])
                                     ) {
                                         indices_.push_back(col);
                                         values_.push_back(
@@ -4021,7 +4031,7 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                                     ) {
                                         indices_.push_back(col);
                                         values_.push_back(
-                                            isinf(X[(size_t)row + col*nrows_])?
+                                            std::isinf((double)X[(size_t)row + col*nrows_])?
                                                 NAN : X[(size_t)row + col*nrows_]
                                         );
                                     }
@@ -4073,11 +4083,11 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                             for (; row < *curr_i-1 + offset; row++) {
                                 for (size_t col = 0; col < ncols_; col++) {
                                     if (ISNAN(X[(size_t)row + col*nrows_]) ||
-                                        isinf(X[(size_t)row + col*nrows_])
+                                        std::isinf((double)X[(size_t)row + col*nrows_])
                                     ) {
                                         indices_.push_back(col);
                                         values_.push_back(
-                                            isinf(X[(size_t)row + col*nrows_])?
+                                            std::isinf((double)X[(size_t)row + col*nrows_])?
                                                 NAN : X[(size_t)row + col*nrows_]
                                         );
                                     }
@@ -4090,8 +4100,8 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                         {
                             for (; row < *curr_i-1 + offset; row++) {
                                 for (size_t col = 0; col < ncols_; col++) {
-                                    if (isnan(X[(size_t)row + col*nrows_]) ||
-                                        isinf(X[(size_t)row + col*nrows_])
+                                    if (std::isnan((float)X[(size_t)row + col*nrows_]) ||
+                                        std::isinf((float)X[(size_t)row + col*nrows_])
                                     ) {
                                         indices_.push_back(col);
                                         values_.push_back(
@@ -4155,12 +4165,12 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
 
             if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value) {
                 for (size_t ix = 0; ix < tot; ix++)
-                    out[ix] = ISNAN(X[ix])? X[ix] : (isinf(X[ix])? NAN : 0);
+                    out[ix] = ISNAN(X[ix])? X[ix] : (std::isinf((double)X[ix])? NAN : 0);
             }
 
             else if (std::is_same<InputDType, float>::value) {
                 for (size_t ix = 0; ix < tot; ix++)
-                    out[ix] = (isnan(X[ix]) || isinf(X[ix])? NAN : 0);
+                    out[ix] = (std::isnan((float)X[ix]) || std::isinf((float)X[ix])? NAN : 0);
             }
 
             else {

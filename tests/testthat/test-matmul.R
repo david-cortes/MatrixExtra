@@ -5,7 +5,7 @@ library("float")
 context("Matrix multiplications")
 
 set_new_matrix_behavior()
-options("MatrixExtra.nthreads" = 2)
+options("MatrixExtra.nthreads" = 1)
 
 ### TODO: add tests about the names of objects
 
