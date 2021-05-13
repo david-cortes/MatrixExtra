@@ -2,7 +2,7 @@
 
 #ifdef __clang__
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#   pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 
 size_t get_size_reserve(size_t nnz, size_t take1, size_t take2)

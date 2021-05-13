@@ -2,7 +2,7 @@
 
 #ifdef __clang__
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#   pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 
 static inline void insert_col_into_row

@@ -118,7 +118,7 @@ void process_i_arbitrary
 
 #ifdef __clang__
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#   pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 void post_process_seq
 (

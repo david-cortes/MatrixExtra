@@ -2,7 +2,7 @@
 
 #ifdef __clang__
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#   pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 
 /* Mental map to figure out what should be called where:
