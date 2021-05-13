@@ -1420,8 +1420,13 @@ Rcpp::List logicaland_csc_by_dense_keep_NAs
 // )
 /* https://github.com/wch/r-source/blob/fe82da3baf849fcd3cc7dbc31c6abc72b57aa083/src/main/arithmetic.c#L217 */
 /*  */
+#if !defined(HAS_LD) || (HAS_LD == 1)
 typedef long double LDOUBLE;
+#define c_eps LDBL_EPSILON
+#else
+typedef double LDOUBLE;
 #define c_eps DBL_EPSILON
+#endif
 static inline double R_intdiv(double x1, double x2)
 {
     double q = x1 / x2;

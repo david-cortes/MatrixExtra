@@ -8,3 +8,4 @@ real-sim
 vignettes/real-sim
 vignettes/*
 ^README\.md$
+^src/Makevars$
