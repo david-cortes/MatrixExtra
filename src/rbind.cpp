@@ -1,5 +1,10 @@
 #include "MatrixExtra.h"
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
+
 // [[Rcpp::export(rng = false)]]
 Rcpp::IntegerVector concat_indptr2(Rcpp::IntegerVector ptr1, Rcpp::IntegerVector ptr2)
 {
@@ -166,3 +171,7 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
 
     return out;
 }
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif

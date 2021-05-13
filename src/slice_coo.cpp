@@ -115,6 +115,11 @@ void process_i_arbitrary
     }
 }
 
+
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
 void post_process_seq
 (
     int *restrict ii_out, size_t n,
@@ -140,6 +145,9 @@ void post_process_seq
         }
     }
 }
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif
 
 template <class RcppVector, class InputDType, class CompileFlag>
 Rcpp::List slice_coo_arbitrary_template

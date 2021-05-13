@@ -1,5 +1,10 @@
 #include "MatrixExtra.h"
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
+
 size_t get_size_reserve(size_t nnz, size_t take1, size_t take2)
 {
     if (sizeof(size_t) < sizeof(uint64_t))
@@ -776,3 +781,7 @@ double extract_single_val_csr_binary
         row, col, false
     );
 }
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif

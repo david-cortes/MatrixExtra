@@ -1,5 +1,10 @@
 #include "MatrixExtra.h"
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
+
 /* Mental map to figure out what should be called where:
 
 matmul(x,y) -> x %*% y
@@ -933,3 +938,7 @@ Rcpp::List matmul_spcolvec_by_scolvecascsr_binary
         y_length
     );
 }
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif

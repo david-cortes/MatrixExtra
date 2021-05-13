@@ -1,5 +1,10 @@
 #include "MatrixExtra.h"
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
+
 /*  R's logic for boolean comparisons:
         NA  & TRUE  = NA
         NA  & FALSE = FALSE
@@ -4294,3 +4299,7 @@ Rcpp::List multiply_elemwise_dense_by_svec_float32
         keep_NAs
     );
 }
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif

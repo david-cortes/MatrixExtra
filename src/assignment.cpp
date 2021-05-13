@@ -1,5 +1,10 @@
 #include "MatrixExtra.h"
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wpass-failed=transform-warning"
+#endif
+
 static inline void insert_col_into_row
 (
     int *restrict indptr,
@@ -2591,3 +2596,7 @@ Rcpp::List set_arbitrary_rows_to_smat
         Rcpp::_["values"] = values_new
     );
 }
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#endif
