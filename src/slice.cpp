@@ -152,7 +152,9 @@ void reverse_columns_inplace
     {
         if (indptr[row] < indptr[row+1])
         {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                 indices[ix] = ncol - indices[ix] - 1;
             std::reverse(indices + indptr[row], indices + indptr[row+1]);
@@ -634,12 +636,16 @@ Rcpp::IntegerVector repeat_indices_n_times(Rcpp::IntegerVector indices,
     Rcpp::IntegerVector out(n_indices*full_repeats + remainder.size());
     for (int repetition = 0; repetition < full_repeats; repetition++)
     {
+        #ifdef _OPENMP
         #pragma omp simd
+        #endif
         for (int ix = 0; ix < n_indices; ix++)
             out[ix + n_indices*repetition] = indices[ix] + ix_length*repetition;
     }
     
+    #ifdef _OPENMP
     #pragma omp simd
+    #endif
     for (int ix = 0; ix < remainder.size(); ix++)
         out[ix + n_indices*full_repeats] = remainder[ix] + ix_length*full_repeats;
     return out;

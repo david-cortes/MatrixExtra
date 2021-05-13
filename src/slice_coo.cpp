@@ -125,12 +125,16 @@ void post_process_seq
     if (!all_i)
     {
         if (i_is_seq) {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (size_t ix = 0; ix < n; ix++)
                 ii_out[ix] -= first_i;
         }
         else if (i_is_rev_seq) {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (size_t ix = 0; ix < n; ix++)
                 ii_out[ix] = first_i - ii_out[ix];
         }

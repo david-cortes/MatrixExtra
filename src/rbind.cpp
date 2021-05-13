@@ -7,7 +7,9 @@ Rcpp::IntegerVector concat_indptr2(Rcpp::IntegerVector ptr1, Rcpp::IntegerVector
     std::copy(INTEGER(ptr1), INTEGER(ptr1) + ptr1.size(), INTEGER(out));
     size_t st_second = ptr1.size();
     int offset = ptr1[ptr1.size()-1];
+    #ifdef _OPENMP
     #pragma omp simd
+    #endif
     for (size_t row = 1; row < (size_t)ptr2.size(); row++)
         out[st_second + row - 1] = offset + ptr2[row];
     return out;
@@ -64,7 +66,9 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
                 if (xvals_obj != nullptr)
                     std::copy(xvals_obj, xvals_obj + nnz_add, values_out + curr_pos);
                 else if (lvals_obj != nullptr)
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out[el + curr_pos] = (lvals_obj[el] == NA_LOGICAL)? (NA_REAL) : lvals_obj[el];
                 else
@@ -75,7 +79,9 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
                 if (lvals_obj != nullptr)
                     std::copy(lvals_obj, lvals_obj + nnz_add, values_out_bool + curr_pos);
                 else if (xvals_obj != nullptr)
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out_bool[el + curr_pos] = ISNAN(xvals_obj[el])? NA_LOGICAL : (bool)xvals_obj[el];
                 else
@@ -90,7 +96,9 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
             nnz_add = Rf_xlength(objects[ix].slot("i"));
             indptr_out[curr_row + 1] = indptr_out[curr_row] + nnz_add;
             curr_row++;
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int el = 0; el < nnz_add; el++)
                 indices_out[el + curr_pos] = indices_obj[el] - 1;
 
@@ -101,12 +109,16 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
                     std::copy(xvals_obj, xvals_obj + nnz_add, values_out + curr_pos);
                 } else if (objects[ix].inherits("isparseVector")) {
                     ivals_obj = INTEGER(objects[ix].slot("x"));
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out[el + curr_pos] = (ivals_obj[el] == NA_INTEGER)? NA_REAL : ivals_obj[el];
                 } else if (objects[ix].inherits("lsparseVector")) {
                     lvals_obj = LOGICAL(objects[ix].slot("x"));
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out[el + curr_pos] = (lvals_obj[el] == NA_LOGICAL)? NA_REAL : (bool)lvals_obj[el];
                 } else if (objects[ix].inherits("nsparseVector")) {
@@ -123,12 +135,16 @@ Rcpp::S4 concat_csr_batch(Rcpp::ListOf<Rcpp::S4> objects, Rcpp::S4 out)
 
                 if (objects[ix].inherits("dsparseVector")) {
                     xvals_obj = REAL(objects[ix].slot("x"));
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out_bool[el + curr_pos] = ISNAN(xvals_obj[el])? NA_LOGICAL : (bool)xvals_obj[el];
                 } else if (objects[ix].inherits("isparseVector")) {
                     ivals_obj = INTEGER(objects[ix].slot("x"));
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int el = 0; el < nnz_add; el++)
                         values_out_bool[el + curr_pos] = (ivals_obj[el] == NA_INTEGER)? NA_LOGICAL : (bool)ivals_obj[el];
                 } else if (objects[ix].inherits("lsparseVector")) {

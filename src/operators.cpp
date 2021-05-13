@@ -18,9 +18,7 @@
     ( ((y) == NA_LOGICAL)? ((x)? NA_LOGICAL : false) : ((bool)(x) && (bool)(y)) )
 #define R_logical_xor(x, y) (((x) == NA_LOGICAL || (y) == NA_LOGICAL)? NA_LOGICAL : ((bool)(x) != (bool)(y)))
 
-/* TODO: change some of the vectors to unique_ptr when there is no dynamic reallocation,
-   modify also the slicers. This way it saves memory by not being zero-allocated and
-   using lazy allocation. */
+/* TODO: some of these operations could benefit from adding 'libdivide' when recycling vectors. */
 
 /* This function does multiplication and ampersand ("&" operator) */
 template <class RcppVector=Rcpp::NumericVector, class InputDType=double>
@@ -36,13 +34,17 @@ Rcpp::List multiply_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVecto
         RcppVector values_out(values1.size());
 
         if (std::is_same<RcppVector, Rcpp::NumericVector>::value) {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int el = 0; el < (int)values1.size(); el++)
                 values_out[el] = values1[el] * values2[el];
         }
 
         else {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int el = 0; el < (int)values1.size(); el++)
                 values_out[el] = R_logical_and(values1[el], values2[el]);
         }
@@ -174,7 +176,9 @@ RcppVector multiply_csr_by_dense_elemwise
     {
         for (size_t row = 0; row < nrows; row++)
         {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int el = indptr[row]; el < indptr[row+1]; el++)
             {
                 if (std::is_same<RcppMatrixAsVector, Rcpp::LogicalVector>::value)
@@ -193,7 +197,9 @@ RcppVector multiply_csr_by_dense_elemwise
     {
         for (size_t row = 0; row < nrows; row++)
         {
+            #ifdef _OPENMP
             #pragma omp simd
+            #endif
             for (int el = indptr[row]; el < indptr[row+1]; el++)
             {
                 values_out[el] = R_logical_and(values[el], dense_mat[row + nrows*(size_t)indices[el]]);
@@ -277,11 +283,15 @@ Rcpp::List add_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector ind
         if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
         {
             if (!substract)
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int el = 0; el < (int)values1_.size(); el++)
                     values_out[el] = values1_[el] + values2_[el];
             else
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int el = 0; el < (int)values1_.size(); el++)
                     values_out[el] = values1_[el] - values2_[el];
         }
@@ -289,11 +299,15 @@ Rcpp::List add_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector ind
         else
         {
             if (!xor_op)
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int el = 0; el < (int)values1_.size(); el++)
                     values_out[el] = R_logical_or(values1_[el], values2_[el]);
             else
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int el = 0; el < (int)values1_.size(); el++)
                     values_out[el] = R_logical_xor(values1_[el], values2_[el]);
         }
@@ -1553,7 +1567,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                 case Multiply:
                 {
                     for (int row = 0; row < nrows; row++)
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out[ix] = values[ix] * dvec[row];
                     break;
@@ -1564,7 +1580,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     if (X_is_LHS)
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = values[ix] / dvec[row];
                     }
@@ -1572,7 +1590,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     else
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = dvec[row] / values[ix];
                     }
@@ -1584,7 +1604,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     if (X_is_LHS)
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_modulus(values[ix], dvec[row]);
                     }
@@ -1592,7 +1614,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     else
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_modulus(dvec[row], values[ix]);
                     }
@@ -1604,7 +1628,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     if (X_is_LHS)
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_intdiv(values[ix], dvec[row]);
                     }
@@ -1612,7 +1638,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     else
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_intdiv(dvec[row], values[ix]);
                     }
@@ -1624,7 +1652,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     if (X_is_LHS)
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_pow(values[ix], dvec[row]);
                     }
@@ -1632,7 +1662,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     else
                     {
                         for (int row = 0; row < nrows; row++)
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_pow(dvec[row], values[ix]);
                     }
@@ -1644,7 +1676,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
         else
         {
             for (int row = 0; row < nrows; row++)
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                     values_out[ix] = R_logical_and(values[ix], dvec[row]);
         }
@@ -1759,7 +1793,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                     for (int row = 0; row < nrows; row++)
                     {
                         val = dvec[row % dvec_size_];
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out[ix] = values[ix] * val;
                     }
@@ -1773,7 +1809,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = values[ix] / val;
                         }
@@ -1784,7 +1822,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = val / values[ix];
                         }
@@ -1799,7 +1839,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_modulus(values[ix], val);
                         }
@@ -1810,7 +1852,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_modulus(val, values[ix]);
                         }
@@ -1825,7 +1869,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_intdiv(values[ix], val);
                         }
@@ -1836,7 +1882,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_intdiv(val, values[ix]);
                         }
@@ -1851,7 +1899,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_pow(values[ix], val);
                         }
@@ -1862,7 +1912,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
                         for (int row = 0; row < nrows; row++)
                         {
                             val = dvec[row % dvec_size_];
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out[ix] = R_pow(val, values[ix]);
                         }
@@ -1877,7 +1929,9 @@ RcppVector multiply_csr_by_dvec_no_NAs
             for (int row = 0; row < nrows; row++)
             {
                 vall = dvec[row % dvec_size_];
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                     values_out[ix] = R_logical_and(values[ix], vall);
             }
@@ -2192,7 +2246,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(values[ix] * val);
                     }
@@ -2233,7 +2289,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(values[ix] / val);
                     }
@@ -2268,7 +2326,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_modulus(values[ix], val));
                     }
@@ -2309,7 +2369,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_intdiv(values[ix], val));
                     }
@@ -2348,7 +2410,9 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
                     {
                         std::copy(indices_begin + indptr[row], indices_begin + indptr[row+1],
                                   std::back_inserter(indices_out));
+                        #ifdef _OPENMP
                         #pragma omp simd
+                        #endif
                         for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                             values_out.push_back(R_pow(values[ix], val));
                     }
@@ -2747,14 +2811,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] * dvec[ii[ix]];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[ii[ix]]);
                 }
@@ -2765,14 +2833,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] / dvec[ii[ix]];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = dvec[ii[ix]] / xx[ix];
                 }
@@ -2783,14 +2855,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(xx[ix], dvec[ii[ix]]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(dvec[ii[ix]], xx[ix]);
                 }
@@ -2801,14 +2877,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(xx[ix], dvec[ii[ix]]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(dvec[ii[ix]], xx[ix]);
                 }
@@ -2819,14 +2899,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(xx[ix], dvec[ii[ix]]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(dvec[ii[ix]], xx[ix]);
                 }
@@ -2843,14 +2927,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] * dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_]);
                 }
@@ -2861,14 +2949,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] / dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_] / xx[ix];
                 }
@@ -2879,14 +2971,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(xx[ix], dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_], xx[ix]);
                 }
@@ -2897,14 +2993,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(xx[ix], dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_], xx[ix]);
                 }
@@ -2915,14 +3015,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(xx[ix], dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_], xx[ix]);
                 }
@@ -2939,14 +3043,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] * dvec[ii[ix] % dvec_size_];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[ii[ix] % dvec_size_]);
                 }
@@ -2957,14 +3065,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] / dvec[ii[ix] % dvec_size_];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = dvec[ii[ix] % dvec_size_] / xx[ix];
                 }
@@ -2975,14 +3087,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(xx[ix], dvec[ii[ix] % dvec_size_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(dvec[ii[ix] % dvec_size_], xx[ix]);
                 }
@@ -2993,14 +3109,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(xx[ix], dvec[ii[ix] % dvec_size_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(dvec[ii[ix] % dvec_size_], xx[ix]);
                 }
@@ -3011,14 +3131,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(xx[ix], dvec[ii[ix] % dvec_size_]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(dvec[ii[ix] % dvec_size_], xx[ix]);
                 }
@@ -3035,14 +3159,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (std::is_same<RcppVector, Rcpp::NumericVector>::value)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] * dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)]);
                 }
@@ -3053,14 +3181,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = xx[ix] / dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)];
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)] / xx[ix];
                 }
@@ -3071,14 +3203,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(xx[ix], dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_intdiv(dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)], xx[ix]);
                 }
@@ -3089,14 +3225,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(xx[ix], dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_modulus(dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)], xx[ix]);
                 }
@@ -3107,14 +3247,18 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
             {
                 if (X_is_LHS)
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(xx[ix], dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)]);
                 }
 
                 else
                 {
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_pow(dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)], xx[ix]);
                 }
@@ -3234,7 +3378,9 @@ Rcpp::List multiply_csr_by_svec_no_NAs
             if (!is_binary)
             {
                 val = xx[el];
+                #ifdef _OPENMP
                 #pragma omp simd
+                #endif
                 for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                     values_out[curr++] = values[ix] * val;
             }
@@ -3359,7 +3505,9 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
                                   std::back_inserter(indices_out));
 
                         if (!is_binary) {
+                            #ifdef _OPENMP
                             #pragma omp simd
+                            #endif
                             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                                 values_out.push_back(values[ix] * val);
                         }
@@ -3427,7 +3575,9 @@ Rcpp::List multiply_csr_by_svec_keep_NAs
 
                 if (!is_binary) {
                     val = xx[el];
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                         values_out.push_back(values[ix] * val);
                 }
@@ -3543,7 +3693,9 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                     row = ii[ix] - 1;
                     indptr[row+1] = ncols;
                     std::iota(indices.begin() + curr, indices.begin() + curr + (size_t)ncols, 0);
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int col = 0; col < ncols; col++)
                         values[curr++] = X[row + col*nrows_] * xx[ix];
                 }
@@ -3556,7 +3708,9 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                     row = ii[ix] - 1;
                     indptr[row+1] = ncols;
                     std::iota(indices.begin() + curr, indices.begin() + curr + (size_t)ncols, 0);
+                    #ifdef _OPENMP
                     #pragma omp simd
+                    #endif
                     for (int col = 0; col < ncols; col++)
                         values[curr++] = (X[row + col*nrows_] == NA_INTEGER)? NA_REAL : (X[row + col*nrows_] * xx[ix]);
                 }
