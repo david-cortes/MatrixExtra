@@ -7,7 +7,7 @@ vignette: >
     %\VignetteEncoding{UTF-8}
 editor_options: 
     markdown: 
-      wrap: 72
+        wrap: 72
 ---
 
 ```{r, include = FALSE}
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 ```{r, include=FALSE}
-### Don't want to run compute-heave code on CRAN
+### Don't want to run compute-heavy code on CRAN
 ### Should build it with 'R CMD build --no-build-vignettes MatrixExtra'
 ### Then set this to TRUE is the vignette is ever to be rebuilt
 RUN_ALL <- FALSE

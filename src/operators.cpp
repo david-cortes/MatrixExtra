@@ -13,6 +13,7 @@
         NA  | FALSE = NA
         NA  |  NA   = NA
 */
+#ifndef __clang__
 #define R_logical_or(x, y) ((x) == NA_LOGICAL)? \
     ( ((y) == NA_LOGICAL)? NA_LOGICAL : ((y)? true : NA_LOGICAL) ) \
         : \
@@ -22,6 +23,75 @@
         : \
     ( ((y) == NA_LOGICAL)? ((x)? NA_LOGICAL : false) : ((bool)(x) && (bool)(y)) )
 #define R_logical_xor(x, y) (((x) == NA_LOGICAL || (y) == NA_LOGICAL)? NA_LOGICAL : ((bool)(x) != (bool)(y)))
+#else
+/* Attempt at solving issues with CRAN checks, might be a compiler bug with clang. */
+int R_logical_or(int x, int y)
+{
+    if (x == NA_LOGICAL)
+    {
+        if (y == NA_LOGICAL) {
+            return NA_LOGICAL;
+        }
+
+        else {
+            if (y)
+                return 1;
+            else
+                return NA_LOGICAL;
+        }
+    }
+
+    else
+    {
+        if (y == NA_LOGICAL) {
+            if (x)
+                return 1;
+            else
+                return NA_LOGICAL;
+        }
+
+        else {
+            return (bool)x || (bool)y;
+        }
+    }
+}
+int R_logical_and(int x, int y)
+{
+    if (x == NA_LOGICAL)
+    {
+        if (y == NA_LOGICAL) {
+            return NA_LOGICAL;
+        }
+        else {
+            if (y)
+                return NA_LOGICAL;
+            else
+                return 0;
+        }
+    }
+
+    else
+    {
+        if (y == NA_LOGICAL) {
+            if (x)
+                return NA_LOGICAL;
+            else
+                return 0;
+        }
+
+        else {
+            return (bool)x && (bool)y;
+        }
+    }
+}
+int R_logical_xor(int x, int y)
+{
+    if (x == NA_LOGICAL || y == NA_LOGICAL)
+        return NA_LOGICAL;
+    else
+        return (bool)x != (bool)y;
+}
+#endif
 
 /* TODO: some of these operations could benefit from adding 'libdivide' when recycling vectors. */
 
@@ -2817,6 +2887,8 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
     const size_t dvec_size = dvec.size();
     const int dvec_size_ = dvec_size;
     const size_t nnz = ii.size();
+    if (xx_out.size() != nnz)
+        Rcpp::stop("Unexpected error.");
     const size_t nrows_ = nrows;
 
     if (dvec_size == (size_t)nrows)
@@ -2836,9 +2908,9 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
 
                 else
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[ii[ix]]);
                 }
@@ -2952,9 +3024,9 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
 
                 else
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[(size_t)ii[ix] + (size_t)jj[ix]*nrows_]);
                 }
@@ -3068,9 +3140,9 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
 
                 else
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[ii[ix] % dvec_size_]);
                 }
@@ -3184,9 +3256,9 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
 
                 else
                 {
-                    #ifdef _OPENMP
-                    #pragma omp simd
-                    #endif
+                    // #ifdef _OPENMP
+                    // #pragma omp simd
+                    // #endif
                     for (size_t ix = 0; ix < nnz; ix++)
                         xx_out[ix] = R_logical_and(xx[ix], dvec[recyle_pos(ii[ix], jj[ix], nrows_, dvec_size)]);
                 }
