@@ -1,4 +1,4 @@
-HAS_LD=`${R_HOME}/bin/Rscript.exe -e "cat(unname(as.integer(capabilities('long.double'))))"`
+HAS_LD=`${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe -e "cat(unname(as.integer(capabilities('long.double'))))"`
 sed -e \
     "s/@HAS_LD@/$HAS_LD/" \
     < src/Makevars.win.in > src/Makevars.win

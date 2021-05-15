@@ -6,6 +6,5 @@ old/*
 vignettes_/*
 real-sim
 vignettes/real-sim
-vignettes/*
 ^README\.md$
 ^src/Makevars$

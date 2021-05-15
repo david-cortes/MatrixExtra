@@ -1,6 +1,10 @@
 ---
 title: "Introducing MatrixExtra"
 output: rmarkdown::html_vignette
+vignette: >
+    %\VignetteIndexEntry{Introducing_MatrixExtra}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 editor_options: 
     markdown: 
       wrap: 72
@@ -12,6 +16,12 @@ knitr::opts_chunk$set(
     comment = "#>"
 )
 options(rmarkdown.html_vignette.check_title = FALSE)
+```
+```{r, include=FALSE}
+### Don't want to run compute-heave code on CRAN
+### Should build it with 'R CMD build --no-build-vignettes MatrixExtra'
+### Then set this to TRUE is the vignette is ever to be rebuilt
+RUN_ALL <- FALSE
 ```
 
 "MatrixExtra" is an R package which extends the sparse matrix and sparse
@@ -214,7 +224,7 @@ as(Xr, "nsparseMatrix")
 Many of these methods can be woefully inefficient when dealing with
 real, large datasets, particularly when dealing with the CSR format:
 
-```{r}
+```{r, eval=RUN_ALL}
 library(microbenchmark)
 set.seed(1)
 X_big_csc <- Matrix::rsparsematrix(1e4, 1e4, .05, repr="C")
@@ -224,7 +234,7 @@ microbenchmark({X_slice <- X_big_csr[1:10, ]}, times=10L)
 
 Compare against what should be the mirror operation in CSC format:
 
-```{r}
+```{r, eval=RUN_ALL}
 microbenchmark({X_slice <- X_big_csc[, 1:10]}, times=10L)
 ```
 
@@ -233,7 +243,7 @@ CSC input, can still be slower than one would expect and than what could
 in theory be achieved with different algorithms, oftentimes due to
 making copies of the data:
 
-```{r}
+```{r, eval=RUN_ALL}
 microbenchmark({X_col <- X_big_csc[, 100, drop=FALSE]}, times=10L)
 ```
 
@@ -241,7 +251,7 @@ It should also be kept in mind that `Matrix` does not exploit
 multi-threading in dense-sparse matrix multiplications, which have
 substantial potential for acceleration:
 
-```{r}
+```{r, eval=RUN_ALL}
 set.seed(1)
 Y_dense <- matrix(rnorm(1e2*nrow(X_big_csc)), nrow=1e2)
 microbenchmark({Z <- Y_dense %*% X_big_csc}, times=10L)
@@ -297,18 +307,18 @@ Xr * Xr
 Some of these operations now become much more efficient when the inputs
 are large:
 
-```{r}
+```{r, eval=RUN_ALL}
 microbenchmark({X_slice <- X_big_csr[1:10, ]}, times=10L)
 ```
 
 Other methods, despite having been fast before in `Matrix`, will still
 be replaced with faster versions:
 
-```{r}
+```{r, eval=RUN_ALL}
 microbenchmark({X_col <- X_big_csc[, 100, drop=FALSE]}, times=10L)
 ```
 
-```{r}
+```{r, eval=RUN_ALL}
 microbenchmark({Z <- Y_dense %*% X_big_csc}, times=10L)
 ```
 
@@ -406,7 +416,7 @@ noticeable.
 
 Loading the data:
 
-```{r}
+```{r, eval=RUN_ALL}
 library(readsparse)
 data <- readsparse::read.sparse("real-sim")
 X <- data$X
@@ -416,7 +426,7 @@ dim(X)
 
 Adding the intercept and creating a 50-50 train-test split:
 
-```{r}
+```{r, eval=RUN_ALL}
 X <- cbind(rep(1, nrow(X)), X) ### Accelerated by 'MatrixExtra'
 set.seed(1)
 ix_train <- sample(nrow(X), floor(.5*nrow(X)), replace=FALSE)
@@ -428,7 +438,7 @@ y_test <- y[-ix_train]
 
 Now fitting the model:
 
-```{r}
+```{r, eval=RUN_ALL}
 logistic_fun <- function(coefs, X, y, lambda) {
     pred <- 1 / (1 + exp(-as.numeric(X %*% coefs))) ### Accelerated by 'MatrixExtra'
     ll <- mean(y * log(pred) + (1 - y) * log(1 - pred))
@@ -458,14 +468,14 @@ fitted_coefs <- res$par
 
 Verify that the model has good performance:
 
-```{r}
+```{r, eval=RUN_ALL}
 y_hat_test <- as.numeric(X_test %*% fitted_coefs)
 MLmetrics::AUC(y_hat_test, y_test)
 ```
 
 Timing the optimizer:
 
-```{r}
+```{r, eval=RUN_ALL}
 x0 <- numeric(ncol(X_train))
 microbenchmark::microbenchmark({
   res <- optim(x0,
