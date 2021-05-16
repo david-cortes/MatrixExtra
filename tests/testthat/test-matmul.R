@@ -157,10 +157,10 @@ test_that("matmult CSR-vector", {
                      unname(as.matrix(A[1:10,1,drop=FALSE]) %*% as.numeric(inp)))
     }
 
-    v[4] <- NA_real_
-    A <- as.csr.matrix(A)
-    A@x[10] <- NA_real_
-    expect_equal(A %*% v, unname(as.matrix(as.csc.matrix(A) %*% v)))
+    # v[4] <- NA_real_
+    # A <- as.csr.matrix(A)
+    # A@x[10] <- NA_real_
+    # expect_equal(A %*% v, unname(as.matrix(as.matrix(A) %*% v)))
 })
 
 test_that("float32 vectors", {
