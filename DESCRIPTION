@@ -31,3 +31,4 @@ URL: https://github.com/david-cortes/MatrixExtra
 BugReports: https://github.com/david-cortes/MatrixExtra/issues
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
+Biarch: TRUE
