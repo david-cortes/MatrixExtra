@@ -2,8 +2,6 @@
 
 `MatrixExtra` is an R package which extends the sparse matrix and sparse vector types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as slicing (selecting rows/columns) or concatenating by rows/columns, along with replacing some `Matrix` methods with more efficient versions, such as multi-threaded `<sparse, dense>` matrix multiplications, much faster slicing for all the sparse types, and faster elementwise addition/subtraction/multiplication, among others.
 
-Right now the package is in alpha status, with many methods yet to be implemented.
-
 This package is based on code originally written for the [rsparse](https://github.com/rexyai/rsparse) package by Dmitriy Selivanov.
 
 # What's missing from Matrix
@@ -91,14 +89,14 @@ In principle, one could stick with just the CSC format from `Matrix` and keep a 
 # Installation
 
 ```r
-remotes::install_github("david-cortes/MatrixExtra")
+install.packages("MatrixExtra")
 ```
 
 # Documentation
 
-Documentation is internally available in the installed package (e.g. `?MatrixExtra::<tab>` or `?MatrixExtra::slice`).
+Documentation is available on [CRAN](https://cran.r-project.org/web/packages/MatrixExtra/index.html).
 
-A package vignette is available [here](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/inst/doc/Introducing_MatrixExtra.html).
+A package vignette is available [here](http://htmlpreview.github.io/?https://github.com/david-cortes/MatrixExtra/blob/master/inst/doc/Introducing_MatrixExtra.html) (and in CRAN).
 
 # Features
 
@@ -119,7 +117,6 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 * Better handling of dimension names of the output matrices.
 * Outer products with sparse vectors.
 * Try to port some parts to `Matrix`.
-* Submit to CRAN.
 * Add timings against the methods from `Matrix`.
 * Perhaps add methods specifically for symmetric and triangular matrices.
 
