@@ -478,16 +478,16 @@ Timing the optimizer:
 ```{r, eval=RUN_ALL}
 x0 <- numeric(ncol(X_train))
 microbenchmark::microbenchmark({
-  res <- optim(x0,
-               logistic_fun,
-               logistic_grad,
-               method="L-BFGS-B",
-               X_train, y_train, lambda)
+    res <- optim(x0,
+                 logistic_fun,
+                 logistic_grad,
+                 method="L-BFGS-B",
+                 X_train, y_train, lambda)
 }, times=10L)
 ```
 
-The same routine using `Matrix` would usually take above 3 seconds
-(~70% slower) in this same setup, plus some extra time in the data
+The same routine using `Matrix` would usually take around 7 seconds
+(~60% slower) in this same setup, plus some extra time in the data
 preparation. The only thing that was needed to accelerate it was to load
 `library(MatrixExtra)`, with everything else remaining the same as it
 would have been in base R or `Matrix`.
