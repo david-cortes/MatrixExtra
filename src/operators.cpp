@@ -2887,7 +2887,7 @@ RcppVector multiply_coo_by_dense_ignore_NAs_template
     const size_t dvec_size = dvec.size();
     const int dvec_size_ = dvec_size;
     const size_t nnz = ii.size();
-    if (xx_out.size() != nnz)
+    if ((size_t)xx_out.size() != nnz)
         Rcpp::stop("Unexpected error.");
     const size_t nrows_ = nrows;
 
