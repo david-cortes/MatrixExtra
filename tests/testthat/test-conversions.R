@@ -323,3 +323,10 @@ test_that("Sparse and dense vectors", {
         expect_s4_class(as(inp, "ngTMatrix"), "ngTMatrix")
     }
 })
+
+test_that("Empty sparse vector", {
+    n <- 10
+    X1 <- as.csr.matrix(sparseVector(x=numeric(), i=integer(), length=n))
+    X2 <- as(matrix(0, nrow=1, ncol=n), "RsparseMatrix")
+    expect_equal(X1, X2)
+})

@@ -5,6 +5,47 @@
 #   pragma clang diagnostic ignored "-Wpass-failed"
 #endif
 
+constexpr const int one = 1;
+extern "C" void saxpy_(const int *, const float*, const float *, const int*, float*, const int*);
+extern "C" void scopy_(const int *, const float*, const int *, float *, const int *);
+
+static inline void axpy(const int *n, const double* alpha, const double *x, const int* incx, double* y, const int* incy)
+{
+    daxpy_(n, alpha, x, incx, y, incy);
+}
+
+static inline void axpy(const int *n, const double alpha, const double *x, const int* incx, double* y, const int* incy)
+{
+    daxpy_(n, &alpha, x, incx, y, incy);
+}
+
+static inline void axpy(const int *n, const double* alpha, const float *x, const int* incx, float* y, const int* incy)
+{
+    const float alpha_ = *alpha;
+    saxpy_(n, &alpha_, x, incx, y, incy);
+}
+
+static inline void axpy(const int *n, const float alpha, const float *x, const int* incx, float* y, const int* incy)
+{
+    saxpy_(n, &alpha, x, incx, y, incy);
+}
+
+static inline void axpy(const int *n, const double alpha, const float *x, const int* incx, float* y, const int* incy)
+{
+    const float alpha_ = alpha;
+    saxpy_(n, &alpha_, x, incx, y, incy);
+}
+
+static inline void tcopy(const int *n, const double* x, const int *incx, double *y, const int *incy)
+{
+    dcopy_(n, x, incx, y, incy);
+}
+
+static inline void tcopy(const int *n, const float* x, const int *incx, float *y, const int *incy)
+{
+    scopy_(n, x, incx, y, incy);
+}
+
 /* Mental map to figure out what should be called where:
 
 matmul(x,y) -> x %*% y
@@ -31,33 +72,6 @@ The required functions are:
     with all the dense ones being column-major
 */
 
-/* TODO: link to 'float' and change to the real 'saxpy' and 'scopy' */
-
-/* Unoptimized replacements for BLAS in single precision
-
-   Note: R does not ship with single-precision BLAS routines.
-   Using an optimized 'saxpy' would imply having to link against
-   the 'float' package, and in such case there might be problems if one
-   changes the BLAS shared object within a session.
-   'axpy' is anyway an operation without much room for optimizations
-   beyond what the compiler already does, so the performance hit
-   might be very small or non-existent.
-
-   Update: the comment above about performance was very wrong */
-static inline void saxpy1(const int n, const float a,
-                          const float *restrict x, float *restrict y)
-{
-    #ifdef _OPENMP
-    #pragma omp simd
-    #endif
-    for (int ix = 0; ix < n; ix++) y[ix] += a * x[ix];
-}
-
-static inline void scopy_1toN(const size_t n, const float *restrict x, float *restrict y, size_t incy)
-{
-    for (size_t ix = 0; ix < n; ix++) y[ix*incy] = x[ix];
-}
-
 /* X <- A*B + X | A(m,k) is sparse CSR, B(k,n) is dense row-major, X(m,n) is dense row-major
 
    Equivalences:
@@ -70,19 +84,19 @@ static inline void scopy_1toN(const size_t n, const float *restrict x, float *re
     X <- B*A    | A(k,m) CSC, B(n,k) column-major, X(n,m) column-major
 
 */
-void dgemm_csr_drm_as_drm
+template <class real_t>
+void gemm_csr_drm_as_drm
 (
     const int m, const int n,
     const int *restrict indptr, const int *restrict indices, const double *restrict values,
-    const double *restrict DenseMat, const size_t ldb,
-    double *restrict OutputMat, const size_t ldc,
+    const real_t *restrict DenseMat, const size_t ldb,
+    real_t *restrict OutputMat, const size_t ldc,
     int nthreads
 )
 {
     if (m <= 0 || indptr[0] == indptr[m])
         return;
-    const int one = 1;
-    double *restrict row_ptr;
+    real_t *restrict row_ptr;
     #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
             shared(OutputMat, DenseMat, indptr, indices, values) \
@@ -92,32 +106,7 @@ void dgemm_csr_drm_as_drm
     {
         row_ptr = OutputMat + (size_t)row*ldc;
         for (int col = indptr[row]; col < indptr[row+1]; col++)
-            daxpy_(&n, values + col, DenseMat + (size_t)indices[col]*ldb, &one, row_ptr, &one);
-    }
-}
-
-void dgemm_csr_drm_as_drm
-(
-    const int m, const int n,
-    const int *restrict indptr, const int *restrict indices, const double *restrict values,
-    const float *restrict DenseMat, const size_t ldb,
-    float *restrict OutputMat, const size_t ldc,
-    int nthreads
-)
-{
-    if (m <= 0 || indptr[0] == indptr[m])
-        return;
-    float *restrict row_ptr;
-    #ifdef _OPENMP
-    #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(OutputMat, DenseMat, indptr, indices, values) \
-            private(row_ptr)
-    #endif
-    for (int row = 0; row < m; row++)
-    {
-        row_ptr = OutputMat + (size_t)row*ldc;
-        for (int col = indptr[row]; col < indptr[row+1]; col++)
-            saxpy1(n, values[col], DenseMat + (size_t)indices[col]*ldb, row_ptr);
+            axpy(&n, values + col, DenseMat + (size_t)indices[col]*ldb, &one, row_ptr, &one);
     }
 }
 
@@ -127,21 +116,21 @@ void dgemm_csr_drm_as_drm
    X <- A*t(B) | A(m,k) CSR, B(n,k) column-major, X(m,n) column-major
 
 */
-void dgemm_csr_drm_as_dcm
+template <class real_t>
+void gemm_csr_drm_as_dcm
 (
     const int m, const int n,
     const int *restrict indptr, const int *restrict indices, const double *restrict values,
-    const double *restrict DenseMat, const size_t ldb,
-    double *restrict OutputMat, const int ldc,
+    const real_t *restrict DenseMat, const size_t ldb,
+    real_t *restrict OutputMat, const int ldc,
     int nthreads
 )
 {
     if (m <= 0 || indptr[0] == indptr[m])
         return;
-    const int one = 1;
-    double *restrict write_ptr;
+    real_t *restrict write_ptr;
     nthreads = std::min(nthreads, m);
-    std::unique_ptr<double[]> temp_arr(new double[(size_t)ldc*(size_t)nthreads]);
+    std::unique_ptr<real_t[]> temp_arr(new real_t[(size_t)ldc*(size_t)nthreads]);
     #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
             shared(OutputMat, DenseMat, indptr, indices, values) \
@@ -152,43 +141,10 @@ void dgemm_csr_drm_as_dcm
         if (indptr[row] < indptr[row+1])
         {
             write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
-            memset(write_ptr, 0, ldb*sizeof(double));
+            memset(write_ptr, 0, ldb*sizeof(real_t));
             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-                daxpy_(&n, values + ix, DenseMat + (size_t)indices[ix]*ldb, &one, write_ptr, &one);
-            dcopy_(&n, write_ptr, &one, OutputMat + row, &ldc);
-        }
-    }
-}
-
-void dgemm_csr_drm_as_dcm
-(
-    const int m, const int n_,
-    const int *restrict indptr, const int *restrict indices, const double *restrict values,
-    const float *restrict DenseMat, const size_t ldb,
-    float *restrict OutputMat, const int ldc,
-    int nthreads
-)
-{
-    if (m <= 0 || indptr[0] == indptr[m])
-        return;
-    const size_t n = n_;
-    float *restrict write_ptr;
-    nthreads = std::min(nthreads, m);
-    std::unique_ptr<float[]> temp_arr(new float[(size_t)ldc*(size_t)nthreads]);
-    #ifdef _OPENMP
-    #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(OutputMat, DenseMat, indptr, indices, values) \
-            private(write_ptr)
-    #endif
-    for (int row = 0; row < m; row++)
-    {
-        if (indptr[row] < indptr[row+1])
-        {
-            write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
-            memset(write_ptr, 0, ldb*sizeof(float));
-            for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
-                saxpy1(n, values[ix], DenseMat + (size_t)indices[ix]*ldb, write_ptr);
-            scopy_1toN(n, write_ptr, OutputMat + row, ldc);
+                axpy(&n, values + ix, DenseMat + (size_t)indices[ix]*ldb, &one, write_ptr, &one);
+            tcopy(&n, write_ptr, &one, OutputMat + row, &ldc);
         }
     }
 }
@@ -208,7 +164,7 @@ RcppMatrix matmul_dense_csc(RcppMatrix X_colmajor,
     int ncols = out_colmajor.ncol();
 
     if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
-        dgemm_csr_drm_as_drm(
+        gemm_csr_drm_as_drm<double>(
             ncols, nrows,
             INTEGER(Y_csc_indptr), INTEGER(Y_csc_indices), REAL(Y_csc_values),
             REAL(X_colmajor), nrows,
@@ -216,7 +172,7 @@ RcppMatrix matmul_dense_csc(RcppMatrix X_colmajor,
             nthreads
         );
     else
-        dgemm_csr_drm_as_drm(
+        gemm_csr_drm_as_drm<float>(
             ncols, nrows,
             INTEGER(Y_csc_indptr), INTEGER(Y_csc_indices), REAL(Y_csc_values),
             (float*)INTEGER(X_colmajor), nrows,
@@ -270,7 +226,7 @@ RcppMatrix tcrossprod_dense_csr(RcppMatrix X_colmajor,
     RcppMatrix out_colmajor(X_colmajor.nrow(), Y_csr_indptr.size()-1);
 
     if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
-        dgemm_csr_drm_as_drm(
+        gemm_csr_drm_as_drm<double>(
             out_colmajor.ncol(), out_colmajor.nrow(),
             INTEGER(Y_csr_indptr), INTEGER(Y_csr_indices), REAL(Y_csr_values),
             REAL(X_colmajor), X_colmajor.nrow(),
@@ -278,7 +234,7 @@ RcppMatrix tcrossprod_dense_csr(RcppMatrix X_colmajor,
             nthreads
         );
     else
-        dgemm_csr_drm_as_drm(
+        gemm_csr_drm_as_drm<float>(
             out_colmajor.ncol(), out_colmajor.nrow(),
             INTEGER(Y_csr_indptr), INTEGER(Y_csr_indices), REAL(Y_csr_values),
             (float*)INTEGER(X_colmajor), X_colmajor.nrow(),
@@ -332,7 +288,7 @@ RcppMatrix tcrossprod_csr_dense(Rcpp::IntegerVector X_csr_indptr,
     RcppMatrix out_colmajor(X_csr_indptr.size()-1, Y_colmajor.nrow());
 
     if (std::is_same<RcppMatrix, Rcpp::NumericMatrix>::value)
-        dgemm_csr_drm_as_dcm(
+        gemm_csr_drm_as_dcm<double>(
             out_colmajor.nrow(), out_colmajor.ncol(),
             INTEGER(X_csr_indptr), INTEGER(X_csr_indices), REAL(X_csr_values),
             REAL(Y_colmajor), Y_colmajor.nrow(),
@@ -340,7 +296,7 @@ RcppMatrix tcrossprod_csr_dense(Rcpp::IntegerVector X_csr_indptr,
             nthreads
         );
     else
-        dgemm_csr_drm_as_dcm(
+        gemm_csr_drm_as_dcm<float>(
             out_colmajor.nrow(), out_colmajor.ncol(),
             INTEGER(X_csr_indptr), INTEGER(X_csr_indices), REAL(X_csr_values),
             (float*)INTEGER(Y_colmajor), Y_colmajor.nrow(),
@@ -688,10 +644,10 @@ Rcpp::IntegerMatrix matmul_rowvec_by_cscbin
     return out_;
 }
 
-// [[Rcpp::export(rng = false)]]
-Rcpp::List matmul_colvec_by_scolvecascsr_f32
+template <class real_t, class RcppVector>
+Rcpp::List matmul_colvec_by_scolvecascsr_template
 (
-    Rcpp::IntegerVector colvec_,
+    RcppVector colvec_,
     Rcpp::IntegerVector indptr,
     Rcpp::IntegerVector indices,
     Rcpp::NumericVector values_
@@ -704,12 +660,24 @@ Rcpp::List matmul_colvec_by_scolvecascsr_f32
     Rcpp::IntegerVector out_csr_indptr(dim2+1);
     Rcpp::IntegerVector out_csr_indices_(nnz_out);
     Rcpp::NumericVector out_csr_values_(nnz_out);
-    std::unique_ptr<float[]> out_csr_values__(new float[nnz_out]());
+    std::unique_ptr<real_t[]> out_csr_values__;
+    if (std::is_same<real_t, float>::value)
+        out_csr_values__ = std::unique_ptr<real_t[]>(new real_t[nnz_out]());
 
-    float *restrict out_csr_values = out_csr_values__.get();
+    real_t *restrict out_csr_values = nullptr;
+    real_t *restrict colvec = nullptr;
+
+    if (std::is_same<real_t, double>::value) {
+        out_csr_values = (real_t*)REAL(out_csr_values_);
+        colvec = (real_t*)REAL(colvec_);
+    }
+    else {
+        out_csr_values = (real_t*)out_csr_values__.get();
+        colvec = (real_t*)INTEGER(colvec_);
+    }
+
     int *restrict out_csr_indices = INTEGER(out_csr_indices_);
-    double *restrict values = REAL(values_);
-    float *restrict colvec = (float*)INTEGER(colvec_);
+    const double *restrict values = REAL(values_);
     size_t ncurr = 0;
 
     for (size_t ix = 0; ix < dim2; ix++)
@@ -717,7 +685,7 @@ Rcpp::List matmul_colvec_by_scolvecascsr_f32
         if (indptr[ix] < indptr[ix+1])
         {
             out_csr_indptr[ix+1] = dim;
-            saxpy1(dim, values[indptr[ix]], colvec, out_csr_values + ncurr);
+            axpy(&dim, values[indptr[ix]], colvec, &one, out_csr_values + ncurr, &one);
             std::iota(out_csr_indices + ncurr, out_csr_indices + ncurr + dim, 0);
             ncurr += dim;
         }
@@ -726,13 +694,31 @@ Rcpp::List matmul_colvec_by_scolvecascsr_f32
     for (size_t ix = 0; ix < dim2; ix++)
         out_csr_indptr[ix+1] += out_csr_indptr[ix];
 
-    for (size_t ix = 0; ix < nnz_out; ix++)
-        out_csr_values_[ix] = (double)out_csr_values[ix];
+    if (std::is_same<real_t, float>::value)
+        for (size_t ix = 0; ix < nnz_out; ix++)
+            out_csr_values_[ix] = (double)out_csr_values[ix];
 
     return Rcpp::List::create(
         Rcpp::_["indptr"] = out_csr_indptr,
         Rcpp::_["indices"] = out_csr_indices_,
         Rcpp::_["values"] = out_csr_values_
+    );
+}
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::List matmul_colvec_by_scolvecascsr_f32
+(
+    Rcpp::IntegerVector colvec_,
+    Rcpp::IntegerVector indptr,
+    Rcpp::IntegerVector indices,
+    Rcpp::NumericVector values_
+)
+{
+    return matmul_colvec_by_scolvecascsr_template<float, Rcpp::IntegerVector>(
+        colvec_,
+        indptr,
+        indices,
+        values_
     );
 }
 
@@ -747,38 +733,11 @@ Rcpp::List matmul_colvec_by_scolvecascsr
     Rcpp::NumericVector values_
 )
 {
-    const int dim = colvec_.size();
-    const size_t dim2 = indptr.size()-1;
-    const size_t nnz = indices.size();
-    Rcpp::IntegerVector out_csr_indptr(dim2+1);
-    Rcpp::IntegerVector out_csr_indices_(nnz * (size_t)dim);
-    Rcpp::NumericVector out_csr_values_(nnz * (size_t)dim);
-
-    double *restrict out_csr_values = REAL(out_csr_values_);
-    int *restrict out_csr_indices = INTEGER(out_csr_indices_);
-    double *restrict values = REAL(values_);
-    double *restrict colvec = REAL(colvec_);
-    const int one = 1;
-    size_t ncurr = 0;
-
-    for (size_t ix = 0; ix < dim2; ix++)
-    {
-        if (indptr[ix] < indptr[ix+1])
-        {
-            out_csr_indptr[ix+1] = dim;
-            daxpy_(&dim, values + indptr[ix], colvec, &one, out_csr_values + ncurr, &one);
-            std::iota(out_csr_indices + ncurr, out_csr_indices + ncurr + dim, 0);
-            ncurr += dim;
-        }
-    }
-
-    for (size_t ix = 0; ix < dim2; ix++)
-        out_csr_indptr[ix+1] += out_csr_indptr[ix];
-
-    return Rcpp::List::create(
-        Rcpp::_["indptr"] = out_csr_indptr,
-        Rcpp::_["indices"] = out_csr_indices_,
-        Rcpp::_["values"] = out_csr_values_
+    return matmul_colvec_by_scolvecascsr_template<double, Rcpp::NumericVector>(
+        colvec_,
+        indptr,
+        indices,
+        values_
     );
 }
 
