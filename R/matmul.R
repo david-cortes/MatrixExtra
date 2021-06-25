@@ -192,6 +192,11 @@ setMethod("%*%", signature(x="matrix", y="CsparseMatrix"), gemm_dense_csc)
 
 gemm_f32_csc <- function(x, y) {
 
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
+
     if (is.vector(x@Data)) {
 
         if (inherits(y, "symmetricMatrix") ||
@@ -247,12 +252,6 @@ gemm_f32_csc <- function(x, y) {
         }
     }
 
-    check_dimensions_match(x, y, matmult=TRUE)
-    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
-    nthreads <- max(as.integer(nthreads), 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
-    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
-
     y <- as.csc.matrix(y)
     check_valid_matrix(y)
 
@@ -299,6 +298,11 @@ tcrossprod_dense_csr <- function(x, y) {
 setMethod("tcrossprod", signature(x="matrix", y="RsparseMatrix"), tcrossprod_dense_csr)
 
 tcrossprod_f32_csr <- function(x, y) {
+
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (is.vector(x@Data)) {
 
@@ -353,12 +357,6 @@ tcrossprod_f32_csr <- function(x, y) {
         }
     }
 
-    check_dimensions_match(x, y, tcrossprod=TRUE)
-    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
-    nthreads <- max(as.integer(nthreads), 1L)
-    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
-    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
-
     y <- as.csr.matrix(y)
     check_valid_matrix(y)
 
@@ -386,6 +384,11 @@ crossprod_dense_csc <- function(x, y) {
 setMethod("crossprod", signature(x="matrix", y="CsparseMatrix"), crossprod_dense_csc)
 
 crossprod_f32_csc <- function(x, y) {
+
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (is.vector(x@Data)) {
         if (length(x@Data) != nrow(y))
@@ -457,6 +460,11 @@ gemm_csr_dense <- function(x, y) {
 setMethod("%*%", signature(x="RsparseMatrix", y="matrix"), gemm_csr_dense)
 
 gemm_csr_f32 <- function(x, y) {
+
+    nthreads <- getOption("MatrixExtra.nthreads", default=parallel::detectCores())
+    nthreads <- max(as.integer(nthreads), 1L)
+    on.exit(RhpcBLASctl::blas_set_num_threads(RhpcBLASctl::blas_get_num_procs()))
+    if (nthreads > 1) RhpcBLASctl::blas_set_num_threads(1L)
 
     if (is.vector(y@Data)) {
         if (ncol(x) == 1L) {
