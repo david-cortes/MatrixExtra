@@ -88,9 +88,9 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
 
     if (inherits(x, "sparseVector")) {
         X.csr <- new(target_class)
-        X.csr@Dim <- c(1L, x@length)
+        X.csr@Dim <- as.integer(c(1L, x@length))
         X.csr@p <- c(0L, length(x@i))
-        X.csr@j <- x@i - 1L
+        X.csr@j <- as.integer(x@i) - 1L
         if (!binary) {
 
             if (inherits(x, "dsparseVector")) {

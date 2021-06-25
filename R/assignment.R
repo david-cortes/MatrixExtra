@@ -300,7 +300,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
                     throw_shape_err()
                 if (length(value@i) == 0L)
                     return(assign_csr_internal(x, i, j, 0, ij_properties))
-                res <- set_single_row_to_svec(x@p, x@j, x@x, ncol(x), i-1L, value@i-1L, value@x, length(value))
+                res <- set_single_row_to_svec(x@p, x@j, x@x, ncol(x), i-1L, as.integer(value@i)-1L, value@x, length(value))
             }
 
             else {
@@ -320,7 +320,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
                     value <- deepcopy_before_sort(value)
                 value <- sort_sparse_indices(value, copy=!inplace_sort)
 
-                res <- set_single_col_to_svec(x@p, x@j, x@x, ncol(x), j-1L, value@i-1L, value@x, length(value))
+                res <- set_single_col_to_svec(x@p, x@j, x@x, ncol(x), j-1L, as.integer(value@i)-1L, value@x, length(value))
             }
 
             else {

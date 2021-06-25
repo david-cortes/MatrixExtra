@@ -16,14 +16,14 @@ get_indices_integer <- function(i, max_i, index_names) {
         if (i@length > max_i) {
             stop("Dimension of indexing vector is larger than matrix to subset.")
         } else if (i@length == max_i) {
-            i <- i@i
+            i <- as.integer(i@i)
         } else { ### mimic of R base's recycling
-            full_repeats <- max_i %/% i@length
-            remainder <- max_i - i@length*full_repeats
+            full_repeats <- as.integer(max_i %/% i@length)
+            remainder <- as.integer(max_i - i@length*full_repeats)
             if (remainder != 0)
-                i <- repeat_indices_n_times(i@i, i[seq(1L, remainder)]@i, i@length, max_i)
+                i <- repeat_indices_n_times(as.integer(i@i), as.integer(i[seq(1L, remainder)]@i), as.integer(i@length), max_i)
             else
-                i <- repeat_indices_n_times(i@i, integer(), i@length, max_i)
+                i <- repeat_indices_n_times(as.integer(i@i), integer(), as.integer(i@length), max_i)
         }
         if (typeof(i) != "integer")
             i <- as.integer(i)

@@ -125,7 +125,7 @@ sort_sparse_indices <- function(X, copy=FALSE, byrow=TRUE) {
 
     } else if (inherits(X, "sparseVector")) {
         
-        if (copy) X@i <- deepcopy_int(X@i)
+        if (copy) X@i <- deepcopy_int(as.integer(X@i))
 
         if (inherits(X, "dsparseVector")) {
             if (copy) X@x <- deepcopy_num(X@x)
@@ -200,9 +200,15 @@ deepcopy_before_sort <- function(X, logical=FALSE, binary=FALSE) {
 #' @export
 deepcopy_sparse_object <- function(X) {
     if (inherits(X, "sparseVector")) {
-
-        X@i <- deepcopy_int(X@i)
-        X@length <- deepcopy_int(X@length)
+        
+        if (inherits(X@i, "integer"))
+            X@i <- deepcopy_int(X@i)
+        else
+            X@i <- deepcopy_num(X@i)
+        if (inherits(X@length, "integer"))
+            X@length <- deepcopy_int(X@length)
+        else
+            X@length <- deepcopy_num(X@length)
         if (inherits(X, "dsparseVector")) {
             X@x <- deepcopy_num(X@x)
         } else if (inherits(X, "isparseVector")) {
@@ -320,11 +326,11 @@ remove_sparse_zeros <- function(X, na.rm=FALSE) {
             return(X)
 
         if (inherits(X, "dsparseVector")) {
-            res <- remove_zero_valued_svec_numeric(X@i, X@x, na.rm)
+            res <- remove_zero_valued_svec_numeric(as.integer(X@i), X@x, na.rm)
         } else if (inherits(X, "isparseVector")) {
-            res <- remove_zero_valued_svec_integer(X@i, X@x, na.rm)
+            res <- remove_zero_valued_svec_integer(as.integer(X@i), X@x, na.rm)
         } else if (inherits(X, "lsparseVector")) {
-            res <- remove_zero_valued_svec_logical(X@i, X@x, na.rm)
+            res <- remove_zero_valued_svec_logical(as.integer(X@i), X@x, na.rm)
         } else {
             throw_internal_error()
         }
@@ -459,7 +465,7 @@ check_sparse_matrix <- function(X, sort=TRUE, remove_zeros=TRUE) {
                 stop("Vector indices and values have different length.")
         }
 
-        res <- check_valid_svec(X@i, X@length)
+        res <- check_valid_svec(as.integer(X@i), as.integer(X@length))
         
     } else {
         stop("Function is only applicable to sparse matrices and sparse vectors.")

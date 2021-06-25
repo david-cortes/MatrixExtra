@@ -39,7 +39,7 @@ rbind_csr <- function(...) {
         }
     }
     args <- lapply(list(...), cast_if_not_csr)
-    ncols <- max(sapply(args, function(x) if (inherits(x, "sparseVector")) x@length else NCOL(x)))
+    ncols <- max(sapply(args, function(x) if (inherits(x, "sparseVector")) as.integer(x@length) else NCOL(x)))
 
     filter_empty <- function(x) {
         if (inherits(x, "sparseVector")) {
@@ -491,10 +491,10 @@ rbind2_coo_vec <- function(x, v, x_is_first) {
     out@Dim <- as.integer(c(nrow(x) + 1L, max(ncol(x), v@length)))
     if (x_is_first) {
         out@i <- c(x@i, rep(nrow(x), length(v@i)))
-        out@j <- c(x@j, v@i - 1L)
+        out@j <- c(x@j, as.integer(v@i) - 1L)
     } else {
         out@i <- c(x@i+1L, rep(0L, length(v@i)))
-        out@j <- c(x@j, v@i - 1L)
+        out@j <- c(x@j, as.integer(v@i) - 1L)
     }
 
     if (inherits(out, "dsparseMatrix")) {

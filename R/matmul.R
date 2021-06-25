@@ -590,7 +590,7 @@ gemv_csr_vec <- function(x, y) {
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
                 nthreads
             )
@@ -599,7 +599,7 @@ gemv_csr_vec <- function(x, y) {
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
                 nthreads
             )
@@ -608,7 +608,7 @@ gemv_csr_vec <- function(x, y) {
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
                 nthreads
             )
@@ -617,7 +617,7 @@ gemv_csr_vec <- function(x, y) {
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 nthreads
             )
         } else {
@@ -660,35 +660,35 @@ outerprod_csrsinglecol_by_dvec <- function(x, y) {
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
-                y@length
+                as.integer(y@length)
             )
         } else if (inherits(y, "isparseVector")) {
             res <- matmul_spcolvec_by_scolvecascsr_integer(
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
-                y@length
+                as.integer(y@length)
             )
         } else if (inherits(y, "lsparseVector")) {
             res <- matmul_spcolvec_by_scolvecascsr_logical(
                 x@p,
                 x@j,
                 x@x,
-                y@i,
+                as.integer(y@i),
                 y@x,
-                y@length
+                as.integer(y@length)
             )
         } else if (inherits(y, "nsparseVector")) {
             res <- matmul_spcolvec_by_scolvecascsr_binary(
                 x@p,
                 x@j,
                 x@x,
-                y@i,
-                y@length
+                as.integer(y@i),
+                as.integer(y@length)
             )
         } else {
             y <- as(y, "dsparseVector")
