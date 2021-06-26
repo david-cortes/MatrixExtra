@@ -330,3 +330,12 @@ test_that("Empty sparse vector", {
     X2 <- as(matrix(0, nrow=1, ncol=n), "RsparseMatrix")
     expect_equal(X1, X2)
 })
+
+test_that("Vector with non-integer indices", {
+    v_s <- new("dsparseVector", i=c(1., 2.), x=c(10, 10), length=5.)
+    X_d <- matrix(as.numeric(v_s), nrow=1)
+    expect_is(v_s@i, "numeric")
+    expect_equal(unname(as.matrix(as.csr.matrix(v_s))), unname(X_d))
+    expect_equal(unname(t(as.matrix(as.csc.matrix(v_s)))), unname(X_d))
+    expect_equal(unname(as.matrix(as.coo.matrix(v_s))), unname(X_d))
+})
