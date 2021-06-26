@@ -37,7 +37,7 @@ assign_through_matrix <- function(x, i, j, value) {
 assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
 
     if (!NROW(value) ||
-        !inherits(value, c("numeric", "integer", "logical", "matrix",
+        !inherits(value, c("numeric", "integer", "logical", "matrix", "float32",
                            "sparseMatrix", "sparseVector", "generalMatrix"))
     ) {
         stop("Invalid value to assign.")
