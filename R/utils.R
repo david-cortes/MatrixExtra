@@ -532,3 +532,49 @@ can_modify_indices <- function(indices, vector=NULL) {
     stop("Not yet implemented.")
     return(TRUE)
 }
+
+#' @title Create Empty Sparse Matrix
+#' @description Creates an empty sparse matrix (all values being zeros)
+#' with the requested format and dimensions. This is a faster alternative
+#' to calling `Matrix::Matrix(0, ...)`.
+#' @param nrow Desired number of rows for the matrix.
+#' @param ncol Desired number of columns for the matrix.
+#' @param format Storage format for the matrix. Options are:\itemize{
+#' \item "R", which will output a CSR Matrix ("RsparseMatrix").
+#' \item "C", which will output a CSC Matrix ("CsparseMatrix").
+#' \item "T", which will output a COO/triplets Matrix ("TsparseMatrix").
+#' }
+#' @param dtype Data type for the matrix. Options are:\itemize{
+#' \item "d", which will output a numeric/double type (e.g. "dgRMatrix").
+#' \item "l", which will output a logical/boolean type.
+#' \item "n", which will output a binary type.
+#' }
+#' @return A sparse matrix of general type, with the specific class
+#' determined by `format` and `dtype`.
+#' @examples 
+#' ### This is very fast despite the large dimensions,
+#' ### as no data is held in the resulting object
+#' library(MatrixExtra)
+#' X <- empty.sparse.matrix(nrow=2^20, ncol=2^25, format="T")
+#' @export
+empty.sparse.matrix <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
+    if (NROW(format) != 1L || !(format %in% c("R", "C", "T")))
+        stop("'format' must be one of 'R', 'C', 'T'.")
+    if (NROW(dtype) != 1L || !(dtype %in% c("d", "l", "n")))
+        stop("'dtype' must be one of 'd', 'l', 'n'.")
+    nrow <- as.integer(nrow)
+    ncol <- as.integer(ncol)
+    if (NROW(nrow) != 1L || is.na(nrow) || nrow < 0)
+        stop("'nrow' must be a non-negative integer.")
+    if (NROW(ncol) != 1L || is.na(ncol) || ncol < 0)
+        stop("'ncol' must be a non-negative integer.")
+    target_class <- sprintf("%sg%sMatrix", dtype, format)
+    out <- new(target_class)
+    out@Dim <- as.integer(c(nrow, ncol))
+    if (format == "R") {
+        out@p <- integer(nrow+1L)
+    } else if (format == "C") {
+        out@p <- integer(ncol+1L)
+    }
+    return(out)
+}

@@ -77,3 +77,15 @@ test_that("Checking indices", {
     X@j <- as.integer(c(4,  2,1,4,  1,  0))
     check_sparse_matrix(X)
 })
+
+test_that("Empty matrices", {
+    X <- empty.sparse.matrix(0, 1, format="R")
+    expect_s4_class(X, "dgRMatrix")
+    X <- empty.sparse.matrix(1, 0, format="C", dtype="l")
+    expect_s4_class(X, "lgCMatrix")
+    X <- empty.sparse.matrix(0, 0, format="T", dtype="n")
+    expect_s4_class(X, "ngTMatrix")
+    expect_error(suppressWarnings({X <- empty.sparse.matrix(2^54, 1)}))
+    expect_error({X <- empty.sparse.matrix(format="Q")})
+    expect_error({X <- empty.sparse.matrix(dtype="i")})
+})
