@@ -1134,6 +1134,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rebuild_indptr_after_filter
+Rcpp::IntegerVector rebuild_indptr_after_filter(Rcpp::IntegerVector indptr, Rcpp::LogicalVector filter);
+RcppExport SEXP _MatrixExtra_rebuild_indptr_after_filter(SEXP indptrSEXP, SEXP filterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type indptr(indptrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type filter(filterSEXP);
+    rcpp_result_gen = Rcpp::wrap(rebuild_indptr_after_filter(indptr, filter));
+    return rcpp_result_gen;
+END_RCPP
+}
 // multiply_csr_elemwise
 Rcpp::List multiply_csr_elemwise(Rcpp::IntegerVector indptr1, Rcpp::IntegerVector indptr2, Rcpp::IntegerVector indices1, Rcpp::IntegerVector indices2, Rcpp::NumericVector values1, Rcpp::NumericVector values2);
 RcppExport SEXP _MatrixExtra_multiply_csr_elemwise(SEXP indptr1SEXP, SEXP indptr2SEXP, SEXP indices1SEXP, SEXP indices2SEXP, SEXP values1SEXP, SEXP values2SEXP) {
@@ -2230,6 +2241,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_check_valid_csr_matrix", (DL_FUNC) &_MatrixExtra_check_valid_csr_matrix, 4},
     {"_MatrixExtra_check_valid_coo_matrix", (DL_FUNC) &_MatrixExtra_check_valid_coo_matrix, 4},
     {"_MatrixExtra_check_valid_svec", (DL_FUNC) &_MatrixExtra_check_valid_svec, 2},
+    {"_MatrixExtra_rebuild_indptr_after_filter", (DL_FUNC) &_MatrixExtra_rebuild_indptr_after_filter, 2},
     {"_MatrixExtra_multiply_csr_elemwise", (DL_FUNC) &_MatrixExtra_multiply_csr_elemwise, 6},
     {"_MatrixExtra_logicaland_csr_elemwise", (DL_FUNC) &_MatrixExtra_logicaland_csr_elemwise, 6},
     {"_MatrixExtra_multiply_csr_by_dense_elemwise_double", (DL_FUNC) &_MatrixExtra_multiply_csr_by_dense_elemwise_double, 4},

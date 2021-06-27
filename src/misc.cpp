@@ -1095,3 +1095,22 @@ Rcpp::List check_valid_svec
 
     return Rcpp::List(); 
 }
+
+// [[Rcpp::export(rng = false)]]
+Rcpp::IntegerVector rebuild_indptr_after_filter
+(
+    Rcpp::IntegerVector indptr,
+    Rcpp::LogicalVector filter
+)
+{
+    Rcpp::IntegerVector indptr_new(indptr.size());
+    int nrows = indptr.size() - 1;
+    int n_remove;
+    for (int row = 0; row < nrows; row++) {
+        n_remove = 0;
+        for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
+            n_remove += filter[ix] == 0;
+        indptr_new[row+1] = indptr_new[row] + (indptr[row+1] - indptr[row]) - n_remove;
+    }
+    return indptr_new;
+}

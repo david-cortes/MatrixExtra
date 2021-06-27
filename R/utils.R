@@ -555,9 +555,9 @@ can_modify_indices <- function(indices, vector=NULL) {
 #' ### This is very fast despite the large dimensions,
 #' ### as no data is held in the resulting object
 #' library(MatrixExtra)
-#' X <- empty.sparse.matrix(nrow=2^20, ncol=2^25, format="T")
+#' X <- emptySparse(nrow=2^20, ncol=2^25, format="T")
 #' @export
-empty.sparse.matrix <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
+emptySparse <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
     if (NROW(format) != 1L || !(format %in% c("R", "C", "T")))
         stop("'format' must be one of 'R', 'C', 'T'.")
     if (NROW(dtype) != 1L || !(dtype %in% c("d", "l", "n")))
@@ -577,4 +577,92 @@ empty.sparse.matrix <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
         out@p <- integer(ncol+1L)
     }
     return(out)
+}
+
+#' @title Filter values of a sparse matrix or vector
+#' @description Filters the non-zero values of a sparse matrix or sparse
+#' vector object according to a user-provided function (e.g. to take only
+#' values above a certain threshold, or only greater than the mean), returning
+#' a sparse object with the same dimension as the input, but having only
+#' the non-zero values that meet the desired criteria.
+#' @param X A sparse matrix or sparse vector.
+#' @param fn A function taking as first argument a vector of non-zero values
+#' (which will be extracted from `X`) and returning a logical/boolean vector of
+#' the same length as the first argument, returning `TRUE` for values that are
+#' to be kept and `FALSE` for values that are to be discarded.
+#' 
+#' If any of the returned values is `NA`, will put a `NA` value at that position.
+#' @param ... Extra arguments to pass to `fn`.
+#' @returns A sparse matrix or sparse vector of the same class as `X` and with the
+#' same dimensions, but having only the non-zero values that meet the condition
+#' specificed by `fn`.
+#' @examples 
+#' library(Matrix)
+#' library(MatrixExtra)
+#' 
+#' ### Random sparse matrix
+#' set.seed(1)
+#' X <- rsparsematrix(nrow=20, ncol=10, density=0.3)
+#' 
+#' ### Take only values above 0.5
+#' X_filtered <- filterSparse(X, function(x) x >= 0.5)
+#' 
+#' ### Only elements with absolute values less than 0.3
+#' X_filtered <- filterSparse(X, function(x) abs(x) <= 0.3)
+#' 
+#' ### Only values above the mean (among non-zeros)
+#' X_filtered <- filterSparse(X, function(x) x > mean(x))
+#' @export
+filterSparse <- function(X, fn, ...) {
+    if (!inherits(X, c("sparseMatrix", "sparseVector")))
+        stop("Method is only applicable to sparse matrices and vectors.")
+    if (!inherits(fn, "function"))
+        stop("'fn' must be a function.")
+    if (!.hasSlot(X, "x"))
+        stop("Method is only applicable for sparse objects with values (slot 'x').")
+    
+    attr_X <- attributes(X)
+    if (inherits(X, "sparseVector")) {
+        
+        meets_cond <- fn(attr_X$x, ...)
+        if (!inherits(meets_cond, "logical"))
+            meets_cond <- as.logical(meets_cond)
+        attr_X$x <- attr_X$x[meets_cond]
+        attr_X$i <- attr_X$i[meets_cond | is.na(meets_cond)]
+
+    } else if (inherits(X, "TsparseMatrix")) {
+        
+        meets_cond <- fn(attr_X$x, ...)
+        if (!inherits(meets_cond, "logical"))
+            meets_cond <- as.logical(meets_cond)
+        attr_X$x <- attr_X$x[meets_cond]
+        meets_cond <- meets_cond | is.na(meets_cond)
+        attr_X$i <- attr_X$i[meets_cond]
+        attr_X$j <- attr_X$j[meets_cond]
+
+    } else if (inherits(X, "sparseMatrix")) {
+        
+        is_csr <- inherits(X, "RsparseMatrix")
+        is_csc <- inherits(X, "CsparseMatrix")
+        if (!is_csr && !is_csc)
+            stop("Invalid matrix type.")
+        meets_cond <- fn(attr_X$x, ...)
+        if (!inherits(meets_cond, "logical"))
+            meets_cond <- as.logical(meets_cond)
+        attr_X$x <- attr_X$x[meets_cond]
+        meets_cond <- meets_cond | is.na(meets_cond)
+        if (is_csr)
+            attr_X$j <- attr_X$j[meets_cond]
+        else
+            attr_X$i <- attr_X$i[meets_cond]
+        attr_X$p <- rebuild_indptr_after_filter(attr_X$p, meets_cond)
+        
+    } else {
+        
+        stop("Unexpected error.")
+        
+    }
+    
+    attributes(X) <- attr_X
+    return(X)
 }

@@ -341,6 +341,10 @@ check_valid_svec <- function(ii, nrows) {
     .Call(`_MatrixExtra_check_valid_svec`, ii, nrows)
 }
 
+rebuild_indptr_after_filter <- function(indptr, filter) {
+    .Call(`_MatrixExtra_rebuild_indptr_after_filter`, indptr, filter)
+}
+
 multiply_csr_elemwise <- function(indptr1, indptr2, indices1, indices2, values1, values2) {
     .Call(`_MatrixExtra_multiply_csr_elemwise`, indptr1, indptr2, indices1, indices2, values1, values2)
 }
