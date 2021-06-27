@@ -18,6 +18,11 @@ Controls some of the behaviors when calling methods from
 `MatrixExtra` which differ very significantly from the same methods in
 `Matrix` and which have the potential for breaking existing code in other packages.
 
+For example, the function `Matrix::sparse.model.matrix` might throw errors
+if it is called after loading `library(MatrixExtra)` with the default options,
+and the default transpose behavior needs to be modified from `MatrixExtra` to
+make it work again.
+
 The `Matrix` package has some particular choice of behaviors which can
 inadvertently make operations very inefficient. Particularly:\itemize{
 \item When transposing a sparse matrix in CSR or CSC formats, `Matrix` will
@@ -36,6 +41,10 @@ This in particular could break code in existing packages, particularly in
 The old `Matrix` behavior can be brought back through
 `options("MatrixExtra.fast_transpose" = FALSE)`.
 
+For example, the function `Matrix::sparse.model.matrix` is unlikely to work
+under the default fast transpose option, and getting it to work again will
+require setting `options("MatrixExtra.fast_transpose" = FALSE)` or calling
+`MatrixExtra::restore_old_matrix_behavior()`.
 \item When selecting slices of a sparse matrix with only one row or only one
 column, `Matrix` will by default simplify them to a \bold{dense} vector, which goes
 against the purpose of using sparse structures. With this being the default,

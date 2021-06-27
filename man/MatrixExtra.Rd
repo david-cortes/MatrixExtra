@@ -32,6 +32,8 @@ elementwise multiplication (`*`), among others (see \link[MatrixExtra]{operators
 }
 
 \bold{Important:} `MatrixExtra` modifies some important behaviors from the
-`Matrix` library. See \link{MatrixExtra-options} for details.
+`Matrix` library, which might cause some functions from `Matrix` or other
+packages to stop working under the default options of `MatrixExtra`.
+See \link{MatrixExtra-options} for details.
 }
 \keyword{package}

@@ -31,7 +31,9 @@
 #' }
 #' 
 #' \bold{Important:} `MatrixExtra` modifies some important behaviors from the
-#' `Matrix` library. See \link{MatrixExtra-options} for details.
+#' `Matrix` library, which might cause some functions from `Matrix` or other
+#' packages to stop working under the default options of `MatrixExtra`.
+#' See \link{MatrixExtra-options} for details.
 #' @docType package
 #' @name MatrixExtra
 #' @keywords package

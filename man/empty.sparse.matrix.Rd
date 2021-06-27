@@ -4,7 +4,7 @@
 \alias{empty.sparse.matrix}
 \title{Create Empty Sparse Matrix}
 \usage{
-empty.sparse.matrix(nrow, ncol, format = "R", dtype = "d")
+empty.sparse.matrix(nrow = 0L, ncol = 0L, format = "R", dtype = "d")
 }
 \arguments{
 \item{nrow}{Desired number of rows for the matrix.}
