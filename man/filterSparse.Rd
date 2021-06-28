@@ -14,6 +14,8 @@ filterSparse(X, fn, ...)
 the same length as the first argument, returning `TRUE` for values that are
 to be kept and `FALSE` for values that are to be discarded.
 
+Alternatively, can pass a logical/boolean vector of the same length as `X@x`.
+
 If any of the returned values is `NA`, will put a `NA` value at that position.}
 
 \item{...}{Extra arguments to pass to `fn`.}

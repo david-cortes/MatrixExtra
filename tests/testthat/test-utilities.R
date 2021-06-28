@@ -120,4 +120,17 @@ test_that("Filter matrices", {
     
     res <- filterSparse(svec_num, function(x) x > 0.1)
     expect_s4_class(res, "dsparseVector")
+    
+    expect_equal(
+        filterSparse(Xcoo, function(x) x > 0.1),
+        filterSparse(Xcoo, Xcoo@x > 0.1)
+    )
+    expect_equal(
+        filterSparse(Xcsr, function(x) x > 0.1),
+        filterSparse(Xcsr, Xcsr@x > 0.1)
+    )
+    expect_equal(
+        filterSparse(Xcsc, function(x) x > 0.1),
+        filterSparse(Xcsc, Xcsc@x > 0.1)
+    )
 })

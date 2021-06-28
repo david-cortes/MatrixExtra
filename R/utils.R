@@ -591,6 +591,8 @@ emptySparse <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
 #' the same length as the first argument, returning `TRUE` for values that are
 #' to be kept and `FALSE` for values that are to be discarded.
 #' 
+#' Alternatively, can pass a logical/boolean vector of the same length as `X@x`.
+#' 
 #' If any of the returned values is `NA`, will put a `NA` value at that position.
 #' @param ... Extra arguments to pass to `fn`.
 #' @returns A sparse matrix or sparse vector of the same class as `X` and with the
@@ -616,6 +618,14 @@ emptySparse <- function(nrow=0L, ncol=0L, format="R", dtype="d") {
 filterSparse <- function(X, fn, ...) {
     if (!inherits(X, c("sparseMatrix", "sparseVector")))
         stop("Method is only applicable to sparse matrices and vectors.")
+    v_orig <- NULL
+    if (inherits(fn, "logical")) {
+        if (length(fn) != length(X@x))
+            stop(sprintf("'fn' has incorrect length (expected %d, got %d)",
+                         length(X@x), length(fn)))
+        v_orig <- fn
+        fn <- function(x, ...) v_orig
+    }
     if (!inherits(fn, "function"))
         stop("'fn' must be a function.")
     if (!.hasSlot(X, "x"))
@@ -649,6 +659,9 @@ filterSparse <- function(X, fn, ...) {
         meets_cond <- fn(attr_X$x, ...)
         if (!inherits(meets_cond, "logical"))
             meets_cond <- as.logical(meets_cond)
+        if (length(meets_cond) != length(attr_X$x))
+            stop(sprintf("'fn' returned incorrect number of entries (expected %d, got %d)",
+                         length(attr_X$x), length(meets_cond)))
         attr_X$x <- attr_X$x[meets_cond]
         meets_cond <- meets_cond | is.na(meets_cond)
         if (is_csr)
