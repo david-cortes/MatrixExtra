@@ -679,3 +679,83 @@ filterSparse <- function(X, fn, ...) {
     attributes(X) <- attr_X
     return(X)
 }
+
+#' @title Map values of a sparse matrix/vector
+#' @description Applies a function to the non-zero values of a sparse
+#' object, returning the transformed input with the new non-zero values.
+#' @param X A sparse matrix or sparse vector, whose non-zero values will
+#' be transformed/mapped according to `fn`.
+#' @param fn A function taking as first argument a vector of non-zero values
+#' (which will be extracted from `X`) and returning another vector of
+#' the same length as the first argument, which will become the non-zero values
+#' of the output.
+#' 
+#' Alternatively, can pass a vector of the same length as `X@x`.
+#' 
+#' If the results are of a different type than the input (e.g. input
+#' is `lsparseMatrix`, but `fn` returns a numeric vector), the type will
+#' be automatically converted to match the type returned by `fn`.
+#' @param ... Extra arguments to pass to `fn`.
+#' @returns A sparse object with the same storage order (T/C/R), dimension,
+#' and number of non-zero entries as `X`, but with its non-zero values substituted
+#' by the output from `fn`, and the exact class determined by the type returned
+#' by `fn`.
+#' @examples 
+#' library(Matrix)
+#' library(MatrixExtra)
+#' 
+#' set.seed(1)
+#' X <- rsparsematrix(10, 5, .5)
+#' mapSparse(X, function(x) abs(x)+1)
+#' @export
+mapSparse <- function(X, fn, ...) {
+    if (!inherits(X, c("sparseMatrix", "sparseVector")))
+        stop("Method is only applicable to sparse matrices and vectors.")
+    if (!.hasSlot(X, "x"))
+        stop("Method is only applicable for sparse objects with values (slot 'x').")
+    
+    attr_X <- attributes(X)
+    
+    v_orig <- NULL
+    if (inherits(fn, c("numeric", "integer", "logical"))) {
+        if (length(fn) != length(attr_X$x))
+            stop(sprintf("'fn' has incorrect length (expected %d, got %d)",
+                         length(attr_X$x), length(fn)))
+        fn <- function(x, ...) v_orig
+    }
+    if (!inherits(fn, "function"))
+        stop("'fn' must be a function.")
+    
+    mapped_x <- fn(attr_X$x, ...)
+    if (length(mapped_x) != length(attr_X$x))
+        stop(sprintf("'fn' returned incorrect number of entries (expected %d, got %d)",
+                     length(attr_X$x), length(mapped_x)))
+    
+    if (typeof(mapped_x) == typeof(attr_X$x)) {
+        attr_X$x <- mapped_x
+    } else {
+        if (inherits(mapped_x, "integer")) {
+            if (inherits(X, "isparseVector")) {
+                attr_X$x <- mapped_x
+            } else if (inherits(X, "sparseVector")) {
+                attr_X$class <- gsub("^\\wsparse", "isparse", attr_X$class, perl=TRUE)
+                attr_X$x <- mapped_x
+            } else {
+                mapped_x <- as.numeric(mapped_x)
+                attr_X$x <- mapped_x
+                attr_X$class <- gsub("^\\wsparse", "dsparse", attr_X$class, perl=TRUE)
+            }
+        } else if (inherites(mapped_x, "logical")) {
+            mapped_x <- as.logical(mapped_x)
+            attr_X$x <- mapped_x
+            attr_X$class <- gsub("^\\wsparse", "lsparse", attr_X$class, perl=TRUE)
+        } else {
+            mapped_x <- as.numeric(mapped_x)
+            attr_X$x <- mapped_x
+            attr_X$class <- gsub("^\\wsparse", "dsparse", attr_X$class, perl=TRUE)
+        }
+    }
+    
+    attributes(X) <- attr_X
+    return(X)
+}
