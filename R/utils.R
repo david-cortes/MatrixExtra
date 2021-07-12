@@ -745,7 +745,7 @@ mapSparse <- function(X, fn, ...) {
                 attr_X$x <- mapped_x
                 attr_X$class <- gsub("^\\wsparse", "dsparse", attr_X$class, perl=TRUE)
             }
-        } else if (inherites(mapped_x, "logical")) {
+        } else if (inherits(mapped_x, "logical")) {
             mapped_x <- as.logical(mapped_x)
             attr_X$x <- mapped_x
             attr_X$class <- gsub("^\\wsparse", "lsparse", attr_X$class, perl=TRUE)
