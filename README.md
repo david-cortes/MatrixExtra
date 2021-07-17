@@ -2,7 +2,7 @@
 
 `MatrixExtra` is an R package which extends the sparse matrix and sparse vector types in the [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html) package, particularly the [CSR](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)) or `RsparseMatrix` formats (row-major), by providing methods that work natively and efficiently on them without converting them to another format along the way, such as slicing (selecting rows/columns) or concatenating by rows/columns, along with replacing some `Matrix` methods with more efficient versions, such as multi-threaded `<sparse, dense>` matrix multiplications, much faster slicing for all the sparse types, and faster elementwise addition/subtraction/multiplication, among others.
 
-This package is based on code originally written for the [rsparse](https://github.com/rexyai/rsparse) package by Dmitriy Selivanov.
+This package is based on code originally written for the [rsparse](https://github.com/rexyai/rsparse) package by Dmitriy Selivanov, and includes the MIT-licensed [robin-map](https://github.com/Tessil/robin-map) library within its source code.
 
 # What's missing from Matrix
 

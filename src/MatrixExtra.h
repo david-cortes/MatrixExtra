@@ -7,8 +7,6 @@
 #include <type_traits>
 #include <numeric>
 #include <algorithm>
-#include <unordered_set>
-#include <unordered_map>
 #include <chrono>
 #ifdef _OPENMP
 #   include <omp.h>
@@ -34,6 +32,20 @@ extern "C" {
     #include <Rinternals.h>
     #include <R_ext/BLAS.h>
 }
+
+#ifdef USE_ROBINMAP
+    #include "robinmap/include/tsl/robin_growth_policy.h"
+    #include "robinmap/include/tsl/robin_hash.h"
+    #include "robinmap/include/tsl/robin_set.h"
+    #include "robinmap/include/tsl/robin_map.h"
+    #define hashed_set tsl::robin_set
+    #define hashed_map tsl::robin_map
+#else
+    #include <unordered_set>
+    #include <unordered_map>
+    #define hashed_set std::unordered_set
+    #define hashed_map std::unordered_map
+#endif
 
 
 /* misc.cpp */

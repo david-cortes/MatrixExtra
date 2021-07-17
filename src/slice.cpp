@@ -458,10 +458,10 @@ Rcpp::List copy_csr_arbitrary_template
 {
     Rcpp::IntegerVector new_indptr(rows_take.size()+1);
 
-    std::unordered_map<int, int> new_mapping;
+    hashed_map<int, int> new_mapping;
     new_mapping.reserve(cols_take.size());
     for (int col = 0; col < (int)cols_take.size(); col++) new_mapping[cols_take[col]] = col;
-    std::unordered_map<int, int> n_repeats;
+    hashed_map<int, int> n_repeats;
     n_repeats.reserve(cols_take.size());
     for (auto el : cols_take) n_repeats[el]++;
     bool has_duplicates = false;
@@ -471,7 +471,7 @@ Rcpp::List copy_csr_arbitrary_template
             break;
         }
     }
-    std::unordered_map<int, std::vector<int>> indices_rep;
+    hashed_map<int, std::vector<int>> indices_rep;
     if (has_duplicates) {
         for (int col = 0; col < (int)cols_take.size(); col++) {
             if (n_repeats[cols_take[col]] > 1) {
@@ -505,7 +505,7 @@ Rcpp::List copy_csr_arbitrary_template
 
     int size_this = 0;
     int row = 0;
-    std::unordered_map<int, int>::iterator match;
+    hashed_map<int, int>::iterator match;
 
     for (int row_ix = 0; row_ix < (int)rows_take.size(); row_ix++)
     {

@@ -1607,7 +1607,7 @@ Rcpp::List set_arbitrary_cols_to_zero
 )
 {
     const int nrows = indptr.size() - 1;
-    std::unordered_set<int> cols_set_(cols_set.begin(), cols_set.end());
+    hashed_set<int> cols_set_(cols_set.begin(), cols_set.end());
     const int col_min = *std::min_element(cols_set.begin(), cols_set.end());
     const int col_max = *std::max_element(cols_set.begin(), cols_set.end());
 
@@ -1673,7 +1673,7 @@ Rcpp::List set_arbitrary_cols_to_const
 {
     const int nrows = indptr.size() - 1;
     std::sort(cols_set.begin(), cols_set.end());
-    std::unordered_set<int> cols_set_(cols_set.begin(), cols_set.end());
+    hashed_set<int> cols_set_(cols_set.begin(), cols_set.end());
     const int col_min = *std::min_element(cols_set.begin(), cols_set.end());
     const int col_max = *std::max_element(cols_set.begin(), cols_set.end());
 

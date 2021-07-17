@@ -53,11 +53,20 @@
 #' on a default install of R for Windows (see
 #' \href{https://github.com/david-cortes/R-openblas-in-windows}{this link} for
 #' a tutorial about getting OpenBLAS in R for Windows).
-#' For the `float32` types, it doesn't use BLAS,
-#' but will rather ship with some BLAS replacements, which might run faster when compiling
-#' this library from source (`install.packages("MatrixExtra", type="source")`) rather
-#' than downloading a pre-compiled binary from CRAN (Windows and macOS), due to
-#' potentially using more advanced SIMD instructions from the CPU.
+#' 
+#' Doing computations in float32 precision depends on the package
+#' \href{https://cran.r-project.org/package=float}{float}, and as such comes
+#' with some caveats:\itemize{
+#' \item On Windows, if installing `float` from CRAN, it will use very unoptimized
+#' routines which will likely result in a slowdown compared to using regular
+#' double (numeric) type. Getting it to use an optimized BLAS library is not as
+#' simple as substituting the Rblas DLL - see the
+#' \href{https://github.com/wrathematics/float}{package's README} for details.
+#' \item On macOS, it will use static linking for `float`, thus if changing the BLAS
+#' library used by R, it will not change the float32 functions, and getting good
+#' performance out of it might require compiling it from source with `-march=native`
+#' flag.
+#' }
 #'
 #' When multiplying a sparse matrix by a sparse vector, their indices
 #' will be sorted in-place (see \link{sort_sparse_indices}).

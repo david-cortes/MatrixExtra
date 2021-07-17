@@ -77,8 +77,8 @@ void process_i_arbitrary
     const int first_i, const int last_i,
     const int nrows,
     int &min_i, int &max_i,
-    std::unordered_map<int, int> &i_mapping,
-    std::unordered_map<int, std::vector<int>> &i_indices_rep,
+    hashed_map<int, int> &i_mapping,
+    hashed_map<int, std::vector<int>> &i_indices_rep,
     bool &i_has_duplicates
 )
 {
@@ -298,8 +298,8 @@ Rcpp::List slice_coo_arbitrary_template
 
 
     int min_i, max_i, min_j, max_j;
-    std::unordered_map<int, int> i_mapping, j_mapping;
-    std::unordered_map<int, std::vector<int>> i_indices_rep, j_indices_rep;
+    hashed_map<int, int> i_mapping, j_mapping;
+    hashed_map<int, std::vector<int>> i_indices_rep, j_indices_rep;
     bool i_has_duplicates = false, j_has_duplicates = false;
 
     process_i_arbitrary(
@@ -349,8 +349,8 @@ Rcpp::List slice_coo_arbitrary_template
         xx_out.reserve(size_reserve);
     }
 
-    std::unordered_map<int, int>::iterator res_i, res_j;
-    std::unordered_map<int, std::vector<int>>::iterator res_in, res_jn;
+    hashed_map<int, int>::iterator res_i, res_j;
+    hashed_map<int, std::vector<int>>::iterator res_in, res_jn;
     bool post_process = false;
 
     if ((all_i || i_is_seq || i_is_rev_seq) && !j_has_duplicates) {
@@ -771,8 +771,8 @@ Rcpp::List inject_NAs_inplace_coo_template
     std::unique_ptr<int[]> jj_out(new int[(size_large)nnz + size_na]);
     std::unique_ptr<InputDType[]> xx_out(new InputDType[(size_large)nnz + size_na]);
 
-    std::unordered_set<int> rows_na(rows_na_.begin(), rows_na_.end());
-    std::unordered_set<int> cols_na(cols_na_.begin(), cols_na_.end());
+    hashed_set<int> rows_na(rows_na_.begin(), rows_na_.end());
+    hashed_set<int> cols_na(cols_na_.begin(), cols_na_.end());
 
     const int min_row = rows_na_.size()? rows_na_[0] : -1;;
     const int max_row = rows_na_.size()? rows_na_[rows_na_.size()-1] : (nrows+1);

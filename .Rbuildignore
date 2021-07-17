@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-LICENSE
+^LICENSE$
 old/*
 .Rhistory
 vignettes_/*
@@ -8,3 +8,4 @@ real-sim
 vignettes/real-sim
 ^README\.md$
 ^src/Makevars$
+^src/robinmap/[^il][^ni][^c].*$
