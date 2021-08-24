@@ -1,0 +1,3 @@
+LIBRARY MatrixExtra.dll
+EXPORTS
+ R_init_MatrixExtra
