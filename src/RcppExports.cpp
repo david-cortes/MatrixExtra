@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // set_single_row_to_zero
 Rcpp::List set_single_row_to_zero(Rcpp::IntegerVector indptr, Rcpp::IntegerVector indices, Rcpp::NumericVector values, const int row_set);
 RcppExport SEXP _MatrixExtra_set_single_row_to_zero(SEXP indptrSEXP, SEXP indicesSEXP, SEXP valuesSEXP, SEXP row_setSEXP) {

@@ -3,10 +3,9 @@ HAS_LD=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(unname(as.integer(capabilitie
 FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "float:::ldflags(static=Sys.info()[['sysname']] == 'Darwin')"`
 
 AC_LANG(C++)
-AC_TRY_COMPILE(
-    [],
-    [double *__restrict x;],
-    [SUPPORTS_RESTRICT="-DSUPPORTS_RESTRICT=1"],
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]], [[double *__restrict x;]])]
+    [SUPPORTS_RESTRICT="-DSUPPORTS_RESTRICT=1"]
     [SUPPORTS_RESTRICT=""]
 )
 
