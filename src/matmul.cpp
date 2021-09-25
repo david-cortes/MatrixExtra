@@ -6,44 +6,44 @@
 #endif
 
 constexpr const int one = 1;
-extern "C" void saxpy_(const int *, const float*, const float *, const int*, float*, const int*);
-extern "C" void scopy_(const int *, const float*, const int *, float *, const int *);
+extern "C" void F77_CALL(saxpy)(const int *, const float*, const float *, const int*, float*, const int*);
+extern "C" void F77_CALL(scopy)(const int *, const float*, const int *, float *, const int *);
 
 static inline void axpy(const int *n, const double* alpha, const double *x, const int* incx, double* y, const int* incy)
 {
-    daxpy_(n, alpha, x, incx, y, incy);
+    F77_CALL(daxpy)(n, alpha, x, incx, y, incy);
 }
 
 static inline void axpy(const int *n, const double alpha, const double *x, const int* incx, double* y, const int* incy)
 {
-    daxpy_(n, &alpha, x, incx, y, incy);
+    F77_CALL(daxpy)(n, &alpha, x, incx, y, incy);
 }
 
 static inline void axpy(const int *n, const double* alpha, const float *x, const int* incx, float* y, const int* incy)
 {
     const float alpha_ = *alpha;
-    saxpy_(n, &alpha_, x, incx, y, incy);
+    F77_CALL(saxpy)(n, &alpha_, x, incx, y, incy);
 }
 
 static inline void axpy(const int *n, const float alpha, const float *x, const int* incx, float* y, const int* incy)
 {
-    saxpy_(n, &alpha, x, incx, y, incy);
+    F77_CALL(saxpy)(n, &alpha, x, incx, y, incy);
 }
 
 static inline void axpy(const int *n, const double alpha, const float *x, const int* incx, float* y, const int* incy)
 {
     const float alpha_ = alpha;
-    saxpy_(n, &alpha_, x, incx, y, incy);
+    F77_CALL(saxpy)(n, &alpha_, x, incx, y, incy);
 }
 
 static inline void tcopy(const int *n, const double* x, const int *incx, double *y, const int *incy)
 {
-    dcopy_(n, x, incx, y, incy);
+    F77_CALL(dcopy)(n, x, incx, y, incy);
 }
 
 static inline void tcopy(const int *n, const float* x, const int *incx, float *y, const int *incy)
 {
-    scopy_(n, x, incx, y, incy);
+    F77_CALL(scopy)(n, x, incx, y, incy);
 }
 
 /* Mental map to figure out what should be called where:
