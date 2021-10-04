@@ -109,7 +109,8 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
                 X_attr$x <- numeric()
                 X_attr$j <- integer()
                 X_attr$p <- integer(X_attr$Dim[1L]+1L)
-                return(X_attr)
+                attributes(x) <- X_attr
+                return(x)
             }
 
             else if (all_j) {
