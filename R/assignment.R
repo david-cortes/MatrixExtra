@@ -24,7 +24,7 @@
 NULL
 
 throw_shape_err <- function() {
-    stop("Values to assign does not match with matrix dimensions.")
+    stop("Values to assign do not match with matrix dimensions.")
 }
 
 assign_through_matrix <- function(x, i, j, value) {
@@ -48,8 +48,6 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
         value <- as.matrix(value)
     if (is.matrix(value))
         value <- as.numeric(value)
-
-    tot_x <- nrow(x) * ncol(x)
 
 
     if (is.null(ij_properties))
@@ -78,15 +76,33 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
             return(assign_through_matrix(x, i, j, value))
     }
 
+    if (
+        inherits(value, c("sparseVector", "sparseMatrix")) &&
+        ((.hasSlot(value, "x") && length(value@x) == 0) ||
+         (!.hasSlot(value, "x") && .hasSlot(value, "i") && length(value@i) == 0) ||
+         (!.hasSlot(value, "x") && !.hasSlot(value, "i") && length(value@j) == 0))
+    ) {
+        if (inherits(value, "sparseMatrix")) {
+            if (!check_shapes_are_assignable_2d(length(i), length(j), nrow(value), ncol(value)))
+                throw_shape_err()
+        } else if (inherits(value, "sparseVector")) {
+            if (!check_shapes_are_assignable_1d(length(i), length(j), value))
+                throw_shape_err()
+        } else {
+            throw_internal_error()
+        }
+        value <- 0.
+    }
+
     if (inherits(value, c("numeric", "integer", "logical")) &&
         length(value) > 1 && length(i) > 1 && length(j) > 1 &&
-        length(value) == length(i) * length(j)
+        (length(value) / length(i)) == length(j)
     ) {
         value <- matrix(as.numeric(value), nrow=length(i), ncol=length(j))
     }
     if (inherits(value, "sparseVector") &&
         length(value) > 1 && length(i) > 1 && length(j) > 1 &&
-        length(value) == (length(i) * length(j))
+        (length(value) / length(i)) == length(j)
     ) {
         value <- Matrix(value, nrow=length(i), ncol=length(j), byrow=FALSE)
     }
@@ -235,7 +251,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
         value <- as.numeric(value)
 
         if (all_i && all_j) {
-            if ((length(value) > tot_x) || (tot_x %% length(value)) != 0)
+            if (!check_shapes_are_assignable_1d(nrow(x), ncol(x), value))
                 throw_shape_err()
             warning("Warning: attempting to set all coordinates of a sparse matrix.")
             res <- matrix(value, nrow=nrow(x), ncol=ncol(x))
@@ -275,7 +291,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
         }
 
         else {
-            if (length(i) * length(j) != length(value))
+            if (!check_shapes_are_assignable_1d(length(i), length(j), value))
                 throw_shape_err()
 
             return(assign_through_matrix(x, i, j, value))
@@ -290,7 +306,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
             return(assign_csr_internal(x, i, j, as.numeric(value), ij_properties))
 
         if (all_i && all_j) {
-            if ((length(value) > tot_x) || (tot_x %% length(value)) != 0)
+            if (!check_shapes_are_assignable_1d(nrow(x), ncol(x), value))
                 throw_shape_err()
             return(assign_through_matrix(x, i, j, value))
         }
@@ -336,12 +352,11 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
 
     else if (inherits(value, "sparseMatrix"))
     {
-        tot_val <- nrow(value) * ncol(value)
         if (length(value@x) == 0L)
             return(assign_csr_internal(x, i, j, 0, ij_properties))
         
         if (all_i && all_j) {
-            if (tot_val > tot_x || (tot_x %% tot_val) != 0)
+            if (!check_shapes_are_assignable_2d(nrow(x), ncol(x), nrow(value), ncol(value)))
                 throw_shape_err()
             if (nrow(x) == nrow(value) && ncol(x) == ncol(value))
                 return(as.csr.matrix(value))
@@ -351,7 +366,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
 
         else if (all_j) {
             if (length(i) == 1L) {
-                if (tot_val > ncol(x) || (ncol(x) %% tot_val) != 0)
+                if (!check_shapes_are_assignable_1d_v2(ncol(x), nrow(value), ncol(value)))
                     throw_shape_err()
                 if (nrow(value) != 1L && ncol(value) != 1L) {
                     value <- as.sparse.vector(value)
@@ -426,7 +441,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
 
         else if (all_i) {
             if (length(j) == 1L) {
-                if (tot_val > nrow(x) || (nrow(x) %% tot_val) != 0)
+                if (!check_shapes_are_assignable_1d_v2(nrow(x), nrow(value), ncol(value)))
                     throw_shape_err()
                 if (nrow(value) != 1L && ncol(value) != 1L) {
                     value <- as.sparse.vector(value)

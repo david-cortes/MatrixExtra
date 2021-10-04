@@ -105,6 +105,18 @@ set_arbitrary_rows_to_smat <- function(indptr, indices, values, rows_set, indptr
     .Call(`_MatrixExtra_set_arbitrary_rows_to_smat`, indptr, indices, values, rows_set, indptr_other, indices_other, values_other)
 }
 
+check_shapes_are_assignable_2d <- function(x1, x2, y1, y2) {
+    .Call(`_MatrixExtra_check_shapes_are_assignable_2d`, x1, x2, y1, y2)
+}
+
+check_shapes_are_assignable_1d <- function(x1, x2, Rvec) {
+    .Call(`_MatrixExtra_check_shapes_are_assignable_1d`, x1, x2, Rvec)
+}
+
+check_shapes_are_assignable_1d_v2 <- function(xlen, y1, y2) {
+    .Call(`_MatrixExtra_check_shapes_are_assignable_1d_v2`, xlen, y1, y2)
+}
+
 cbind_csr_numeric <- function(X_csr_indptr, X_csr_indices, X_csr_values, Y_csr_indptr, Y_csr_indices_plus_ncol, Y_csr_values) {
     .Call(`_MatrixExtra_cbind_csr_numeric`, X_csr_indptr, X_csr_indices, X_csr_values, Y_csr_indptr, Y_csr_indices_plus_ncol, Y_csr_values)
 }

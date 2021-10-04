@@ -31,7 +31,7 @@ Suggests: testthat, data.table, knitr, rmarkdown
 VignetteBuilder: knitr
 URL: https://github.com/david-cortes/MatrixExtra
 BugReports: https://github.com/david-cortes/MatrixExtra/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 NeedsCompilation: yes
 Biarch: TRUE
 StagedInstall: TRUE

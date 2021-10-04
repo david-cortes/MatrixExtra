@@ -2600,3 +2600,48 @@ Rcpp::List set_arbitrary_rows_to_smat
 #ifdef __clang__
 #   pragma clang diagnostic pop
 #endif
+
+// [[Rcpp::export(rng = false)]]
+bool check_shapes_are_assignable_2d(double x1, double x2, double y1, double y2)
+{
+    /* This is used to check if a matrix can be used as RHS in an assignment operator,
+       with dim(indices(LHS))=(x1,x2), dim(RHS)=y1,y2
+       Note that since both the LHS and RHS need to be R matrices, their dimensions
+       are constrained to INT_MAX, thus this will never overflow. */
+    uint64_t x1_ = x1;
+    uint64_t x2_ = x2;
+    uint64_t y1_ = y1;
+    uint64_t y2_ = y2;
+
+    return !((y1_*y2_ > x1_*x2_) || ((x1_*x2_) % (y1_*y2_)) != 0);
+}
+
+uint64_t get_S4_lenght(Rcpp::S4 obj)
+{
+    return Rcpp::as<uint64_t>(obj.slot("length"));
+}
+
+// [[Rcpp::export(rng = false)]]
+bool check_shapes_are_assignable_1d(double x1, double x2, SEXP Rvec)
+{
+    uint64_t x1_ = x1;
+    uint64_t x2_ = x2;
+    uint64_t vlen_;
+
+    if (TYPEOF(Rvec) == S4SXP)
+        vlen_ = get_S4_lenght(Rvec);
+    else
+        vlen_ = Rf_xlength(Rvec);
+
+    return !((vlen_ > x1_*x2_) || ((x1_*x2_) % vlen_) != 0);
+}
+
+// [[Rcpp::export(rng = false)]]
+bool check_shapes_are_assignable_1d_v2(double xlen, double y1, double y2)
+{
+    uint64_t xlen_ = xlen;
+    uint64_t y1_ = y1;
+    uint64_t y2_ = y2;
+
+    return !((y1_*y2_ > xlen_) || (xlen_ % (y1_*y2_)) != 0);
+}

@@ -848,3 +848,97 @@ test_that("Set random rows to sparse matrix", {
     run_tests(X5, X5d)
     run_tests(X6, X6d)
 })
+
+test_that("Set full sequences to zero", {
+    run_tests <- function(X, Xd) {
+        v1 <- 0
+        v2 <- numeric(2)
+        v3 <- as.sparse.vector(emptySparse(nrow=1, ncol=2))
+        v4 <- emptySparse(nrow=1, ncol=3)
+        
+        v3d <- as.numeric(v3)
+        v4d <- as.matrix(v4)
+        
+        X_orig <- X
+        Xd_orig <- Xd
+        
+        suppressWarnings(X[1:nrow(X), 1:ncol(X)] <- v1)
+        Xd[1:nrow(Xd), 1:ncol(Xd)] <- v1
+        expect_equal(unname(as.matrix(X)), unname(Xd))
+        X <- X_orig
+        Xd <- Xd_orig
+        
+        suppressWarnings(X[rev(1:nrow(X)), rev(1:ncol(X))] <- v1)
+        Xd[rev(1:nrow(Xd)), rev(1:ncol(Xd))] <- v1
+        expect_equal(unname(as.matrix(X)), unname(Xd))
+        X <- X_orig
+        Xd <- Xd_orig
+        
+        if ((nrow(X) %% 2) == 0 || (ncol(X) %% 2) == 0) {
+            suppressWarnings(X[1:nrow(X), 1:ncol(X)] <- v2)
+            Xd[1:nrow(Xd), 1:ncol(Xd)] <- v2
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+            
+            suppressWarnings(X[rev(1:nrow(X)), rev(1:ncol(X))] <- v2)
+            Xd[rev(1:nrow(Xd)), rev(1:ncol(Xd))] <- v2
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+            
+            suppressWarnings(X[1:nrow(X), 1:ncol(X)] <- v3)
+            Xd[1:nrow(Xd), 1:ncol(Xd)] <- v3d
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+            
+            suppressWarnings(X[rev(1:nrow(X)), rev(1:ncol(X))] <- v3)
+            Xd[rev(1:nrow(Xd)), rev(1:ncol(Xd))] <- v3d
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+        }
+        
+        if (ncol(X) > 6) {
+            X[, 1:6] <- v2
+            Xd[, 1:6] <- v2
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+            
+            X[, 1:6] <- v3
+            Xd[, 1:6] <- v3d
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+            
+            X[, 1:6] <- v4
+            Xd[, 1:6] <- v4d
+            expect_equal(unname(as.matrix(X)), unname(Xd))
+            X <- X_orig
+            Xd <- Xd_orig
+        }
+        
+        expect_error(X[2, 1:ncol(X)] <- emptySparse(nrow=3, ncol=ncol(X)))
+        
+        X[2, 1:ncol(X)] <- emptySparse(nrow=1, ncol=ncol(X))
+        Xd[2, 1:ncol(Xd)] <- as.matrix(emptySparse(nrow=1, ncol=ncol(Xd)))
+        expect_equal(unname(as.matrix(X)), unname(Xd))
+        X <- X_orig
+        Xd <- Xd_orig
+        
+        X[1:3, 1:ncol(X)] <- emptySparse(nrow=3, ncol=ncol(X))
+        Xd[1:3, 1:ncol(Xd)] <- as.matrix(emptySparse(nrow=3, ncol=ncol(Xd)))
+        expect_equal(unname(as.matrix(X)), unname(Xd))
+        X <- X_orig
+        Xd <- Xd_orig
+    }
+    
+    run_tests(X1, X1d)
+    run_tests(X2, X2d)
+    run_tests(X3, X3d)
+    run_tests(X4, X4d)
+    run_tests(X5, X5d)
+    run_tests(X6, X6d)
+})

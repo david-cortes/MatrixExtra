@@ -404,6 +404,43 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// check_shapes_are_assignable_2d
+bool check_shapes_are_assignable_2d(double x1, double x2, double y1, double y2);
+RcppExport SEXP _MatrixExtra_check_shapes_are_assignable_2d(SEXP x1SEXP, SEXP x2SEXP, SEXP y1SEXP, SEXP y2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
+    Rcpp::traits::input_parameter< double >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< double >::type y1(y1SEXP);
+    Rcpp::traits::input_parameter< double >::type y2(y2SEXP);
+    rcpp_result_gen = Rcpp::wrap(check_shapes_are_assignable_2d(x1, x2, y1, y2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_shapes_are_assignable_1d
+bool check_shapes_are_assignable_1d(double x1, double x2, SEXP Rvec);
+RcppExport SEXP _MatrixExtra_check_shapes_are_assignable_1d(SEXP x1SEXP, SEXP x2SEXP, SEXP RvecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
+    Rcpp::traits::input_parameter< double >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< SEXP >::type Rvec(RvecSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_shapes_are_assignable_1d(x1, x2, Rvec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// check_shapes_are_assignable_1d_v2
+bool check_shapes_are_assignable_1d_v2(double xlen, double y1, double y2);
+RcppExport SEXP _MatrixExtra_check_shapes_are_assignable_1d_v2(SEXP xlenSEXP, SEXP y1SEXP, SEXP y2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< double >::type xlen(xlenSEXP);
+    Rcpp::traits::input_parameter< double >::type y1(y1SEXP);
+    Rcpp::traits::input_parameter< double >::type y2(y2SEXP);
+    rcpp_result_gen = Rcpp::wrap(check_shapes_are_assignable_1d_v2(xlen, y1, y2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cbind_csr_numeric
 Rcpp::List cbind_csr_numeric(Rcpp::IntegerVector X_csr_indptr, Rcpp::IntegerVector X_csr_indices, Rcpp::NumericVector X_csr_values, Rcpp::IntegerVector Y_csr_indptr, Rcpp::IntegerVector Y_csr_indices_plus_ncol, Rcpp::NumericVector Y_csr_values);
 RcppExport SEXP _MatrixExtra_cbind_csr_numeric(SEXP X_csr_indptrSEXP, SEXP X_csr_indicesSEXP, SEXP X_csr_valuesSEXP, SEXP Y_csr_indptrSEXP, SEXP Y_csr_indices_plus_ncolSEXP, SEXP Y_csr_valuesSEXP) {
@@ -2187,6 +2224,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_const", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_arbitrary_cols_to_const, 7},
     {"_MatrixExtra_set_rowseq_to_smat", (DL_FUNC) &_MatrixExtra_set_rowseq_to_smat, 8},
     {"_MatrixExtra_set_arbitrary_rows_to_smat", (DL_FUNC) &_MatrixExtra_set_arbitrary_rows_to_smat, 7},
+    {"_MatrixExtra_check_shapes_are_assignable_2d", (DL_FUNC) &_MatrixExtra_check_shapes_are_assignable_2d, 4},
+    {"_MatrixExtra_check_shapes_are_assignable_1d", (DL_FUNC) &_MatrixExtra_check_shapes_are_assignable_1d, 3},
+    {"_MatrixExtra_check_shapes_are_assignable_1d_v2", (DL_FUNC) &_MatrixExtra_check_shapes_are_assignable_1d_v2, 3},
     {"_MatrixExtra_cbind_csr_numeric", (DL_FUNC) &_MatrixExtra_cbind_csr_numeric, 6},
     {"_MatrixExtra_cbind_csr_logical", (DL_FUNC) &_MatrixExtra_cbind_csr_logical, 6},
     {"_MatrixExtra_cbind_csr_binary", (DL_FUNC) &_MatrixExtra_cbind_csr_binary, 4},
