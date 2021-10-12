@@ -28,6 +28,8 @@
 #' \item Faster replacements for many methods from `Matrix` for all the sparse formats
 #' (COO, CSR, CSC), such as `[` (\link[MatrixExtra]{slice}), addition (`+`),
 #' elementwise multiplication (`*`), among others (see \link[MatrixExtra]{operators}).
+#' \item Convenience functions for sparse objects, such as \link[MatrixExtra]{mapSparse},
+#' \link[MatrixExtra]{emptySparse}, and a shorter \link[MatrixExtra]{show} method for sparse objects.
 #' }
 #' 
 #' \bold{Important:} `MatrixExtra` modifies some important behaviors from the

@@ -92,6 +92,19 @@ instructions.
 
 `MatrixExtra` will by default use all the available threads in the system.
 The number of threads can be controlled through `options("MatrixExtra.nthreads" = 1L)`.
+
+\item When calling method `show` on a sparse matrix object (for example, by typing the
+corresponding variable name in an R console and pressing 'Enter', `Matrix` will
+take a glance at the object by printing the values in some or all of the rows and columns,
+typically involving a long output which, for a mid-to-large sparse matrix, will typically be
+larger than the available screen space and can make it very inconvenient to quickly inspect
+sparse objects.
+
+`MatrixExtra` will instead override this method with a quicker one that will only show
+the type, dimensions, and number of entries in a sparse object, without printing the
+values per-se as `Matrix` would do. Note that this only overrides the `show` method, while
+`print` remains the same as it was. It can be changed back to the same `show` that is
+provided by `Matrix` through `options("MatrixExtra.quick_show" = FALSE)`.
 }
 
 These behaviors will change at the moment one loads `MatrixExtra` through
@@ -130,6 +143,8 @@ Option for behavior of `NA`s in elementwise
 sparse-dense multipliction.
 \item `options("MatrixExtra.nthreads" = 1L)` :
 Number of parallel threads to use in sparse-dense matrix
+\item `options("MatrixExtra.quick_show" = FALSE)` :
+Option for behavior of `show` method for sparse objects.
 }
 }
 

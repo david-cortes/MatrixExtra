@@ -109,6 +109,7 @@ A package vignette is available [here](http://htmlpreview.github.io/?https://git
 * Convenience conversion functions between different sparse formats, and registered coercion methods between pairs which are not in `Matrix` (e.g. `matrix` -> `ngRMatrix` or `dgRMatrix` -> `lgCMatrix`).
 * Fast transposes which work by outputting in the opposite format (CSR -> CSC and CSC -> CSR).
 * Utility functions for sorting sparse indices and removing zero-valued entries.
+* Convenience functions such as `mapSparse`, `emptySparse`, and a shorter `show` method for sparse objects.
 
 # TODO
 
