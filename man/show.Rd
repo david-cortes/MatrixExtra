@@ -4,11 +4,14 @@
 \alias{show}
 \alias{show,sparseMatrix-method}
 \alias{show,sparseVector-method}
+\alias{print,sparseVector-method}
 \title{Quick Glance at Sparse Objects}
 \usage{
 \S4method{show}{sparseMatrix}(object)
 
 \S4method{show}{sparseVector}(object)
+
+\S4method{print}{sparseVector}(x)
 }
 \arguments{
 \item{object}{A sparse matrix or sparse vector.}

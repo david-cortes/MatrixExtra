@@ -193,3 +193,7 @@ glance_sp_vector <- function(object) {
 #' @rdname show
 #' @export
 setMethod("show", signature(object="sparseVector"), glance_sp_vector)
+
+#' @rdname show
+#' @export
+setMethod("print", signature(x="sparseVector"), function(x) old_show_spvec(x))
