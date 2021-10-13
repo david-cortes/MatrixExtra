@@ -287,6 +287,25 @@ faster replacements of many methods.
 library(MatrixExtra)
 ```
 
+
+##### **Important!!**
+
+`MatrixExtra` overrides the `show` method of sparse objects with a shorter version with
+only summary information:
+```{r}
+Xr
+```
+
+This new behavior usually comes handy when one wants to examine large sparse matrices
+as it will not generate so much print output, but for the examples in here the
+matrices to examine are small and one would likely want to see them in full instead.
+This can be controlled with a global option in the package (see `?MatrixExtra-options`
+for more):
+```{r}
+options("MatrixExtra.quick_show" = FALSE)
+Xr
+```
+
 The earlier examples would now become:
 
 ```{r}
@@ -421,7 +440,7 @@ library(readsparse)
 data <- readsparse::read.sparse("real-sim")
 X <- data$X
 y <- as.numeric(factor(data$y))-1 ### convert to 0/1
-dim(X)
+X
 ```
 
 Adding the intercept and creating a 50-50 train-test split:
