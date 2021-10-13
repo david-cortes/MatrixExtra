@@ -39,5 +39,5 @@ library(MatrixExtra)
 
 set.seed(1)
 X <- rsparsematrix(10, 5, .5)
-mapSparse(X, function(x) abs(x)+1)
+print(mapSparse(X, function(x) abs(x)+1))
 }

@@ -15,6 +15,7 @@
 #' @examples
 #' library(Matrix)
 #' library(MatrixExtra)
+#' options("MatrixExtra.quick_show" = FALSE)
 #' v <- as(1:10, "sparseVector")
 #' rbind_csr(v, v, v)
 #'

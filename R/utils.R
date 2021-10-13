@@ -706,7 +706,7 @@ filterSparse <- function(X, fn, ...) {
 #' 
 #' set.seed(1)
 #' X <- rsparsematrix(10, 5, .5)
-#' mapSparse(X, function(x) abs(x)+1)
+#' print(mapSparse(X, function(x) abs(x)+1))
 #' @export
 mapSparse <- function(X, fn, ...) {
     if (!inherits(X, c("sparseMatrix", "sparseVector")))

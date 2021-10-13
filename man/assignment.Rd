@@ -94,5 +94,5 @@ library(MatrixExtra)
 set.seed(1)
 X <- rsparsematrix(5, 3, .5, repr="R")
 X[1:3] <- 0
-X
+print(X)
 }

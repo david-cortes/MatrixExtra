@@ -24,6 +24,7 @@
 #' library(MatrixExtra)
 #' set.seed(1)
 #' X <- rsparsematrix(4, 3, .5, repr="R")
+#' options("MatrixExtra.quick_show" = FALSE)
 #' X + X
 #' X * X
 #' X * as.coo.matrix(X)
@@ -34,9 +35,9 @@
 #' 
 #' ### Beware
 #' set_new_matrix_behavior()
-#' suppressWarnings(X / 0)
+#' print(suppressWarnings(X / 0))
 #' restore_old_matrix_behavior()
-#' suppressWarnings(X / 0)
+#' print(suppressWarnings(X / 0))
 NULL
 
 multiply_csr_by_csr <- function(e1, e2, logical=FALSE) {

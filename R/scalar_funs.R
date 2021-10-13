@@ -16,6 +16,7 @@
 #' @examples
 #' library(Matrix)
 #' library(MatrixExtra)
+#' options("MatrixExtra.quick_show" = FALSE)
 #' set.seed(1)
 #' X <- as.csr.matrix(rsparsematrix(4, 3, .4))
 #' abs(X)

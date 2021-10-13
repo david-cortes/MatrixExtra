@@ -128,6 +128,9 @@ library(Matrix)
 library(MatrixExtra)
 X = matrix(c(0,0,2,1, 0,3,0,0, 0,0,0,0), nrow=3, ncol=4, byrow=TRUE)
 X = as(X, "RsparseMatrix")
+show(X)
+options("MatrixExtra.quick_show" = FALSE)
+show(X)
 
 X[1:2, ]
 X + X
