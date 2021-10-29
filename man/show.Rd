@@ -15,6 +15,8 @@
 }
 \arguments{
 \item{object}{A sparse matrix or sparse vector.}
+
+\item{x}{A sparse vector (same method as in matrix, readded here to avoid naming conflicts).}
 }
 \value{
 The same object that was passed as input, as invisible.

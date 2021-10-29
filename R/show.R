@@ -9,6 +9,7 @@
 #' 
 #' In order to restore the `show` method provided by `Matrix`, call `options("MatrixExtra.quick_show" = FALSE)`.
 #' @param object A sparse matrix or sparse vector.
+#' @param x A sparse vector (same method as in matrix, readded here to avoid naming conflicts).
 #' @return The same object that was passed as input, as invisible.
 #' @name show
 #' @rdname show
