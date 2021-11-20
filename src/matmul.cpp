@@ -130,17 +130,21 @@ void gemm_csr_drm_as_dcm
         return;
     real_t *restrict write_ptr;
     nthreads = std::min(nthreads, m);
-    std::unique_ptr<real_t[]> temp_arr(new real_t[(size_t)ldc*(size_t)nthreads]);
+    std::unique_ptr<real_t[]> temp_arr;
     #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(OutputMat, DenseMat, indptr, indices, values) \
-            private(write_ptr)
+            shared(OutputMat, DenseMat, indptr, indices, values, ldc) \
+            private(write_ptr, temp_arr)
     #endif
     for (int row = 0; row < m; row++)
     {
         if (indptr[row] < indptr[row+1])
         {
-            write_ptr = temp_arr.get() + ldc*omp_get_thread_num();
+            write_ptr = temp_arr.get();
+            if (!write_ptr) {
+                temp_arr = std::unique_ptr<real_t[]>(new real_t[ldc]);
+                write_ptr = temp_arr.get();
+            }
             memset(write_ptr, 0, ldb*sizeof(real_t));
             for (int ix = indptr[row]; ix < indptr[row+1]; ix++)
                 axpy(&n, values + ix, DenseMat + (size_t)indices[ix]*ldb, &one, write_ptr, &one);
@@ -364,17 +368,21 @@ OutputVector matmul_csr_dvec(Rcpp::IntegerVector X_csr_indptr,
             shared(X_csr_indptr, X_csr_indices, X_csr_values, y_dense)
     #endif
     for (int row = 0; row < nrows; row++)
+    {
+        OutputDType val = 0;
         for (int ix = X_csr_indptr[row]; ix < X_csr_indptr[row+1]; ix++)
         {
             if (std::is_same<RcppVector, Rcpp::IntegerVector>::value)
-                out[row] += (y_dense[X_csr_indices[ix]] == NA_INTEGER)?
-                             NA_REAL : X_csr_values[ix] * y_dense[X_csr_indices[ix]];
+                val += (y_dense[X_csr_indices[ix]] == NA_INTEGER)?
+                        NA_REAL : X_csr_values[ix] * y_dense[X_csr_indices[ix]];
             else if (std::is_same<RcppVector, Rcpp::LogicalVector>::value)
-                out[row] += (y_dense[X_csr_indices[ix]] == NA_LOGICAL)?
-                             NA_REAL : X_csr_values[ix] * (bool)y_dense[X_csr_indices[ix]];
+                val += (y_dense[X_csr_indices[ix]] == NA_LOGICAL)?
+                        NA_REAL : X_csr_values[ix] * (bool)y_dense[X_csr_indices[ix]];
             else
-                out[row] += X_csr_values[ix] * y_dense[X_csr_indices[ix]];
+                val += X_csr_values[ix] * y_dense[X_csr_indices[ix]];
         }
+        out[row] = val;
+    }
 
     return out_;
 }

@@ -1,4 +1,4 @@
-AC_INIT([MatrixExtra], 0.1.8)
+AC_INIT([MatrixExtra], 0.1.9)
 HAS_LD=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(unname(as.integer(capabilities('long.double'))))"`
 FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "float:::ldflags(static=Sys.info()[['sysname']] == 'Darwin')"`
 
