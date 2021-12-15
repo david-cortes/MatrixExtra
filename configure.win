@@ -1,4 +1,26 @@
+R_EXE="${R_HOME}/bin${R_ARCH_BIN}/R.exe"
+CXX=`"${R_EXE}" CMD config CXX`
+
+cat > test.cpp <<EOL
+int main() {
+  return 0;
+}
+EOL
+
+FNTP_FLAG=""
+${CXX} -fno-trapping-math -o test test.cpp 2>/dev/null && ./test && FNTP_FLAG="-fno-trapping-math"
+rm -f ./test
+
+FNE_FLAG=""
+${CXX} -fno-math-errno -o test test.cpp 2>/dev/null && ./test && FNE_FLAG="-fno-math-errno"
+
+rm -f ./test
+rm -f ./test.cpp
+
 HAS_LD=`${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe -e "cat(unname(as.integer(capabilities('long.double'))))"`
-sed -e \
-    "s/@HAS_LD@/$HAS_LD/" \
+
+sed \
+    -e "s/@FNE_FLAG@/$FNE_FLAG/" \
+    -e "s/@FNTP_FLAG@/$FNTP_FLAG/" \
+    -e "s/@HAS_LD@/$HAS_LD/" \
     < src/Makevars.win.in > src/Makevars.win
