@@ -133,7 +133,7 @@ void gemm_csr_drm_as_dcm
     std::unique_ptr<real_t[]> temp_arr;
     #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic) num_threads(nthreads) \
-            shared(OutputMat, DenseMat, indptr, indices, values, ldc) \
+            shared(OutputMat, DenseMat, indptr, indices, values) \
             private(write_ptr, temp_arr)
     #endif
     for (int row = 0; row < m; row++)
