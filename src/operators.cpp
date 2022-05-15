@@ -1500,15 +1500,15 @@ typedef double LDOUBLE;
 static inline double R_intdiv(double x1, double x2)
 {
     double q = x1 / x2;
-    if (x2 == 0.0 || fabs(q) * c_eps > 1 || !R_FINITE(q))
+    if (x2 == 0.0 || std::fabs(q) * c_eps > 1 || !R_FINITE(q))
     return q;
-    if(fabs(q) < 1)
+    if(std::fabs(q) < 1)
     return (q < 0) ? -1
         : ((x1 < 0 && x2 > 0) ||
            (x1 > 0 && x2 < 0) // differing signs
            ? -1 : 0);
-    LDOUBLE tmp = (LDOUBLE)x1 - floor(q) * (LDOUBLE)x2;
-    return (double) (floor(q) + floorl(tmp/x2));
+    LDOUBLE tmp = (LDOUBLE)x1 - std::floor(q) * (LDOUBLE)x2;
+    return (double) (std::floor(q) + std::floor(tmp/x2));
 }
 
 /* Note: strictly speaking, this is the correct function, but in order to match
@@ -1526,17 +1526,17 @@ static inline double R_intdiv(double x1, double x2)
 static inline double R_modulus(double x1, double x2)
 {
     if (x2 == 0.0) return R_NaN;
-    if(fabs(x2) * c_eps > 1 && R_FINITE(x1) && fabs(x1) <= fabs(x2)) {
+    if(std::fabs(x2) * c_eps > 1 && R_FINITE(x1) && std::fabs(x1) <= std::fabs(x2)) {
     return
-        (fabs(x1) == fabs(x2)) ? 0 :
+        (std::fabs(x1) == std::fabs(x2)) ? 0 :
         ((x1 < 0 && x2 > 0) ||
          (x2 < 0 && x1 > 0))
          ? x1+x2  // differing signs
          : x1   ; // "same" signs (incl. 0)
     }
     double q = x1 / x2;
-    LDOUBLE tmp = (LDOUBLE)x1 - floor(q) * (LDOUBLE)x2;
-    return (double) (tmp - floorl(tmp/x2) * x2);
+    LDOUBLE tmp = (LDOUBLE)x1 - std::floor(q) * (LDOUBLE)x2;
+    return (double) (tmp - std::floor(tmp/x2) * x2);
 }
 // define R_pow(x, y) (
 //     ((x) == 1)? 1 : (
@@ -2582,7 +2582,7 @@ Rcpp::List multiply_csr_by_dvec_with_NAs
         const size_large ix_max = (size_large)nrows * (size_large)ncols;
         const size_t n_repeats
             =
-        ceill((long double)((size_large)nrows * (size_large)ncols) / (long double)dvec_size);
+        std::ceil((long double)((size_large)nrows * (size_large)ncols) / (long double)dvec_size);
 
         size_t ix_this, row, col;
         bool add_el;

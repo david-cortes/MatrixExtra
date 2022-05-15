@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <limits.h>
-#include <math.h>
+#include <cmath>
 #include <string.h>
 #include <inttypes.h>
 #include <vector>
@@ -107,7 +107,7 @@ int extract_single_val_csr
 #   define size_large size_t
 #endif
 
-#define size_times_ratio_dbl(x) ((size_t)ceill(\
+#define size_times_ratio_dbl(x) ((size_t)std::ceil(\
     (long double)(x) * \
     (   (long double)std::max(sizeof(double), sizeof(int)) \
             / \
