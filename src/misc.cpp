@@ -74,7 +74,7 @@ bool contains_any_zero(Rcpp::NumericVector x)
 bool contains_any_inf(Rcpp::NumericVector x)
 {
     for (auto el : x)
-        if (isinf(el))
+        if (std::isinf(el))
             return true;
     return false;
 }
@@ -91,7 +91,7 @@ bool contains_any_neg(Rcpp::NumericVector x)
 bool contains_any_nas_or_inf(Rcpp::NumericVector x)
 {
     for (auto el : x)
-        if (ISNAN(el) || isinf(el))
+        if (ISNAN(el) || std::isinf(el))
             return true;
     return false;
 }
