@@ -4,11 +4,17 @@ HAS_LD=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(unname(as.integer(capabilitie
 AC_SUBST(HAS_LD)
 
 IS_MAC=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(unname(as.integer(Sys.info()[['sysname']] == 'Darwin')))"`
-if test "$IS_MAC" = "1"; then
-    FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "float:::ldflags(TRUE)"`
-    FLOAT_LIBS=`sed -r 's/^(.*float\.a) (.*)$/"\1" \2/g' <<<"${FLOAT_LIBS}"`
+if test "$IS_MAC" = "0"; then
+    FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(float:::ldflags_string(FALSE))"`
+    FLOAT_LIBS=`sed -r 's/"/\\\"/g' <<<"${FLOAT_LIBS}"`
+    FLOAT_LIBS=`sed -r 's/^-L(.*)( -l:float\.so.*)$/-L"\1"\2/g' <<<"${FLOAT_LIBS}"`
+    FLOAT_LIBS=`sed -r 's/^(.*)-Wl,-rpath.(.*)$/\1-Wl,-rpath,"\2"/g' <<<"${FLOAT_LIBS}"`
+    FLOAT_LIBS_PT2=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "cat(paste(float:::lapack_ldflags_string(), float:::blas_ldflags_string()))"`
+    FLOAT_LIBS="${FLOAT_LIBS} ${FLOAT_LIBS_PT2}"
 else
-    FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "float:::ldflags()"`
+    FLOAT_LIBS=`${R_HOME}/bin${R_ARCH_BIN}/Rscript -e "float:::ldflags(TRUE)"`
+    FLOAT_LIBS=`sed -r 's/"/\\\"/g' <<<"${FLOAT_LIBS}"`
+    FLOAT_LIBS=`sed -r 's/^(.*float\.a) (.*)$/"\1" \2/g' <<<"${FLOAT_LIBS}"`
 fi
 AC_SUBST(FLOAT_LIBS)
 

@@ -16,3 +16,4 @@ vignettes_/*
 real-sim
 vignettes/real-sim
 src/Makevars
+configure~
