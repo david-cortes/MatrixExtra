@@ -6,8 +6,39 @@
 #endif
 
 constexpr const int one = 1;
-extern "C" void F77_CALL(saxpy)(const int *, const float*, const float *, const int*, float*, const int*);
-extern "C" void F77_CALL(scopy)(const int *, const float*, const int *, float *, const int *);
+// extern "C" void F77_CALL(saxpy)(const int *, const float*, const float *, const int*, float*, const int*);
+// extern "C" void F77_CALL(scopy)(const int *, const float*, const int *, float *, const int *);
+
+/* Note: it'd be faster to take these functions from the 'float' package (which will end up linking
+   to BLAS), but it gives too many headaches, especailly in some platforms like windows, and at
+   the time of writing, the maintainer of the 'float' package had mostly abandoned it and was
+   not replying to PRs fixing linkage issues. If some other package comes out offering single-precision
+   BLAS, should be safe to just switch to it instead. */
+static inline void F77_CALL(saxpy)(const int *n, const float *a, const float *x, const int *incx, float *y, const int *incy)
+{
+    const int n_ = *n;
+    const int inc_x = *incx;
+    const int inc_y = *incy;
+    const float alpha = *a;
+    if (inc_x == 1 && inc_y == 1 && alpha == 1.0f) {
+        for (int ix = 0; ix < n_; ix++) {
+            y[ix] += x[ix];
+        }
+    }
+    else {
+        for (int ix = 0; ix < n_; ix++) {
+            y[ix*inc_y] += alpha * x[ix*inc_x];
+        }
+    }
+}
+
+static inline void F77_CALL(scopy)(const int *n, const float *x, const int *incx, float *y, const int *incy)
+{
+    for (int ix = 0; ix < *n; ix++) {
+        y[ix * (*incy)] = x[ix * (*incx)];
+    }
+}
+
 
 static inline void axpy(const int *n, const double* alpha, const double *x, const int* incx, double* y, const int* incy)
 {

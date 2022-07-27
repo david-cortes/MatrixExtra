@@ -33,12 +33,10 @@ Description: Extends sparse matrix and vector classes from the 'Matrix' package 
 License: GPL (>= 2)
 Depends: Matrix (>= 1.3), methods
 Imports: Rcpp, RhpcBLASctl, float
-LinkingTo: Rcpp, float
+LinkingTo: Rcpp
 Suggests: testthat, data.table, knitr, rmarkdown
 VignetteBuilder: knitr
 URL: https://github.com/david-cortes/MatrixExtra
 BugReports: https://github.com/david-cortes/MatrixExtra/issues
 RoxygenNote: 7.1.2
 NeedsCompilation: yes
-Biarch: TRUE
-StagedInstall: TRUE

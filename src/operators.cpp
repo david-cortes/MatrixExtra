@@ -4009,7 +4009,7 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                         row = ii[ix] - 1 + recycle*length;
                         indptr[row+1] = ncols;
                         std::iota(indices.begin() + curr, indices.begin() + curr + ncols_, 0);
-                        daxpy_(&ncols, xx_ + ix, X__ + row, &nrows, values_ + curr, &one);
+                        F77_CALL(daxpy)(&ncols, xx_ + ix, X__ + row, &nrows, values_ + curr, &one);
                         curr += ncols;
                     }
                 }
@@ -4022,6 +4022,7 @@ Rcpp::List multiply_elemwise_dense_by_svec_template
                         val = xx_[ix];
                         indptr[row+1] = ncols;
                         std::iota(indices.begin() + curr, indices.begin() + curr + ncols_, 0);
+                        /* Note: this is mixed precision so cannot replace with saxpy */
                         for (size_t col = 0; col < ncols_; col++)
                             values[curr++] = X[(size_t)row + col*nrows_] * val;
                     }
