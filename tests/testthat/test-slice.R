@@ -24,29 +24,29 @@ test_that("RsparseMatrix subset cols and rows", {
     expect_equal(m[as.character(1:10), 1:100],
                  as(m_base[as.character(1:10), 1:100], "RsparseMatrix"))
     expect_equal(m["10", "20", drop=FALSE],
-                 as(m_base["10", "20", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base["10", "20", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m["10", "20", drop=TRUE],
                  m_base["10", "20", drop=TRUE])
     expect_equal(m[10, "20", drop=FALSE],
-                 as(m_base[10, "20", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base[10, "20", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m["10", 20, drop=TRUE],
                  m_base["10", 20, drop=TRUE])
     expect_equal(m["10", "20", drop=FALSE],
-                 as(m_base["10", "20", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base["10", "20", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m[10, 20, drop=TRUE],
                  m_base[10, 20, drop=TRUE])
 
 
     expect_equal(m["1000", "2", drop=FALSE],
-                 as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m["1000", "2", drop=TRUE],
                  m_base["1000", "2", drop=TRUE])
     expect_equal(m[1000, "2", drop=FALSE],
-                 as(m_base[1000, "2", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base[1000, "2", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m["1000", 2, drop=TRUE],
                  m_base["1000", 2, drop=TRUE])
     expect_equal(m["1000", "2", drop=FALSE],
-                 as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"))
+                 as(as(m_base["1000", "2", drop=FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m[1000, 2, drop=TRUE],
                  m_base[1000, 2, drop=TRUE])
 
@@ -98,9 +98,9 @@ test_that("RsparseMatrix subset empty", {
                  as(m_base[integer(), 3:10], "RsparseMatrix"))
 
     expect_equal(m[integer(), integer()],
-                 as(m_base[integer(), integer()], "RsparseMatrix"))
+                 as(as(m_base[integer(), integer()], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m[character(), character()],
-                 as(m_base[character(), character()], "RsparseMatrix"))
+                 as(as(m_base[character(), character()], "RsparseMatrix"), "generalMatrix"))
 })
 
 test_that("RsparseMatrix subset cols", {
@@ -153,7 +153,7 @@ test_that("RsparseMatrix subset with boolean", {
 
     expect_equal(m[FALSE, ], as(m_base[FALSE, ], "RsparseMatrix"))
     expect_equal(m[, FALSE], as(m_base[, FALSE], "RsparseMatrix"))
-    expect_equal(m[FALSE, FALSE], as(m_base[FALSE, FALSE], "RsparseMatrix"))
+    expect_equal(m[FALSE, FALSE], as(as(m_base[FALSE, FALSE], "RsparseMatrix"), "generalMatrix"))
     expect_equal(m[TRUE, TRUE], as(m_base[TRUE, TRUE], "RsparseMatrix"))
 })
 

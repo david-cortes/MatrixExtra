@@ -41,6 +41,7 @@ test_that("matmult dense-CSC", {
 
     tri <- matrix(c(1,2,0,4, 0,0,6,7, 0,0,8,9, 0,0,0,0), byrow=TRUE, nrow=4)
     tri <- as(tri, "triangularMatrix")
+    tri <- as(tri, "CsparseMatrix")
     expect_s4_class(tri, "dtCMatrix")
     set.seed(1)
     tri_counterpart <- rsparsematrix(20, nrow(tri), .4)
