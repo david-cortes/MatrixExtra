@@ -14,7 +14,19 @@
 
 <title>Introducing MatrixExtra</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -24,6 +36,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -125,7 +138,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -141,46 +334,130 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<p>“MatrixExtra” is an R package which extends the sparse matrix and sparse vector classes from the <a href="https://cran.r-project.org/package=Matrix">Matrix</a> package, particularly the CSR formats, by providing optimized functions, methods, and operators which exploit the storage order (COO, CSC, CSR) of the inputs and work natively with different formats, such as slicing (e.g. <code>X[1:10,]</code>), concatenation (e.g. <code>rbind(X, Y)</code>, <code>cbind(X, Y)</code>), matrix multiplication with a dense matrix (<code>X %*% Y</code>), or elementwise multiplication (<code>X * Y</code>).</p>
+<p>“MatrixExtra” is an R package which extends the sparse matrix and
+sparse vector classes from the <a href="https://cran.r-project.org/package=Matrix">Matrix</a> package,
+particularly the CSR formats, by providing optimized functions, methods,
+and operators which exploit the storage order (COO, CSC, CSR) of the
+inputs and work natively with different formats, such as slicing (e.g.
+<code>X[1:10,]</code>), concatenation (e.g. <code>rbind(X, Y)</code>,
+<code>cbind(X, Y)</code>), matrix multiplication with a dense matrix
+(<code>X %*% Y</code>), or elementwise multiplication
+(<code>X * Y</code>).</p>
 <div id="sparse-matrix-formats" class="section level1">
 <h1>Sparse Matrix Formats</h1>
-<p>A typical matrix is a 2D array which has a given number of rows and columns, and stores tabular data inside - e.g. measures of different variables (columns) for many observations (rows). Behind the scenes, matrices in R are represented as a 1D array with a column-major storage, where element <code>(i,j)</code> is at position <code>i + (j-1)*nrows</code>. This is a straightforward concept - performing operations on such matrices is trivial, and allows easy exploitation of modern CPU capabilities such as SIMD and multi-threading.</p>
-<p>In many applications, one finds some matrices in which most of the values are exactly zero with only a few different entries - so called “sparse” matrices. For example, in recommender systems, one might construct a matrix of user-item interactions, in which users are rows, items are columns, and values denote e.g. movie ratings or hours spent playing something. Typically, each user interacts with only a handful items, so such a matrix will typically have &gt;99% of the entries set to zero. In such cases, using a typical matrix is wasteful, since it requires creating an array which contains mostly zeros, and doing operations on them is inefficient, since the output of e.g. <code>X * 2</code> only needs to look at the non-zero entries rather than the full <code>nrows*ncols</code> entries. Similar situations are encountered in natural language processing (e.g. word counts by documents), social networks (e.g. connections between users), and classification/regression with one-hot/dummy encoded features, among others.</p>
-<p>In such cases, it’s more efficient to use a matrix representation that stores only the non-zero values and the indices which are non-zero. In many cases it might even be impossible to represent the full matrix in a computer’s memory due it’s size (e.g. 1,000,000 users and 10,000 movies = 74.5GB, but if only 1% of the entries are non-zero, can be put down to ~1.5GB or less), and it’s thus necessary to perform operations in this sparse representation instead.</p>
-<p>Object classes for sparse matrix representations in R are provided by packages like <code>Matrix</code> or <code>SparseM</code> (or <code>igraph</code> for more specialized topics), and those objects - particularly the ones from <code>Matrix</code> - are accepted and handled efficiently by many other packages such as <a href="https://cran.r-project.org/package=rsparse">rsparse</a> or <a href="https://cran.r-project.org/package=glmnet">glmnet</a>.</p>
-<p>As a general rule, if a given matrix has &lt;5% non-zero values, it is more efficient to do common operations on it in a sparse representation, which typically comes in one of the following formats:</p>
+<p>A typical matrix is a 2D array which has a given number of rows and
+columns, and stores tabular data inside - e.g. measures of different
+variables (columns) for many observations (rows). Behind the scenes,
+matrices in R are represented as a 1D array with a column-major storage,
+where element <code>(i,j)</code> is at position
+<code>i + (j-1)*nrows</code>. This is a straightforward concept -
+performing operations on such matrices is trivial, and allows easy
+exploitation of modern CPU capabilities such as SIMD and
+multi-threading.</p>
+<p>In many applications, one finds some matrices in which most of the
+values are exactly zero with only a few different entries - so called
+“sparse” matrices. For example, in recommender systems, one might
+construct a matrix of user-item interactions, in which users are rows,
+items are columns, and values denote e.g. movie ratings or hours spent
+playing something. Typically, each user interacts with only a handful
+items, so such a matrix will typically have &gt;99% of the entries set
+to zero. In such cases, using a typical matrix is wasteful, since it
+requires creating an array which contains mostly zeros, and doing
+operations on them is inefficient, since the output of
+e.g. <code>X * 2</code> only needs to look at the non-zero entries
+rather than the full <code>nrows*ncols</code> entries. Similar
+situations are encountered in natural language processing (e.g. word
+counts by documents), social networks (e.g. connections between users),
+and classification/regression with one-hot/dummy encoded features, among
+others.</p>
+<p>In such cases, it’s more efficient to use a matrix representation
+that stores only the non-zero values and the indices which are non-zero.
+In many cases it might even be impossible to represent the full matrix
+in a computer’s memory due it’s size (e.g. 1,000,000 users and 10,000
+movies = 74.5GB, but if only 1% of the entries are non-zero, can be put
+down to ~1.5GB or less), and it’s thus necessary to perform operations
+in this sparse representation instead.</p>
+<p>Object classes for sparse matrix representations in R are provided by
+packages like <code>Matrix</code> or <code>SparseM</code> (or
+<code>igraph</code> for more specialized topics), and those objects -
+particularly the ones from <code>Matrix</code> - are accepted and
+handled efficiently by many other packages such as <a href="https://cran.r-project.org/package=rsparse">rsparse</a> or <a href="https://cran.r-project.org/package=glmnet">glmnet</a>.</p>
+<p>As a general rule, if a given matrix has &lt;5% non-zero values, it
+is more efficient to do common operations on it in a sparse
+representation, which typically comes in one of the following
+formats:</p>
 <div id="coo-coordinate-or-triplets-a.k.a.-tsparsematrix" class="section level4">
 <h4>1. COO (coordinate) or triplets, a.k.a. “TsparseMatrix”:</h4>
-<p>The COO format is the simplest form, consisting of storing all the triplets <code>(row,column,value)</code> which are non-zero.</p>
-<p>The COO format is typically not optimal to operate with, but allows easy conversion to CSR and CSC formats (see below). Nevertheless, some operations such as concatenating inputs (<code>rbind</code>, <code>cbind</code>) or elementwise multiplication with a dense matrix (<code>X * Y</code>) are efficient with a COO representation.</p>
+<p>The COO format is the simplest form, consisting of storing all the
+triplets <code>(row,column,value)</code> which are non-zero.</p>
+<p>The COO format is typically not optimal to operate with, but allows
+easy conversion to CSR and CSC formats (see below). Nevertheless, some
+operations such as concatenating inputs (<code>rbind</code>,
+<code>cbind</code>) or elementwise multiplication with a dense matrix
+(<code>X * Y</code>) are efficient with a COO representation.</p>
 </div>
 <div id="csr-compressed-sparse-row-a.k.a.-rsparsematrix" class="section level4">
 <h4>2. CSR (compressed sparse row), a.k.a. “RsparseMatrix”</h4>
-<p>The CSR format, instead of of storing triplets, stores the elements in a row-major format, keeping track only of the column indices and of the positions at which the column indices for a given row start and end. Typically the column indices are meant to be sorted within each row, but this is not strictly assumed by all software or all functions.</p>
-<p>The CSR format is optimal for doing row-based operations, such as selecting rows (<code>X[1:1000,]</code>), concatenating by rows (<code>rbind</code>), or matrix multiplication with a vector (<code>CSR %*% v</code>).</p>
+<p>The CSR format, instead of of storing triplets, stores the elements
+in a row-major format, keeping track only of the column indices and of
+the positions at which the column indices for a given row start and end.
+Typically the column indices are meant to be sorted within each row, but
+this is not strictly assumed by all software or all functions.</p>
+<p>The CSR format is optimal for doing row-based operations, such as
+selecting rows (<code>X[1:1000,]</code>), concatenating by rows
+(<code>rbind</code>), or matrix multiplication with a vector
+(<code>CSR %*% v</code>).</p>
 </div>
 <div id="csc-compressed-sparse-column-a.k.a.-csparsematrix" class="section level4">
 <h4>3. CSC (compressed sparse column), a.k.a. “CsparseMatrix”</h4>
-<p>The CSC format is the same as the CSR format, but is column-major instead of row-major.</p>
-<p>The CSC format is optimal for doing column-based operations, such as selecting columns (<code>X[, 1:1000]</code>), concatenating by columns (<code>cbind</code>), and matrix multiplication with a dense matrix in column-major format (like all R’s matrices) as the LHS (<code>Dense %*% CSC</code>). Typically, tree-based methods work with CSC format.</p>
+<p>The CSC format is the same as the CSR format, but is column-major
+instead of row-major.</p>
+<p>The CSC format is optimal for doing column-based operations, such as
+selecting columns (<code>X[, 1:1000]</code>), concatenating by columns
+(<code>cbind</code>), and matrix multiplication with a dense matrix in
+column-major format (like all R’s matrices) as the LHS
+(<code>Dense %*% CSC</code>). Typically, tree-based methods work with
+CSC format.</p>
 </div>
 <div id="sparse-vectors" class="section level4">
 <h4>4. Sparse vectors</h4>
-<p>A vector (single row or single column) can also be represented in a sparse format by keeping track of the indices which are non-zero and the values.</p>
-<p>Sparse vectors are typically not used but some operations involving them are fast, such as inner products or matrix multiplication with a CSR matrix as the LHS (<code>CSR %*% v</code>).</p>
+<p>A vector (single row or single column) can also be represented in a
+sparse format by keeping track of the indices which are non-zero and the
+values.</p>
+<p>Sparse vectors are typically not used but some operations involving
+them are fast, such as inner products or matrix multiplication with a
+CSR matrix as the LHS (<code>CSR %*% v</code>).</p>
 </div>
 </div>
 <div id="sparse-objects-in-matrix" class="section level1">
 <h1>Sparse objects in Matrix</h1>
-<p>The <code>Matrix</code> package provides S4 classes to represent all the formats above in R. These objects are handled in a rich hierarchy of different matrix types with multiple inheritance. In general, one should keep in mind the following points:</p>
+<p>The <code>Matrix</code> package provides S4 classes to represent all
+the formats above in R. These objects are handled in a rich hierarchy of
+different matrix types with multiple inheritance. In general, one should
+keep in mind the following points:</p>
 <ul>
 <li>COO formats are called <code>TsparseMatrix</code>.</li>
 <li>CSR formats are called <code>RsparseMatrix</code>.</li>
 <li>CSC formats are called <code>CsparseMatrix</code>.</li>
-<li>The actual matrices will not be of a class like <code>RsparseMatrix</code>, but will rather have a class which inherits from it (has <code>RsparseMatrix</code> as parent class), and be of a different type depending on the type of elements (<code>dsparseMatrix</code> for numeric values, <code>lsparseMatrix</code> for logical values, <code>nsparseMatrix</code> for binary values), and depending on whether they are symmetric, triangular-diagonal, or regular.</li>
-<li>Typically, one deals with sparse matrices which are numeric and of general format. These are <code>dgTMatrix</code>, <code>dgRMatrix</code>, and <code>dgCMatrix</code>; but oftentimes when dealing with <code>Matrix</code> methods, one has to refer to the parent class - e.g. <code>as(X, &quot;RsparseMatrix&quot;)</code>, but not <code>as(X, &quot;dgRMatrix&quot;)</code> (which is what one usually wants to do).</li>
+<li>The actual matrices will not be of a class like
+<code>RsparseMatrix</code>, but will rather have a class which inherits
+from it (has <code>RsparseMatrix</code> as parent class), and be of a
+different type depending on the type of elements
+(<code>dsparseMatrix</code> for numeric values,
+<code>lsparseMatrix</code> for logical values,
+<code>nsparseMatrix</code> for binary values), and depending on whether
+they are symmetric, triangular-diagonal, or regular.</li>
+<li>Typically, one deals with sparse matrices which are numeric and of
+general format. These are <code>dgTMatrix</code>,
+<code>dgRMatrix</code>, and <code>dgCMatrix</code>; but oftentimes when
+dealing with <code>Matrix</code> methods, one has to refer to the parent
+class - e.g. <code>as(X, &quot;RsparseMatrix&quot;)</code>, but not
+<code>as(X, &quot;dgRMatrix&quot;)</code> (which is what one usually wants to
+do).</li>
 </ul>
-<p>Sparse matrices can be created in any of the three formats in <code>Matrix</code> with the function <code>sparseMatrix</code> - example:</p>
+<p>Sparse matrices can be created in any of the three formats in
+<code>Matrix</code> with the function <code>sparseMatrix</code> -
+example:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="do">### Will construct this Matrix</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">### [ 1, 0, 2 ]</span></span>
@@ -202,14 +479,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span></code></pre></div>
-<p>They can typically be converted to other formats through <code>methods::as</code> - example:</p>
+<p>They can typically be converted to other formats through
+<code>methods::as</code> - example:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(X, <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span></code></pre></div>
-<p>Such <code>Matrix</code> objects have a lot of defined operators and functions so that they could be used as drop-in replacements of base R matrices - e.g.:</p>
+<p>Such <code>Matrix</code> objects have a lot of defined operators and
+functions so that they could be used as drop-in replacements of base R
+matrices - e.g.:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="sc">+</span> X</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgTMatrix&quot;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
@@ -219,8 +499,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="doesnt-matrix-provide-everything" class="section level1">
 <h1>Doesn’t Matrix provide everything?</h1>
-<p>The <code>Matrix</code> package provides most of the functions and methods from base R which one would expect, such as <code>+</code>, <code>-</code>, <code>*</code>, <code>%*%</code>, <code>rbind</code>, <code>cbind</code>, <code>[</code>, <code>[&lt;-</code>, <code>sqrt</code>, <code>norm</code>, among many others.</p>
-<p>However, the whole package is centered around the CSC format, with the provided functions oftentimes converting the input to CSC if it isn’t already, which is inefficient and loses many optimization potentials for operations like <code>CSR[1:100,]</code> or <code>rbind(COO, CSR)</code>, to name a few. Examples:</p>
+<p>The <code>Matrix</code> package provides most of the functions and
+methods from base R which one would expect, such as <code>+</code>,
+<code>-</code>, <code>*</code>, <code>%*%</code>, <code>rbind</code>,
+<code>cbind</code>, <code>[</code>, <code>[&lt;-</code>,
+<code>sqrt</code>, <code>norm</code>, among many others.</p>
+<p>However, the whole package is centered around the CSC format, with
+the provided functions oftentimes converting the input to CSC if it
+isn’t already, which is inefficient and loses many optimization
+potentials for operations like <code>CSR[1:100,]</code> or
+<code>rbind(COO, CSR)</code>, to name a few. Examples:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Xr <span class="ot">&lt;-</span> <span class="fu">as</span>(X, <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">### This will forcibly convert the matrix to triplets</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Xr[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, ]</span>
@@ -245,242 +533,305 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1  . 4</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] .  . 9</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 16 .</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This should be a straighforward operation</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(Xr, <span class="st">&quot;ngRMatrix&quot;</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in as(Xr, &quot;ngRMatrix&quot;): no method or default for coercing &quot;dgRMatrix&quot; to &quot;ngRMatrix&quot;</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This doesn&#39;t do what it should</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(Xr, <span class="st">&quot;nsparseMatrix&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngCMatrix&quot;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] | . |</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . |</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . | .</span></span></code></pre></div>
-<p>Many of these methods can be woefully inefficient when dealing with real, large datasets, particularly when dealing with the CSR format:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microbenchmark)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>X_big_csc <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">rsparsematrix</span>(<span class="fl">1e4</span>, <span class="fl">1e4</span>, .<span class="dv">05</span>, <span class="at">repr=</span><span class="st">&quot;C&quot;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>X_big_csr <span class="ot">&lt;-</span> <span class="fu">as</span>(<span class="fu">t</span>(X_big_csc), <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean   median</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 137.9918 138.6661 196.1937 219.9392</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  221.5226 226.6653    10</span></span></code></pre></div>
-<p>Compare against what should be the mirror operation in CSC format:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]}, <span class="at">times=</span>10L)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean  median</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csc[, 1:10] } 4.132839 4.185929 4.494835 4.24812</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.294662 6.904135    10</span></span></code></pre></div>
-<p>Some operations in <code>Matrix</code>, even if done natively in CSC format with a CSC input, can still be slower than one would expect and than what could in theory be achieved with different algorithms, oftentimes due to making copies of the data:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr      min      lq     mean</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 4.137548 4.15453 4.341068</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    median       uq      max neval</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.195232 4.270918 5.647169    10</span></span></code></pre></div>
-<p>It should also be kept in mind that <code>Matrix</code> does not exploit multi-threading in dense-sparse matrix multiplications, which have substantial potential for acceleration:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>Y_dense <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fl">1e2</span><span class="sc">*</span><span class="fu">nrow</span>(X_big_csc)), <span class="at">nrow=</span><span class="fl">1e2</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min       lq     mean   median</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 351.0095 352.2786 356.9553 356.8541</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  361.3904 362.7509    10</span></span></code></pre></div>
+<p>Many of these methods can be woefully inefficient when dealing with
+real, large datasets, particularly when dealing with the CSR format:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microbenchmark)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>X_big_csc <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">rsparsematrix</span>(<span class="fl">1e4</span>, <span class="fl">1e4</span>, .<span class="dv">05</span>, <span class="at">repr=</span><span class="st">&quot;C&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>X_big_csr <span class="ot">&lt;-</span> <span class="fu">as</span>(<span class="fu">t</span>(X_big_csc), <span class="st">&quot;RsparseMatrix&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean   median</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 154.7282 155.4318 167.9717 156.3491</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  164.0112 258.7927    10</span></span></code></pre></div>
+<p>Compare against what should be the mirror operation in CSC
+format:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]}, <span class="at">times=</span>10L)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr      min       lq     mean   median</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csc[, 1:10] } 5.660606 5.759361 6.418859 5.993871</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6.845528 9.001482    10</span></span></code></pre></div>
+<p>Some operations in <code>Matrix</code>, even if done natively in CSC
+format with a CSC input, can still be slower than one would expect and
+than what could in theory be achieved with different algorithms,
+oftentimes due to making copies of the data:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr      min       lq    mean</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 5.327531 5.520133 5.70143</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    median       uq      max neval</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5.575491 5.651869 7.090658    10</span></span></code></pre></div>
+<p>It should also be kept in mind that <code>Matrix</code> does not
+exploit multi-threading in dense-sparse matrix multiplications, which
+have substantial potential for acceleration:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Y_dense <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fl">1e2</span><span class="sc">*</span><span class="fu">nrow</span>(X_big_csc)), <span class="at">nrow=</span><span class="fl">1e2</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min      lq     mean   median       uq</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 356.6463 357.711 359.8849 360.5575 360.7445</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       max neval</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  363.2819    10</span></span></code></pre></div>
 </div>
 <div id="why-is-csr-needed" class="section level1">
 <h1>Why is CSR needed?</h1>
-<p>The CSR sparse format is particularly useful when dealing with machine learning applications - e.g. splitting between a train and test set, tokenizing text features, multiplying a matrix by a vector of coefficients, calculating a gradient observation-by-observation, among others. Many stochastic optimization techniques and libraries (e.g. LibSVM, VowpalWabbit) require the inputs to be in CSR format or alike (see also <a href="https://cran.r-project.org/package=readsparse">readsparse</a>), which does not play well with the column-centric methods of Matrix.</p>
-<p>In principle, one could stick with just the CSC format from Matrix and keep a mental map of the matrix as being transposed. This however gets complicated rather soon and is very prone to errors. Additionally, one might want to pass sparse matrices to another package whose code is outside of one’s control, for which the storage format can make a large difference in performance.</p>
+<p>The CSR sparse format is particularly useful when dealing with
+machine learning applications - e.g. splitting between a train and test
+set, tokenizing text features, multiplying a matrix by a vector of
+coefficients, calculating a gradient observation-by-observation, among
+others. Many stochastic optimization techniques and libraries (e.g.
+LibSVM, VowpalWabbit) require the inputs to be in CSR format or alike
+(see also <a href="https://cran.r-project.org/package=readsparse">readsparse</a>),
+which does not play well with the column-centric methods of Matrix.</p>
+<p>In principle, one could stick with just the CSC format from Matrix
+and keep a mental map of the matrix as being transposed. This however
+gets complicated rather soon and is very prone to errors. Additionally,
+one might want to pass sparse matrices to another package whose code is
+outside of one’s control, for which the storage format can make a large
+difference in performance.</p>
 </div>
 <div id="matrixextra-to-the-rescue" class="section level1">
 <h1>MatrixExtra to the rescue</h1>
-<p><code>MatrixExtra</code> is a package which extends the same classes from <code>Matrix</code> for COO, CSR, CSC, and sparse vectors, by providing optimized replacements for typical methods which will work without changing the storage format of the matrices when not necessary; and providing some faster replacements of many methods.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MatrixExtra)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &#39;MatrixExtra&#39; modifies important behaviors from &#39;Matrix&#39;. See ?MatrixExtra-options.</span></span></code></pre></div>
+<p><code>MatrixExtra</code> is a package which extends the same classes
+from <code>Matrix</code> for COO, CSR, CSC, and sparse vectors, by
+providing optimized replacements for typical methods which will work
+without changing the storage format of the matrices when not necessary;
+and providing some faster replacements of many methods.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MatrixExtra)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &#39;MatrixExtra&#39; modifies important behaviors from &#39;Matrix&#39;. See ?MatrixExtra-options.</span></span></code></pre></div>
 <div id="important" class="section level5">
 <h5><strong>Important!!</strong></h5>
-<p><code>MatrixExtra</code> overrides the <code>show</code> method of sparse objects with a shorter version with only summary information:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Xr</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sparse CSR matrix (class &#39;dgRMatrix&#39;)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dimensions: 3 x 3</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (4 entries, 44.44% full)</span></span></code></pre></div>
-<p>This new behavior usually comes handy when one wants to examine large sparse matrices as it will not generate so much print output, but for the examples in here the matrices to examine are small and one would likely want to see them in full instead. This can be controlled with a global option in the package (see <code>?MatrixExtra-options</code> for more):</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="st">&quot;MatrixExtra.quick_show&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>Xr</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
+<p><code>MatrixExtra</code> overrides the <code>show</code> method of
+sparse objects with a shorter version with only summary information:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Xr</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sparse CSR matrix (class &#39;dgRMatrix&#39;)</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dimensions: 3 x 3</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (4 entries, 44.44% full)</span></span></code></pre></div>
+<p>This new behavior usually comes handy when one wants to examine large
+sparse matrices as it will not generate so much print output, but for
+the examples in here the matrices to examine are small and one would
+likely want to see them in full instead. This can be controlled with a
+global option in the package (see <code>?MatrixExtra-options</code> for
+more):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="st">&quot;MatrixExtra.quick_show&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>Xr</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span></code></pre></div>
+<p>The earlier examples would now become:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This will not change the format</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>Xr[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, ]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This will not change the format</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(Xr, Xr)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span></code></pre></div>
-<p>The earlier examples would now become:</p>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1 . 2</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] . . 3</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] . 4 .</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This will not change the format</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Xr[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, ]</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This will not change the format</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(Xr, Xr)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . 2</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 3</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 4 .</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,] 1 . 2</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] . . 3</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] . 4 .</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">### This will not change the format</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>Xr <span class="sc">*</span> Xr</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            </span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1  . 4</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] .  . 9</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 16 .</span></span></code></pre></div>
-<p>Some of these operations now become much more efficient when the inputs are large:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr     min     lq     mean   median      uq</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 322.404 330.99 21768.11 335.9605 344.045</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       max neval</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  214655.9    10</span></span></code></pre></div>
-<p>Other methods, despite having been fast before in <code>Matrix</code>, will still be replaced with faster versions:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr     min      lq     mean</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 353.634 364.333 906.7754</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   median      uq      max neval</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  367.704 371.707 5774.207    10</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min       lq     mean   median</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 51.54923 52.54824 52.92596 53.14878</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq     max neval</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  53.40562 53.6087    10</span></span></code></pre></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Xr <span class="sc">*</span> Xr</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgRMatrix&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            </span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1  . 4</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] .  . 9</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . 16 .</span></span></code></pre></div>
+<p>Some of these operations now become much more efficient when the
+inputs are large:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_slice <span class="ot">&lt;-</span> X_big_csr[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, ]}, <span class="at">times=</span>10L)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                  expr     min      lq     mean   median      uq</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_slice &lt;- X_big_csr[1:10, ] } 347.592 349.776 22292.82 351.5795 358.924</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       max neval</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  219742.1    10</span></span></code></pre></div>
+<p>Other methods, despite having been fast before in
+<code>Matrix</code>, will still be replaced with faster versions:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({X_col <span class="ot">&lt;-</span> X_big_csc[, <span class="dv">100</span>, drop<span class="ot">=</span><span class="cn">FALSE</span>]}, <span class="at">times=</span>10L)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                             expr     min      lq     mean</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     X_col &lt;- X_big_csc[, 100, drop = FALSE] } 374.963 384.801 922.3007</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    median      uq      max neval</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  390.4325 407.615 5699.459    10</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>({Z <span class="ot">&lt;-</span> Y_dense <span class="sc">%*%</span> X_big_csc}, <span class="at">times=</span>10L)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                expr      min       lq     mean   median</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     Z &lt;- Y_dense %*% X_big_csc } 72.02418 72.19792 73.70507 72.73744</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        uq      max neval</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  73.53253 80.91364    10</span></span></code></pre></div>
 <p>Conversions between sparse matrix classes also become easier:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(Xr, <span class="st">&quot;ngRMatrix&quot;</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngRMatrix&quot;</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] | . |</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . |</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . | .</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>MatrixExtra<span class="sc">::</span><span class="fu">as.csr.matrix</span>(Xr, <span class="at">binary=</span><span class="cn">TRUE</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngRMatrix&quot;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] | . |</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . |</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . | .</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as</span>(Xr, <span class="st">&quot;ngRMatrix&quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngRMatrix&quot;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] | . |</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . |</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . | .</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>MatrixExtra<span class="sc">::</span><span class="fu">as.csr.matrix</span>(Xr, <span class="at">binary=</span><span class="cn">TRUE</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;ngRMatrix&quot;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] | . |</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . |</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] . | .</span></span></code></pre></div>
 </div>
 </div>
 <div id="what-else-does-it-do" class="section level1">
 <h1>What else does it do?</h1>
-<p>Here’s a non-comprehensive list of operations which are accelerated by <code>MatrixExtra</code>:</p>
+<p>Here’s a non-comprehensive list of operations which are accelerated
+by <code>MatrixExtra</code>:</p>
 <ul>
-<li><code>CSR %*% dense</code>, <code>dense %*% CSC</code>, <code>tcrossprod(CSR, dense)</code>, <code>tcrossprod(dense, CSR)</code>, <code>crossprod(dense, CSC)</code>, <code>CSR %*% vector</code>.</li>
-<li><code>rbind(CSR, CSR)</code>, <code>rbind(CSR, COO)</code>, <code>rbind(CSR, vector)</code>, <code>rbind(COO, vector)</code>.</li>
-<li><code>cbind(CSR, CSR)</code>, <code>cbind(CSR, vector)</code>, <code>cbind(CSR, COO)</code>.</li>
-<li><code>CSR * dense</code>, <code>CSR * vector</code>, <code>COO * dense</code>, <code>COO * vector</code>, <code>CSR * scalar</code>, <code>COO * scalar</code> (and other similarly-working operators like <code>&amp;</code>, <code>^</code>, <code>%</code>, <code>%%</code>, <code>%/%</code>).</li>
-<li><code>CSR + CSR</code>, <code>CSR + COO</code>, <code>CSC + CSC</code>, <code>CSC + COO</code>, <code>CSR + CSC</code> (and <code>|</code>).</li>
+<li><code>CSR %*% dense</code>, <code>dense %*% CSC</code>,
+<code>tcrossprod(CSR, dense)</code>,
+<code>tcrossprod(dense, CSR)</code>, <code>crossprod(dense, CSC)</code>,
+<code>CSR %*% vector</code>.</li>
+<li><code>rbind(CSR, CSR)</code>, <code>rbind(CSR, COO)</code>,
+<code>rbind(CSR, vector)</code>, <code>rbind(COO, vector)</code>.</li>
+<li><code>cbind(CSR, CSR)</code>, <code>cbind(CSR, vector)</code>,
+<code>cbind(CSR, COO)</code>.</li>
+<li><code>CSR * dense</code>, <code>CSR * vector</code>,
+<code>COO * dense</code>, <code>COO * vector</code>,
+<code>CSR * scalar</code>, <code>COO * scalar</code> (and other
+similarly-working operators like <code>&amp;</code>, <code>^</code>,
+<code>%</code>, <code>%%</code>, <code>%/%</code>).</li>
+<li><code>CSR + CSR</code>, <code>CSR + COO</code>,
+<code>CSC + CSC</code>, <code>CSC + COO</code>, <code>CSR + CSC</code>
+(and <code>|</code>).</li>
 <li><code>t(CSR)</code>, <code>t(CSC)</code>.</li>
-<li><code>CSR[i,j]</code>, <code>CSC[i,j]</code>, <code>COO[i,j]</code>.</li>
-<li>Syntactic sugar for CSR such as <code>sqrt(CSR)</code>, <code>norm(CSR)</code>, <code>diag(CSR)</code>, among others.</li>
+<li><code>CSR[i,j]</code>, <code>CSC[i,j]</code>,
+<code>COO[i,j]</code>.</li>
+<li>Syntactic sugar for CSR such as <code>sqrt(CSR)</code>,
+<code>norm(CSR)</code>, <code>diag(CSR)</code>, among others.</li>
 </ul>
-<p>Many of the operations with dense types in <code>MatrixExtra</code> allow inputs of <code>float32</code> type from the <a href="https://cran.r-project.org/package=float">float</a> package, which leads to faster operations; and many of the operations with vector types allow sparse vectors from the same <code>Matrix</code> package and dense vectors from <code>float</code>.</p>
-<p>In addition, it also provides utility functions which come in handy when sparse matrices are manually constructed or output by a different software, such as functions for sorting the indices or for removing zero-valued and <code>NA</code> elements.</p>
+<p>Many of the operations with dense types in <code>MatrixExtra</code>
+allow inputs of <code>float32</code> type from the <a href="https://cran.r-project.org/package=float">float</a> package, which
+leads to faster operations; and many of the operations with vector types
+allow sparse vectors from the same <code>Matrix</code> package and dense
+vectors from <code>float</code>.</p>
+<p>In addition, it also provides utility functions which come in handy
+when sparse matrices are manually constructed or output by a different
+software, such as functions for sorting the indices or for removing
+zero-valued and <code>NA</code> elements.</p>
 </div>
 <div id="modifying-sub-optimal-behaviors-from-matrix" class="section level1">
 <h1>Modifying sub-optimal behaviors from Matrix</h1>
-<p>When one loads <code>MatrixExtra</code> through <code>library(MatrixExtra)</code>, it will modify some behaviors from <code>Matrix</code> in important ways which make them more efficient, but which can cause breakage in code or in packages if they make certain assumptions about <code>Matrix</code> methods. Among others:</p>
+<p>When one loads <code>MatrixExtra</code> through
+<code>library(MatrixExtra)</code>, it will modify some behaviors from
+<code>Matrix</code> in important ways which make them more efficient,
+but which can cause breakage in code or in packages if they make certain
+assumptions about <code>Matrix</code> methods. Among others:</p>
 <ul>
-<li>Transposing a CSC or CSR matrix returns an object in the opposite format:</li>
+<li>Transposing a CSC or CSR matrix returns an object in the opposite
+format:</li>
 </ul>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Here Matrix would return a &#39;dgRMatrix&#39;</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(Xr)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . .</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 4</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 2 3 .</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Here Matrix would return a &#39;dgRMatrix&#39;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(Xr)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 x 3 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           </span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 1 . .</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] . . 4</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] 2 3 .</span></span></code></pre></div>
 <ul>
 <li>Dropping a slice of a sparse matrix returns a sparse vector:</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Here Matrix would return a dense vector</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>Xr[<span class="dv">1</span>,]</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sparse vector (nnz/length = 2/3) of class &quot;dsparseVector&quot;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 . 2</span></span></code></pre></div>
-<p>These behaviors can be changed to their less-optimal versions as would be done by <code>Matrix</code>, either individually (see <code>?MatrixExtra-options</code>) or all at once:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">restore_old_matrix_behavior</span>()</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set_new_matrix_behavior</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Here Matrix would return a dense vector</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Xr[<span class="dv">1</span>,]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sparse vector (nnz/length = 2/3) of class &quot;dsparseVector&quot;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 . 2</span></span></code></pre></div>
+<p>These behaviors can be changed to their less-optimal versions as
+would be done by <code>Matrix</code>, either individually (see
+<code>?MatrixExtra-options</code>) or all at once:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">restore_old_matrix_behavior</span>()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set_new_matrix_behavior</span>()</span></code></pre></div>
 </div>
 <div id="a-real-world-example" class="section level1">
 <h1>A real-world example</h1>
-<p>One would wonder what kind of workflows specifically does <code>MatrixExtra</code> improve upon, and one obvious example would be fitting a logistic regression with gradient-based procedures.</p>
-<p>This example here will fit a binary logistic regression with L2 regularization using the L-BFGS-B optimizer in R. For simplicity purposes, the intercept will be calculated by concatenating a column of 1s to the data, but note that this is not the most efficient way of doing it.</p>
-<p>The dataset used is the “Real-Simulated” data, downloaded from <a href="https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html#real-sim">LibSVM datasets</a>. This is an artificially-generated toy dataset for which it’s easy to achieve almost-perfect accuracy, but it’s nevertheless a large-ish dataset in which the improved methods and operators here become noticeable.</p>
+<p>One would wonder what kind of workflows specifically does
+<code>MatrixExtra</code> improve upon, and one obvious example would be
+fitting a logistic regression with gradient-based procedures.</p>
+<p>This example here will fit a binary logistic regression with L2
+regularization using the L-BFGS-B optimizer in R. For simplicity
+purposes, the intercept will be calculated by concatenating a column of
+1s to the data, but note that this is not the most efficient way of
+doing it.</p>
+<p>The dataset used is the “Real-Simulated” data, downloaded from <a href="https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html#real-sim">LibSVM
+datasets</a>. This is an artificially-generated toy dataset for which
+it’s easy to achieve almost-perfect accuracy, but it’s nevertheless a
+large-ish dataset in which the improved methods and operators here
+become noticeable.</p>
 <p>Loading the data:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readsparse)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> readsparse<span class="sc">::</span><span class="fu">read.sparse</span>(<span class="st">&quot;real-sim&quot;</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> data<span class="sc">$</span>X</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(data<span class="sc">$</span>y))<span class="sc">-</span><span class="dv">1</span> <span class="do">### convert to 0/1</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>X</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sparse CSR matrix (class &#39;dgRMatrix&#39;)</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dimensions: 72,309 x 20,958</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (3,709,083 entries, 0.24% full)</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readsparse)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> readsparse<span class="sc">::</span><span class="fu">read.sparse</span>(<span class="st">&quot;real-sim&quot;</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> data<span class="sc">$</span>X</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(data<span class="sc">$</span>y))<span class="sc">-</span><span class="dv">1</span> <span class="do">### convert to 0/1</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>X</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sparse CSR matrix (class &#39;dgRMatrix&#39;)</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dimensions: 72,309 x 20,958</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (3,709,083 entries, 0.24% full)</span></span></code></pre></div>
 <p>Adding the intercept and creating a 50-50 train-test split:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(X)), X) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>ix_train <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(X), <span class="fu">floor</span>(.<span class="dv">5</span><span class="sc">*</span><span class="fu">nrow</span>(X)), <span class="at">replace=</span><span class="cn">FALSE</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>X_train <span class="ot">&lt;-</span> X[ix_train,] <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> y[ix_train]</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>X_test <span class="ot">&lt;-</span> X[<span class="sc">-</span>ix_train,] <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">&lt;-</span> y[<span class="sc">-</span>ix_train]</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(X)), X) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>ix_train <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(X), <span class="fu">floor</span>(.<span class="dv">5</span><span class="sc">*</span><span class="fu">nrow</span>(X)), <span class="at">replace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>X_train <span class="ot">&lt;-</span> X[ix_train,] <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> y[ix_train]</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>X_test <span class="ot">&lt;-</span> X[<span class="sc">-</span>ix_train,] <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">&lt;-</span> y[<span class="sc">-</span>ix_train]</span></code></pre></div>
 <p>Now fitting the model:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>logistic_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(coefs, X, y, lambda) {</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fu">as.numeric</span>(X <span class="sc">%*%</span> coefs))) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    ll <span class="ot">&lt;-</span> <span class="fu">mean</span>(y <span class="sc">*</span> <span class="fu">log</span>(pred) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> y) <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">-</span> pred))</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> lambda <span class="sc">*</span> <span class="fu">as.numeric</span>(coefs <span class="sc">%*%</span> coefs)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Don&#39;t regularize the intercept</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> reg <span class="sc">-</span> lambda <span class="sc">*</span> (coefs[<span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="sc">-</span>ll <span class="sc">+</span> reg)</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>logistic_grad <span class="ot">&lt;-</span> <span class="cf">function</span>(coefs, X, y, lambda) {</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>(X <span class="sc">%*%</span> coefs))) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    grad <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(X <span class="sc">*</span> <span class="fu">as.numeric</span>(pred <span class="sc">-</span> y)) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    grad <span class="ot">&lt;-</span> grad <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> lambda <span class="sc">*</span> <span class="fu">as.numeric</span>(coefs)</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Don&#39;t regularize the intercept</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    grad[<span class="dv">1</span>] <span class="ot">&lt;-</span> grad[<span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> lambda <span class="sc">*</span> coefs[<span class="dv">1</span>]</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">as.numeric</span>(grad))</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fl">1e-5</span> <span class="do">### &lt;- Regularization parameter</span></span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="fu">numeric</span>(<span class="fu">ncol</span>(X_train)),</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>             logistic_fun,</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>             logistic_grad,</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">method=</span><span class="st">&quot;L-BFGS-B&quot;</span>,</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>             X_train, y_train, lambda)</span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>fitted_coefs <span class="ot">&lt;-</span> res<span class="sc">$</span>par</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>logistic_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(coefs, X, y, lambda) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fu">as.numeric</span>(X <span class="sc">%*%</span> coefs))) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    ll <span class="ot">&lt;-</span> <span class="fu">mean</span>(y <span class="sc">*</span> <span class="fu">log</span>(pred) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> y) <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">-</span> pred))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> lambda <span class="sc">*</span> <span class="fu">as.numeric</span>(coefs <span class="sc">%*%</span> coefs)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Don&#39;t regularize the intercept</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> reg <span class="sc">-</span> lambda <span class="sc">*</span> (coefs[<span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="sc">-</span>ll <span class="sc">+</span> reg)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>logistic_grad <span class="ot">&lt;-</span> <span class="cf">function</span>(coefs, X, y, lambda) {</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>(X <span class="sc">%*%</span> coefs))) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    grad <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(X <span class="sc">*</span> <span class="fu">as.numeric</span>(pred <span class="sc">-</span> y)) <span class="do">### Accelerated by &#39;MatrixExtra&#39;</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    grad <span class="ot">&lt;-</span> grad <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> lambda <span class="sc">*</span> <span class="fu">as.numeric</span>(coefs)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="do">### Don&#39;t regularize the intercept</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    grad[<span class="dv">1</span>] <span class="ot">&lt;-</span> grad[<span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> lambda <span class="sc">*</span> coefs[<span class="dv">1</span>]</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">as.numeric</span>(grad))</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fl">1e-5</span> <span class="do">### &lt;- Regularization parameter</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="fu">numeric</span>(<span class="fu">ncol</span>(X_train)),</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>             logistic_fun,</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>             logistic_grad,</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">method=</span><span class="st">&quot;L-BFGS-B&quot;</span>,</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>             X_train, y_train, lambda)</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>fitted_coefs <span class="ot">&lt;-</span> res<span class="sc">$</span>par</span></code></pre></div>
 <p>Verify that the model has good performance:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>y_hat_test <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X_test <span class="sc">%*%</span> fitted_coefs)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>MLmetrics<span class="sc">::</span><span class="fu">AUC</span>(y_hat_test, y_test)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.9947617</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>y_hat_test <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X_test <span class="sc">%*%</span> fitted_coefs)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>MLmetrics<span class="sc">::</span><span class="fu">AUC</span>(y_hat_test, y_test)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.9947617</span></span></code></pre></div>
 <p>Timing the optimizer:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">ncol</span>(X_train))</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>({</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> <span class="fu">optim</span>(x0,</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                 logistic_fun,</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                 logistic_grad,</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method=</span><span class="st">&quot;L-BFGS-B&quot;</span>,</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                 X_train, y_train, lambda)</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>}, <span class="at">times=</span>10L)</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: seconds</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                                                           expr</span></span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     res &lt;- optim(x0, logistic_fun, logistic_grad, method = &quot;L-BFGS-B&quot;,          X_train, y_train, lambda) }</span></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      min       lq     mean   median       uq      max neval</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4.02818 4.054176 4.116148 4.077869 4.176172 4.273774    10</span></span></code></pre></div>
-<p>The same routine using <code>Matrix</code> would usually take around 7 seconds (~60% slower) in this same setup, plus some extra time in the data preparation. The only thing that was needed to accelerate it was to load <code>library(MatrixExtra)</code>, with everything else remaining the same as it would have been in base R or <code>Matrix</code>.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">ncol</span>(X_train))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>({</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> <span class="fu">optim</span>(x0,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                 logistic_fun,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                 logistic_grad,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method=</span><span class="st">&quot;L-BFGS-B&quot;</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                 X_train, y_train, lambda)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>}, <span class="at">times=</span>10L)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Unit: seconds</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                                                           expr</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  {     res &lt;- optim(x0, logistic_fun, logistic_grad, method = &quot;L-BFGS-B&quot;,          X_train, y_train, lambda) }</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       min       lq     mean   median       uq      max neval</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3.907413 3.956523 4.016892 4.011786 4.035334 4.179486    10</span></span></code></pre></div>
+<p>The same routine using <code>Matrix</code> would usually take around
+7 seconds (~60% slower) in this same setup, plus some extra time in the
+data preparation. The only thing that was needed to accelerate it was to
+load <code>library(MatrixExtra)</code>, with everything else remaining
+the same as it would have been in base R or <code>Matrix</code>.</p>
 </div>
 
 

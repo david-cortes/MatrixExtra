@@ -60,25 +60,6 @@ X * X
 [2,] . 9 . .
 [3,] . . . .
 ```
-```r
-### This should be a straighforward operation
-as(X, "ngRMatrix")
-```
-```
-Error in as(X, "ngRMatrix") : 
-  no method or default for coercing “dgRMatrix” to “ngRMatrix”
-```
-```r
-### This doesn't do what it should
-as(X, "nsparseMatrix")
-```
-```
-3 x 4 sparse Matrix of class "ngCMatrix"
-            
-[1,] . . | |
-[2,] . | . .
-[3,] . . . .
-```
 
 # Why is CSR needed?
 

@@ -211,16 +211,6 @@ rbind(Xr, Xr)
 X * X
 ```
 
-```{r, error=TRUE}
-### This should be a straighforward operation
-as(Xr, "ngRMatrix")
-```
-
-```{r}
-### This doesn't do what it should
-as(Xr, "nsparseMatrix")
-```
-
 Many of these methods can be woefully inefficient when dealing with
 real, large datasets, particularly when dealing with the CSR format:
 
