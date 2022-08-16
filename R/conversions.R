@@ -1,3 +1,5 @@
+#' @importFrom utils packageVersion
+
 #' @name conversions
 #' @title Conversions between matrix types
 #' @description Convenience functions for converting to different sparse matrix formats,
@@ -56,9 +58,7 @@
 #' as(as.csc.matrix(m.coo), "dgRMatrix")
 NULL
 
-#' @rdname conversions
-#' @export
-as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+as.csr.matrix.old <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
     if (binary && logical)
         stop("Can pass only one of 'binary' or 'logical'.")
 
@@ -177,7 +177,124 @@ as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
 
 #' @rdname conversions
 #' @export
-as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+as.csr.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+    if (packageVersion("Matrix") <= "1.4.1") {
+        return(as.csr.matrix.old(x, binary, logical, sort))
+    }
+    if (binary && logical)
+        stop("Can pass only one of 'binary' or 'logical'.")
+
+    if ((inherits(x, "dgRMatrix") && !binary && !logical) ||
+        (inherits(x, "ngRMatrix") && binary) ||
+        (inherits(x, "lgRMatrix") && logical)) {
+        return(x)
+    }
+
+    if (inherits(x, "float32"))
+        x <- float::dbl(x)
+
+    if (inherits(x, "data.frame"))
+        x <- as.matrix(x)
+
+    if (inherits(x, c("numeric", "integer", "logical")))
+        x <- matrix(x, nrow=1L)
+
+
+    if (inherits(x, "sparseVector")) {
+
+        if (!binary && !logical) {
+            target_class <- "dgRMatrix"
+        } else if (binary) {
+            target_class <- "ngRMatrix"
+        } else {
+            target_class <- "lgRMatrix"
+        }
+
+        X.csr <- new(target_class)
+        X.csr@Dim <- as.integer(c(1L, x@length))
+        X.csr@p <- c(0L, length(x@i))
+        X.csr@j <- as.integer(x@i) - 1L
+        if (!binary) {
+
+            if (inherits(x, "dsparseVector")) {
+                if (!logical)
+                    X.csr@x <- x@x
+                else
+                    X.csr@x <- as.logical(x@x)
+            } else if (inherits(x, "isparseVector")) {
+                if (!logical)
+                    X.csr@x <- as.numeric(x@x)
+                else
+                    X.csr@x <- as.logical(x@x)
+            } else if (inherits(x, "lsparseVector")) {
+                    if (!logical)
+                        X.csr@x <- as.numeric(x@x)
+                    else
+                        X.csr@x <- x@x
+            } else {
+                if (!logical)
+                    X.csr@x <- rep(1., length(x@i))
+                else
+                    X.csr@x <- rep(TRUE, length(x@i))
+            }
+
+        }
+        x <- X.csr
+    }
+
+    if (!inherits(x, "generalMatrix")) {
+        x <- as(x, "generalMatrix")
+    }
+    if (!inherits(x, "RsparseMatrix")) {
+        x <- as(x, "RsparseMatrix")
+    }
+
+
+    if (!binary && !logical && !inherits(x, "dgRMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "dgRMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.numeric(X_attr$x)
+        else
+            X_attr$x <- rep(1., length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (logical && !inherits(x, "lgRMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "lgRMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.logical(X_attr$x)
+        else
+            X_attr$x <- rep(TRUE, length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (binary && !inherits(x, "ngRMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "ngRMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (sort) X <- sort_sparse_indices(X, copy=TRUE)
+    return(x)
+}
+
+as.csc.matrix.old <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
     if (binary && logical)
         stop("Can pass only one of 'binary' or 'logical'.")
 
@@ -248,7 +365,77 @@ as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
 
 #' @rdname conversions
 #' @export
-as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+as.csc.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+    if (packageVersion("Matrix") <= "1.4.1") {
+        return(as.csc.matrix.old(x, binary, logical, sort))
+    }
+    if (binary && logical)
+        stop("Can pass only one of 'binary' or 'logical'.")
+
+    if ((inherits(x, "dgCMatrix") && !binary && !logical) ||
+        (inherits(x, "ngCMatrix") && binary) ||
+        (inherits(x, "lgCMatrix") && logical)) {
+        return(x)
+    }
+
+    if (inherits(x, "float32"))
+        x <- float::dbl(x)
+
+    if (inherits(x, c("numeric", "integer", "logical", "data.frame")))
+        x <- as.matrix(x)
+
+    if (!inherits(x, "generalMatrix") && !inherits(x, "sparseVector")) {
+        x <- as(x, "generalMatrix")
+    }
+    if (!inherits(x, "CsparseMatrix")) {
+        x <- as(x, "CsparseMatrix")
+    }
+
+    if (!binary && !logical && !inherits(x, "dgCMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "dgCMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.numeric(X_attr$x)
+        else
+            X_attr$x <- rep(1., length(X_attr$i))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (logical && !inherits(x, "lgCMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "lgCMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.logical(X_attr$x)
+        else
+            X_attr$x <- rep(TRUE, length(X_attr$i))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (binary && !inherits(x, "ngCMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "ngCMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (sort) X <- sort_sparse_indices(X, copy=TRUE)
+    return(x)
+}
+
+as.coo.matrix.old <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
     if (binary && logical)
         stop("Can pass only one of 'binary' or 'logical'.")
 
@@ -277,6 +464,84 @@ as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
         if (!inherits(x, "dsparseMatrix"))
             x <- as(x, "dsparseMatrix")
         x <- as(x, "dgTMatrix")
+    }
+
+    if (!binary && !logical && !inherits(x, "dgTMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "dgTMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.numeric(X_attr$x)
+        else
+            X_attr$x <- rep(1., length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (logical && !inherits(x, "lgTMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "lgTMatrix"
+        if (.hasSlot(x, "x"))
+            X_attr$x <- as.logical(X_attr$x)
+        else
+            X_attr$x <- rep(TRUE, length(X_attr$j))
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (binary && !inherits(x, "ngTMatrix")) {
+        X_attr <- attributes(x)
+        X_attr$class <- "ngTMatrix"
+        if ("x" %in% names(X_attr))
+            X_attr$x <- NULL
+        if ("diag" %in% names(X_attr))
+            X_attr$diag <- NULL
+        if ("uplo" %in% names(X_attr))
+            X_attr$uplo <- NULL
+        attributes(x) <- X_attr
+    }
+
+    if (sort) X <- sort_sparse_indices(X, copy=TRUE)
+    return(x)
+}
+
+#' @rdname conversions
+#' @export
+as.coo.matrix <- function(x, binary=FALSE, logical=FALSE, sort=FALSE) {
+    if (packageVersion("Matrix") <= "1.4.1") {
+        return(as.coo.matrix.old(x, binary, logical, sort))
+    }
+    if (binary && logical)
+        stop("Can pass only one of 'binary' or 'logical'.")
+
+    if ((inherits(x, "dgTMatrix") && !binary && !logical) ||
+        (inherits(x, "ngTMatrix") && binary) ||
+        (inherits(x, "lgTMatrix") && logical)) {
+        return(x)
+    }
+
+    if (inherits(x, "float32"))
+        x <- float::dbl(x)
+
+    if (inherits(x, c("data.frame")))
+        x <- as.matrix(x)
+
+    if (inherits(x, c("numeric", "integer", "logical")))
+        x <- matrix(x, nrow=1L)
+
+    if (inherits(x, "sparseVector"))
+        x <- as.csr.matrix(x)
+
+    if (!inherits(x, "generalMatrix") && !inherits(x, "sparseVector")) {
+        x <- as(x, "generalMatrix")
+    }
+    if (!inherits(x, "TsparseMatrix")) {
+        x <- as(x, "TsparseMatrix")
     }
 
     if (!binary && !logical && !inherits(x, "dgTMatrix")) {
