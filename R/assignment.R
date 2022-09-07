@@ -104,7 +104,7 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
         length(value) > 1 && length(i) > 1 && length(j) > 1 &&
         (length(value) / length(i)) == length(j)
     ) {
-        value <- Matrix(value, nrow=length(i), ncol=length(j), byrow=FALSE)
+        value <- Matrix(value, nrow=length(i), ncol=length(j), byrow=FALSE, sparse=TRUE)
     }
     if (is.matrix(value) &&
         nrow(value) == length(i) && ncol(value) == length(j) &&
