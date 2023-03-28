@@ -69,6 +69,8 @@ In principle, one could stick with just the CSC format from `Matrix` and keep a 
 
 # Installation
 
+**Note:** This package greatly benefits from extra optimizations that aren't enabled by default for R packages. See [this guide](https://github.com/david-cortes/installing-optimized-libraries) for instructions on how to enable them.
+
 ```r
 install.packages("MatrixExtra")
 ```
