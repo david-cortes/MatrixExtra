@@ -3,6 +3,7 @@
 \docType{package}
 \name{MatrixExtra}
 \alias{MatrixExtra}
+\alias{MatrixExtra-package}
 \title{MatrixExtra package}
 \description{
 Additional methods for the sparse matrices and sparse vector classes
@@ -37,5 +38,26 @@ elementwise multiplication (`*`), among others (see \link[MatrixExtra]{operators
 `Matrix` library, which might cause some functions from `Matrix` or other
 packages to stop working under the default options of `MatrixExtra`.
 See \link{MatrixExtra-options} for details.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/david-cortes/MatrixExtra}
+  \item Report bugs at \url{https://github.com/david-cortes/MatrixExtra/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: David Cortes \email{david.cortes.rivera@gmail.com} [copyright holder]
+
+Other contributors:
+\itemize{
+  \item Dmitry Selivanov [copyright holder]
+  \item Thibaut Goetghebuer-Planchon (Copyright holder of included robinmap library) [copyright holder]
+  \item Martin Maechler (Copyright holder of 'Matrix' package from which some code was taken) [copyright holder]
+  \item Robert Gentleman (Copyright holder of mathematical functions used by base R which were copied) [copyright holder]
+  \item Ross Ihaka (Copyright holder of mathematical functions used by base R which were copied) [copyright holder]
+}
+
 }
 \keyword{package}

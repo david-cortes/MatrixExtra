@@ -39,4 +39,4 @@
 #' @docType package
 #' @name MatrixExtra
 #' @keywords package
-NULL
+"_PACKAGE"
