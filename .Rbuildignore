@@ -6,6 +6,8 @@ old/*
 vignettes_/*
 real-sim
 vignettes/real-sim
+vignettes/Introducing_MatrixExtra.R$
+vignettes/Introducing_MatrixExtra.html
 ^README\.md$
 ^src/Makevars$
 ^src/robinmap/[^il][^ni][^c].*$

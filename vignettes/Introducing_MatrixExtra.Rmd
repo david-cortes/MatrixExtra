@@ -17,11 +17,14 @@ knitr::opts_chunk$set(
 )
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
-```{r, include=FALSE}
+```{r, echo=FALSE}
 ### Don't want to run compute-heavy code on CRAN
 ### Should build it with 'R CMD build --no-build-vignettes MatrixExtra'
 ### Then set this to TRUE is the vignette is ever to be rebuilt
 RUN_ALL <- FALSE
+if (!RUN_ALL) {
+    options("MatrixExtra.nthreads" = 1L)
+}
 ```
 
 "MatrixExtra" is an R package which extends the sparse matrix and sparse
