@@ -68,11 +68,11 @@ assign_csr_internal <- function(x, i, j, value, ij_properties=NULL) {
     n_col <- ij_properties$n_col
 
     if (!all_i || !i_is_seq || !i_is_rev_seq) {
-        if (any(duplicated(i)))
+        if (anyDuplicated(i))
             return(assign_through_matrix(x, i, j, value))
     }
     if (!all_j || !j_is_seq || !j_is_rev_seq) {
-        if (any(duplicated(j)))
+        if (anyDuplicated(j))
             return(assign_through_matrix(x, i, j, value))
     }
 
